@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Şahları da Vururlar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-charcoal: #0f1115;
+      --surface-dark: #171a21;
+      --surface-elevated: #1f242e;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --accent-crimson: #ef4444;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --light-square: #d8cfc2;
+      --dark-square: #5a6270;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 50% 0%, #1c212c 0%, #0f1115 65%);
+      color: #f3f4f6;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* Ekran sarsıntısı ve darbe animasyonları */
+    @keyframes screenShake {
+      0%, 100% { transform: translate3d(0, 0, 0); }
+      20% { transform: translate3d(-5px, 3px, 0); }
+      40% { transform: translate3d(5px, -3px, 0); }
+      60% { transform: translate3d(-4px, -2px, 0); }
+      80% { transform: translate3d(3px, 2px, 0); }
+    }
+
+    @keyframes kingShake {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      25% { transform: translateX(-3px) rotate(-3deg); }
+      75% { transform: translateX(3px) rotate(3deg); }
+    }
+
+    @keyframes smashPop {
+      0% { transform: scale(0.45); opacity: 0; }
+      65% { transform: scale(1.18); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes floatUp {
+      0% { transform: translate(-50%, 0) scale(0.8); opacity: 1; }
+      100% { transform: translate(-50%, -34px) scale(1.12); opacity: 0; }
+    }
+
+    @keyframes hitFlash {
+      0% { box-shadow: inset 0 0 0 999px rgba(239, 68, 68, 0.72), 0 0 22px rgba(239, 68, 68, 0.85); }
+      100% { box-shadow: inset 0 0 0 0 rgba(239, 68, 68, 0), 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .shake-board {
+      animation: screenShake 0.28s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    .king-idle {
+      animation: kingShake 2.8s ease-in-out infinite;
+    }
+
+    .smash-enter {
+      animation: smashPop 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .square-hit-flash {
+      animation: hitFlash 0.45s ease-out forwards;
+    }
+
+    .floating-popup {
+      position: absolute;
+      left: 50%;
+      top: 18%;
+      pointer-events: none;
+      z-index: 40;
+      font-weight: 900;
+      font-size: 0.95rem;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+      animation: floatUp 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      white-space: nowrap;
+    }
+
+    /* Tahta karesi görünümleri */
+    .board-square {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.12s ease, filter 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .sq-light {
+      background-color: var(--light-square);
+      color: #181a1f;
+    }
+
+    .sq-dark {
+      background-color: var(--dark-square);
+      color: #f9fafb;
+    }
+
+    /* Önizleme vurguları */
+    .preview-hover-empty {
+      box-shadow: inset 0 0 0 3px rgba(251, 191, 36, 0.92);
+      filter: brightness(1.07);
+    }
+
+    .preview-path {
+      box-shadow: inset 0 0 0 2px rgba(250, 204, 21, 0.45);
+      background-image: radial-gradient(circle, rgba(250, 204, 21, 0.32) 22%, transparent 24%);
+    }
+
+    .preview-target {
+      box-shadow: inset 0 0 0 3px #ef4444, 0 0 16px rgba(239, 68, 68, 0.65) !important;
+      background-color: rgba(220, 38, 38, 0.34) !important;
+    }
+
+    .preview-king-target {
+      box-shadow: inset 0 0 0 3.5px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.85) !important;
+      background-color: rgba(245, 158, 11, 0.38) !important;
+    }
+
+    .preview-blocked {
+      box-shadow: inset 0 0 0 2px rgba(148, 163, 184, 0.45);
+    }
+
+    /* Taşların görsel derinliği */
+    .piece-glyph {
+      line-height: 1;
+      filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+      transition: transform 0.14s ease;
+    }
+
+    .friendly-badge {
+      background: linear-gradient(145deg, #10b981, #047857);
+      color: #ecfdf5;
+      border: 2px solid rgba(167, 243, 208, 0.85);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
+    }
+
+    .king-target-badge {
+      background: linear-gradient(145deg, #ef4444, #991b1b);
+      color: #fffbeb;
+      border: 2px solid #fde68a;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.55);
+    }
+
+    .pawn-target-badge {
+      background: linear-gradient(145deg, #f97316, #9a3412);
+      color: #fff7ed;
+      border: 2px solid rgba(254, 215, 170, 0.75);
+      box-shadow: 0 3px 10px rgba(249, 115, 22, 0.45);
+    }
+
+    .dock-card {
+      background: linear-gradient(180deg, rgba(31, 36, 46, 0.96) 0%, rgba(21, 24, 31, 0.98) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .dock-card:hover:not(:disabled) {
+      transform: translateY(-3px);
+      border-color: rgba(251, 191, 36, 0.55);
+    }
+
+    .dock-card.selected {
+      transform: translateY(-6px);
+      border-color: #fbbf24;
+      box-shadow: 0 10px 24px -4px rgba(245, 158, 11, 0.35), 0 0 0 2px rgba(251, 191, 36, 0.35);
+      background: linear-gradient(180deg, rgba(45, 39, 26, 0.98) 0%, rgba(24, 24, 30, 0.98) 100%);
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-between min-h-screen px-3 py-3 sm:px-6 sm:py-4">
+
+  <!-- Üst Bilgi ve Kontrol Çubuğu -->
+  <header class="w-full max-w-3xl flex flex-col gap-2.5">
+    <div class="flex flex-wrap items-center justify-between gap-2 bg-[#171a21]/90 border border-white/10 rounded-2xl px-4 py-2.5 shadow-lg backdrop-blur">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-red-500/15 border border-red-400/30 flex items-center justify-center text-2xl text-red-400 shadow-inner">
+          ♚
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-black tracking-tight text-white leading-tight">
+            Şahları da Vururlar
+          </h1>
+          <p class="text-[11px] sm:text-xs text-gray-400">
+            Taşı seç, boş kareye koy ve hat boyunca devir!
+          </p>
+        </div>
+      </div>
+
+      <!-- Ses & Yardım & Sıfırla Butonları -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button
+          id="undoBtn"
+          type="button"
+          title="Hamleyi Geri Al"
+          class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-xs sm:text-sm font-semibold text-gray-200 transition flex items-center gap-1.5 disabled:opacity-35 disabled:pointer-events-none"
+        >
+          <span>↩</span>
+          <span class="hidden sm:inline">Geri Al</span>
+        </button>
+
+        <button
+          id="resetBtn"
+          type="button"
+          title="Bölümü Yeniden Başlat"
+          class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-xs sm:text-sm font-semibold text-gray-200 transition flex items-center gap-1.5"
+        >
+          <span>↻</span>
+          <span class="hidden sm:inline">Yeniden</span>
+        </button>
+
+        <button
+          id="soundBtn"
+          type="button"
+          title="Ses Aç/Kapat"
+          class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-sm text-amber-300 transition"
+        >
+          🔊
+        </button>
+
+        <button
+          id="rulesBtn"
+          type="button"
+          title="Nasıl Oynanır?"
+          class="px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 active:scale-95 border border-amber-400/30 text-xs sm:text-sm font-bold text-amber-300 transition"
+        >
+          ?
+        </button>
+      </div>
+    </div>
+
+    <!-- Durum Göstergeleri (Seviye, Kalan Şah, Skor, Hamle) -->
+    <div class="grid grid-cols-4 gap-2 sm:gap-3">
+      <div class="bg-[#171a21]/90 border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center justify-center">
+        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Seviye</span>
+        <span id="hudLevel" class="text-base sm:text-xl font-extrabold text-amber-400">1</span>
+      </div>
+
+      <div class="bg-[#171a21]/90 border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center justify-center">
+        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Kalan Şah</span>
+        <span id="hudKings" class="text-base sm:text-xl font-extrabold text-red-400">1</span>
+      </div>
+
+      <div class="bg-[#171a21]/90 border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center justify-center">
+        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Skor</span>
+        <span id="hudScore" class="text-base sm:text-xl font-extrabold text-emerald-400">0</span>
+      </div>
+
+      <div class="bg-[#171a21]/90 border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center justify-center">
+        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Vuruş</span>
+        <span id="hudHits" class="text-base sm:text-xl font-extrabold text-sky-400">0</span>
+      </div>
+    </div>
+
+    <!-- Bölüm Başlığı & İpucu -->
+    <div class="flex items-center justify-between px-1 text-xs sm:text-sm text-gray-300">
+      <span id="levelTitle" class="font-bold text-white">1. Perde: Tek Şah</span>
+      <span id="levelHint" class="text-gray-400 text-right truncate ml-2">Kale veya Vezir seçip aynı sıra/sütuna bırak.</span>
+    </div>
+  </header>
+
+  <!-- Orta Alan: 8x8 Satranç Tahtası -->
+  <main class="w-full max-w-[min(92vw,470px)] sm:max-w-[min(86vw,500px)] my-2 relative">
+    <div
+      id="boardContainer"
+      class="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.65)] bg-[#14171d]"
+    >
+      <div id="boardGrid" class="grid grid-cols-8 grid-rows-8 w-full h-full"></div>
+
+      <!-- Bölüm Geçildi / Hamle Bitti Katmanı -->
+      <div
+        id="overlayModal"
+        class="hidden absolute inset-0 z-30 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
+      >
+        <div class="w-full max-w-sm bg-[#1a1e27] border border-white/15 rounded-2xl p-5 text-center shadow-2xl smash-enter">
+          <div id="modalIcon" class="text-4xl mb-2">👑</div>
+          <h2 id="modalTitle" class="text-xl sm:text-2xl font-black text-white mb-1">Şah Devrildi!</h2>
+          <p id="modalDesc" class="text-xs sm:text-sm text-gray-300 mb-4">
+            Tahtadaki tüm Şahlar vuruldu. Yeni perdeye geçmeye hazır mısın?
+          </p>
+          <div class="flex items-center justify-center gap-3 text-xs bg-black/30 rounded-xl p-2.5 mb-5 border border-white/5">
+            <div>
+              <span class="text-gray-400 block">Toplam Skor</span>
+              <strong id="modalScore" class="text-emerald-400 text-sm">0</strong>
+            </div>
+            <div class="h-6 w-px bg-white/10"></div>
+            <div>
+              <span class="text-gray-400 block">Seviye</span>
+              <strong id="modalLevel" class="text-amber-400 text-sm">1</strong>
+            </div>
+          </div>
+          <button
+            id="modalPrimaryBtn"
+            type="button"
+            class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-400 hover:to-red-400 active:scale-[0.98] text-white font-extrabold text-sm sm:text-base shadow-lg transition cursor-pointer"
+          >
+            Sonraki Seviye →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seçili Taş Bilgi Çubuğu -->
+    <div
+      id="selectionBar"
+      class="mt-2 min-h-[34px] px-3.5 py-1.5 rounded-xl bg-[#171a21]/90 border border-white/10 flex items-center justify-between text-xs text-gray-300"
+    >
+      <span id="selectionText" class="font-medium text-amber-300">Alttan bir taş seçin.</span>
+      <span id="previewStats" class="font-bold text-red-400"></span>
+    </div>
+  </main>
+
+  <!-- Alt Dock: 3 Rastgele Satranç Taşı -->
+  <footer class="w-full max-w-xl mt-1">
+    <div id="dockContainer" class="grid grid-cols-3 gap-2.5 sm:gap-4"></div>
+
+    <!-- Alt Lejant -->
+    <div class="mt-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-gray-400">
+      <span class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span> Şah (Hedef)
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> Piyon (Hedef / Puan)
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Yerleştirilen Taş (Engel)
+      </span>
+    </div>
+  </footer>
+
+  <!-- Nasıl Oynanır Penceresi -->
+  <div
+    id="rulesModal"
+    class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
+  >
+    <div class="w-full max-w-md bg-[#1a1e27] border border-white/15 rounded-2xl p-5 shadow-2xl">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-extrabold text-white">Nasıl Oynanır?</h3>
+        <button id="closeRulesBtn" type="button" class="text-gray-400 hover:text-white text-xl font-bold px-2">✕</button>
+      </div>
+      <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 leading-relaxed">
+        <li><strong class="text-amber-400">1. Amaç:</strong> Tahtadaki tüm <strong class="text-red-400">Şah (♚)</strong> taşlarını devirerek bölümü geç.</li>
+        <li><strong class="text-amber-400">2. Koy &amp; Vur:</strong> Alttaki 3 taştan birini seç ve boş bir kareye bırak. Taş, kendi satranç vuruş hattındaki hedefleri anında ezer!</li>
+        <li><strong class="text-amber-400">3. Taşların Ömrü:</strong> Vuruşunu yapan taşın <strong class="text-emerald-400">tahtada kalır</strong> ve sonraki vuruş hatlarını kesen bir engele dönüşür.</li>
+        <li><strong class="text-amber-400">4. Satranç Hatları:</strong>
+          <span class="block text-gray-400 text-xs mt-0.5">
+            • <strong>Kale (♜):</strong> Yatay ve dikey düz hat (engel taşta durur, hedefleri ezer).<br/>
+            • <strong>Fil (♝):</strong> Çapraz hatlar (engel taşta durur).<br/>
+            • <strong>Vezir (♛):</strong> Düz + çapraz tüm hatlar.<br/>
+            • <strong>At (♞):</strong> L şeklinde atlar; aradaki taşların üzerinden geçip konduğu L uçlarındaki hedefleri vurur.
+          </span>
+        </li>
+      </ul>
+      <button
+        id="gotItBtn"
+        type="button"
+        class="mt-5 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-sm transition cursor-pointer"
+      >
+        Anladım, Vurmaya Başla
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ŞAHLARI DA VURURLAR - HTML5 Oyun Motoru
+     * 8x8 tahta üzerinde "Koy ve Vur" satranç mekaniği.
+     * Harici sunucu veya oturum gerektirmez.
+     */
+
+    // --- TAŞ TANIMLARI ---
+    const PIECE_DEFS = {
+      ROOK: {
+        id: 'ROOK',
+        name: 'Kale',
+        glyph: '♜',
+        desc: 'Düz hat (yatay/dikey)',
+        points: 100
+      },
+      BISHOP: {
+        id: 'BISHOP',
+        name: 'Fil',
+        glyph: '♝',
+        desc: 'Çapraz hatlar',
+        points: 110
+      },
+      KNIGHT: {
+        id: 'KNIGHT',
+        name: 'At',
+        glyph: '♞',
+        desc: 'L-atlayışı (8 nokta)',
+        points: 120
+      },
+      QUEEN: {
+        id: 'QUEEN',
+        name: 'Vezir',
+        glyph: '♛',
+        desc: 'Düz + çapraz hatlar',
+        points: 160
+      }
+    };
+
+    const PIECE_POOL = ['ROOK', 'BISHOP', 'KNIGHT', 'QUEEN'];
+
+    // --- EL YAPIMI BÖLÜMLER (1 - 7) ---
+    // Koordinatlar: r (0..7 yukarıdan aşağı), c (0..7 soldan sağa)
+    // type: 'KING' (Şah - seviye hedefi) | 'PAWN' (Piyon - bonus puan / hat açma-kapama)
+    const HANDCRAFTED_LEVELS = [
+      {
+        title: '1. Perde: Tek Şah',
+        hint: 'Düz veya çapraz hat kurup Şahı devir.',
+        allowedPool: ['ROOK', 'BISHOP', 'QUEEN'],
+        targets: [
+          { r: 2, c: 4, type: 'KING' },
+          { r: 2, c: 2, type: 'PAWN' },
+          { r: 4, c: 4, type: 'PAWN' }
+        ]
+      },
+      {
+        title: '2. Perde: Çapraz Pusu',
+        hint: 'Fil veya Vezir ile çapraz hattı yakala.',
+        allowedPool: ['BISHOP', 'ROOK', 'QUEEN'],
+        targets: [
+          { r: 1, c: 6, type: 'KING' },
+          { r: 5, c: 2, type: 'KING' },
+          { r: 3, c: 4, type: 'PAWN' }
+        ]
+      },
+      {
+        title: '3. Perde: Atın L Darbesi',
+        hint: 'Korumalı Şahları Atın L sıçramasıyla vur.',
+        allowedPool: ['KNIGHT', 'ROOK', 'BISHOP'],
+        targets: [
+          { r: 2, c: 3, type: 'KING' },
+          { r: 5, c: 5, type: 'KING' },
+          { r: 2, c: 2, type: 'PAWN' },
+          { r: 2, c: 4, type: 'PAWN' },
+          { r: 3, c: 3, type: 'PAWN' }
+        ]
+      },
+      {
+        title: '4. Perde: Kale Koridoru',
+        hint: 'Yerleştirdiğin taşların hattı kesmesine dikkat et!',
+        allowedPool: ['ROOK', 'KNIGHT', 'QUEEN'],
+        targets: [
+          { r: 0, c: 1, type: 'KING' },
+          { r: 0, c: 6, type: 'KING' },
+          { r: 4, c: 3, type: 'KING' },
+          { r: 2, c: 1, type: 'PAWN' },
+          { r: 2, c: 6, type: 'PAWN' }
+        ]
+      },
+      {
+        title: '5. Perde: Saray Muhafızları',
+        hint: 'Piyonları devirerek Şahlara giden yolları aç.',
+        allowedPool: ['ROOK', 'BISHOP', 'KNIGHT', 'QUEEN'],
+        targets: [
+          { r: 1, c: 1, type: 'KING' },
+          { r: 1, c: 6, type: 'KING' },
+          { r: 6, c: 1, type: 'KING' },
+          { r: 6, c: 6, type: 'KING' },
+          { r: 1, c: 2, type: 'PAWN' },
+          { r: 2, c: 1, type: 'PAWN' },
+          { r: 5, c: 6, type: 'PAWN' }
+        ]
+      },
+      {
+        title: '6. Perde: Çapraz & L Kapanı',
+        hint: 'Az hamlede çoklu devirme yaparak kombo skor yakala.',
+        allowedPool: ['BISHOP', 'KNIGHT', 'ROOK', 'QUEEN'],
+        targets: [
+          { r: 2, c: 2, type: 'KING' },
+          { r: 2, c: 5, type: 'KING' },
+          { r: 5, c: 2, type: 'KING' },
+          { r: 5, c: 5, type: 'KING' },
+          { r: 3, c: 3, type: 'PAWN' },
+          { r: 3, c: 4, type: 'PAWN' },
+          { r: 4, c: 3, type: 'PAWN' },
+          { r: 4, c: 4, type: 'PAWN' }
+        ]
+      },
+      {
+        title: '7. Perde: Büyük Taht Devrimi',
+        hint: 'Tüm Şahları indir ve sonsuz perdelere geç!',
+        allowedPool: ['ROOK', 'BISHOP', 'KNIGHT', 'QUEEN'],
+        targets: [
+          { r: 0, c: 0, type: 'KING' },
+          { r: 0, c: 7, type: 'KING' },
+          { r: 3, c: 3, type: 'KING' },
+          { r: 3, c: 4, type: 'KING' },
+          { r: 7, c: 0, type: 'KING' },
+          { r: 7, c: 7, type: 'KING' },
+          { r: 1, c: 1, type: 'PAWN' },
+          { r: 1, c: 6, type: 'PAWN' },
+          { r: 6, c: 1, type: 'PAWN' },
+          { r: 6, c: 6, type: 'PAWN' }
+        ]
+      }
+    ];
+
+    // --- SES MOTORU (Web Audio API) ---
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      ensureContext() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+      }
+
+      playSelect() {
+        if (this.muted) return;
+        this.ensureContext();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(620, now + 0.06);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+      }
+
+      playSmash(hitCount, hitKing) {
+        if (this.muted) return;
+        this.ensureContext();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+
+        // Bowling / taş devirme tok darbesi
+        const thud = this.ctx.createOscillator();
+        const thudGain = this.ctx.createGain();
+        thud.type = 'sine';
+        thud.frequency.setValueAtTime(hitKing ? 150 : 120, now);
+        thud.frequency.exponentialRampToValueAtTime(38, now + 0.18);
+
+        thudGain.gain.setValueAtTime(Math.min(0.28, 0.14 + hitCount * 0.04), now);
+        thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.19);
+
+        thud.connect(thudGain);
+        thudGain.connect(this.ctx.destination);
+        thud.start(now);
+        thud.stop(now + 0.2);
+
+        // Vuruş çıngırtısı / kombo tonu
+        if (hitCount > 0) {
+          const chime = this.ctx.createOscillator();
+          const chimeGain = this.ctx.createGain();
+          chime.type = hitKing ? 'sawtooth' : 'triangle';
+          const baseFreq = hitKing ? 520 : 340 + Math.min(hitCount, 5) * 65;
+          chime.frequency.setValueAtTime(baseFreq, now + 0.02);
+          chime.frequency.exponentialRampToValueAtTime(baseFreq * 1.35, now + 0.14);
+
+          chimeGain.gain.setValueAtTime(hitKing ? 0.12 : 0.08, now + 0.02);
+          chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+          chime.connect(chimeGain);
+          chimeGain.connect(this.ctx.destination);
+          chime.start(now + 0.02);
+          chime.stop(now + 0.16);
+        }
+      }
+
+      playWin() {
+        if (this.muted) return;
+        this.ensureContext();
+        if (!this.ctx) return;
+
+        const notes = [523.25, 659.25, 783.99, 1046.5];
+        notes.forEach((freq, idx) => {
+          const start = this.ctx.currentTime + idx * 0.08;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0.11, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(start);
+          osc.stop(start + 0.24);
+        });
+      }
+
+      playFail() {
+        if (this.muted) return;
+        this.ensureContext();
+        if (!this.ctx) return;
+
+        const notes = [280, 220];
+        notes.forEach((freq, idx) => {
+          const start = this.ctx.currentTime + idx * 0.14;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0.08, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 0.18);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(start);
+          osc.stop(start + 0.2);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    // --- OYUN DURUMU ---
+    const state = {
+      levelIndex: 0, // 0 tabanlı seviye indeksi (0..6 el yapımı, 7+ sonsuz üretim)
+      score: 0,
+      hits: 0,
+      board: [], // 8x8 dizi: null veya { kind: 'KING' | 'PAWN' | 'FRIENDLY', pieceType?: string }
+      dock: [], // [pieceType, pieceType, pieceType] veya null (kullanılmış)
+      selectedDockIndex: null,
+      hoverSquare: null, // { r, c } veya null
+      history: [], // Geri alma (Undo) yığını
+      levelCleared: false,
+      flashingSquares: new Set() // Darbe animasyonu için kare anahtarları "r,c"
+    };
+
+    // --- BÖLÜM ÜRETİCİ ---
+    function createLevelData(idx) {
+      if (idx < HANDCRAFTED_LEVELS.length) {
+        const lvl = HANDCRAFTED_LEVELS[idx];
+        return {
+          levelNumber: idx + 1,
+          title: lvl.title,
+          hint: lvl.hint,
+          allowedPool: [...lvl.allowedPool],
+          targets: lvl.targets.map(t => ({ ...t }))
+        };
+      }
+
+      // 7. seviye sonrası sonsuz dinamik bölümler
+      const lvlNum = idx + 1;
+      const kingCount = Math.min(7, 3 + Math.floor((lvlNum - 7) / 2));
+      const pawnCount = Math.min(10, 4 + ((lvlNum - 7) % 5));
+      const used = new Set();
+      const targets = [];
+
+      const pickFreeCell = () => {
+        for (let attempt = 0; attempt < 200; attempt++) {
+          const r = Math.floor(Math.random() * 8);
+          const c = Math.floor(Math.random() * 8);
+          const key = `${r},${c}`;
+          if (!used.has(key)) {
+            used.add(key);
+            return { r, c };
+          }
+        }
+        return null;
+      };
+
+      for (let i = 0; i < kingCount; i++) {
+        const pos = pickFreeCell();
+        if (pos) targets.push({ ...pos, type: 'KING' });
+      }
+      for (let i = 0; i < pawnCount; i++) {
+        const pos = pickFreeCell();
+        if (pos) targets.push({ ...pos, type: 'PAWN' });
+      }
+
+      return {
+        levelNumber: lvlNum,
+        title: `${lvlNum}. Perde: Sonsuz Devrim`,
+        hint: `${kingCount} Şah seni bekliyor. Hatları iyi hesapla!`,
+        allowedPool: [...PIECE_POOL],
+        targets
+      };
+    }
+
+    function rollThreePieces(pool) {
+      const activePool = pool && pool.length > 0 ? pool : PIECE_POOL;
+      return [0, 1, 2].map(() => activePool[Math.floor(Math.random() * activePool.length)]);
+    }
+
+    function cloneBoard(board) {
+      return board.map(row => row.map(cell => (cell ? { ...cell } : null)));
+    }
+
+    function saveHistorySnapshot() {
+      state.history.push({
+        board: cloneBoard(state.board),
+        dock: [...state.dock],
+        score: state.score,
+        hits: state.hits,
+        selectedDockIndex: state.selectedDockIndex
+      });
+    }
+
+    function loadLevel(idx, keepScore = true) {
+      state.levelIndex = idx;
+      if (!keepScore) {
+        state.score = 0;
+        state.hits = 0;
+      }
+      const lvl = createLevelData(idx);
+      state.board = Array.from({ length: 8 }, () => Array(8).fill(null));
+      lvl.targets.forEach(t => {
+        state.board[t.r][t.c] = { kind: t.type };
+      });
+      state.dock = rollThreePieces(lvl.allowedPool);
+      state.selectedDockIndex = 0;
+      state.hoverSquare = null;
+      state.history = [];
+      state.levelCleared = false;
+      state.flashingSquares.clear();
+
+      hideOverlay();
+      renderAll();
+    }
+
+    // --- SATRANÇ VURUŞ / DEVİRME HESAPLAMA ---
+    /**
+     * Bir taşı (pieceType) boş (r, c) karesine koyduğumuzda:
+     * - pathSquares: taş ile hedef arasında veya vuruş çizgisindeki kareler
+     * - targets: devrilecek hedefler ({ r, c, kind })
+     * - blockedByFriendly: dost taşın yolu kestiği kareler
+     *
+     * Not: Bu "Place & Smash" mekaniğinde, yerleştirilen taş kendi satranç
+     * saldırı hatları boyunca ilerler; dost taşa ('FRIENDLY') çarparsa o yönde durur.
+     * Hedeflere ('KING' veya 'PAWN') çarptığında onları ezer/devirir ve hat boyunca devam eder
+     * (böylece tek bir Kale veya Vezir hattı birden fazla taşı devirebilir).
+     */
+    function computeSmashPreview(board, pieceType, r, c) {
+      const pathSquares = [];
+      const targets = [];
+      const blockedByFriendly = [];
+
+      if (r < 0 || r > 7 || c < 0 || c > 7 || board[r][c] !== null) {
+        return { pathSquares, targets, blockedByFriendly };
+      }
+
+      const traceRay = (dr, dc) => {
+        let nr = r + dr;
+        let nc = c + dc;
+        while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+          const cell = board[nr][nc];
+          if (cell && cell.kind === 'FRIENDLY') {
+            blockedByFriendly.push({ r: nr, c: nc });
+            break; // Yerleştirilmiş taş hattı keser
+          }
+          pathSquares.push({ r: nr, c: nc });
+          if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
+            targets.push({ r: nr, c: nc, kind: cell.kind });
+          }
+          nr += dr;
+          nc += dc;
+        }
+      };
+
+      const orthoDirs = [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1]
+      ];
+      const diagDirs = [
+        [-1, -1],
+        [-1, 1],
+        [1, -1],
+        [1, 1]
+      ];
+      const knightJumps = [
+        [-2, -1],
+        [-2, 1],
+        [-1, -2],
+        [-1, 2],
+        [1, -2],
+        [1, 2],
+        [2, -1],
+        [2, 1]
+      ];
+
+      if (pieceType === 'ROOK') {
+        orthoDirs.forEach(([dr, dc]) => traceRay(dr, dc));
+      } else if (pieceType === 'BISHOP') {
+        diagDirs.forEach(([dr, dc]) => traceRay(dr, dc));
+      } else if (pieceType === 'QUEEN') {
+        [...orthoDirs, ...diagDirs].forEach(([dr, dc]) => traceRay(dr, dc));
+      } else if (pieceType === 'KNIGHT') {
+        knightJumps.forEach(([dr, dc]) => {
+          const nr = r + dr;
+          const nc = c + dc;
+          if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+            const cell = board[nr][nc];
+            if (cell && cell.kind === 'FRIENDLY') {
+              blockedByFriendly.push({ r: nr, c: nc });
+            } else {
+              pathSquares.push({ r: nr, c: nc });
+              if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
+                targets.push({ r: nr, c: nc, kind: cell.kind });
+              }
+            }
+          }
+        });
+      }
+
+      return { pathSquares, targets, blockedByFriendly };
+    }
+
+    function countRemainingKings(board) {
+      let count = 0;
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          if (board[r][c] && board[r][c].kind === 'KING') {
+            count++;
+          }
+        }
+      }
+      return count;
+    }
+
+    function hasAnyEmptySquare(board) {
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          if (board[r][c] === null) return true;
+        }
+      }
+      return false;
+    }
+
+    function hasAnyRemainingDockPiece(dock) {
+      return dock.some(item => item !== null);
+    }
+
+    // --- HAMLE UYGULAMA ---
+    function placeAndSmash(r, c) {
+      if (state.levelCleared) return;
+      if (state.selectedDockIndex === null) return;
+      const pieceType = state.dock[state.selectedDockIndex];
+      if (!pieceType) return;
+      if (state.board[r][c] !== null) return;
+
+      saveHistorySnapshot();
+
+      const preview = computeSmashPreview(state.board, pieceType, r, c);
+
+      // Taşı tahtaya yerleştir (vuruş sonrası tahtada engel/strateji taşı olarak kalır)
+      state.board[r][c] = {
+        kind: 'FRIENDLY',
+        pieceType,
+        justPlaced: true
+      };
+
+      // Hedefleri devir
+      let kingsSmashed = 0;
+      let pawnsSmashed = 0;
+      let earnedPoints = 0;
+
+      preview.targets.forEach(t => {
+        const targetCell = state.board[t.r][t.c];
+        if (targetCell && targetCell.kind === 'KING') {
+          kingsSmashed++;
+          earnedPoints += 350;
+        } else if (targetCell && targetCell.kind === 'PAWN') {
+          pawnsSmashed++;
+          earnedPoints += 120;
+        }
+        state.board[t.r][t.c] = null;
+        state.flashingSquares.add(`${t.r},${t.c}`);
+      });
+
+      const totalSmashed = kingsSmashed + pawnsSmashed;
+      if (totalSmashed > 1) {
+        // Çoklu devirme bonusu
+        earnedPoints += (totalSmashed - 1) * 75;
+      }
+
+      state.score += earnedPoints;
+      state.hits += totalSmashed;
+
+      // Kullanılan taşı dock'tan çıkar
+      state.dock[state.selectedDockIndex] = null;
+
+      // 3 taş da kullanıldıysa ve kalan şah varsa yeni 3 taş dağıt
+      const remainingKingsAfter = countRemainingKings(state.board);
+      if (remainingKingsAfter > 0 && !hasAnyRemainingDockPiece(state.dock)) {
+        const lvl = createLevelData(state.levelIndex);
+        state.dock = rollThreePieces(lvl.allowedPool);
+      }
+
+      // Sonraki uygun taşı otomatik seç
+      const nextIdx = state.dock.findIndex(item => item !== null);
+      state.selectedDockIndex = nextIdx >= 0 ? nextIdx : null;
+
+      // Ses ve görsel darbe geri bildirimi
+      sound.playSmash(totalSmashed, kingsSmashed > 0);
+      triggerBoardShake(kingsSmashed > 0 || totalSmashed >= 2);
+
+      // Yüzen puan / devirme yazısı
+      if (totalSmashed > 0) {
+        const label =
+          kingsSmashed > 0
+            ? `👑 ŞAH DEVRİLDİ! +${earnedPoints}`
+            : `💥 ${totalSmashed} DEVİRME! +${earnedPoints}`;
+        spawnFloatingPopup(r, c, label, kingsSmashed > 0 ? 'text-amber-300' : 'text-red-400');
+      } else {
+        spawnFloatingPopup(r, c, 'TAŞ KONDU', 'text-emerald-300');
+      }
+
+      renderAll();
+
+      // Kazanma / Kaybetme kontrolü
+      if (remainingKingsAfter === 0) {
+        state.levelCleared = true;
+        sound.playWin();
+        setTimeout(() => {
+          showWinModal();
+        }, 420);
+      } else if (!hasAnyEmptySquare(state.board) || !hasAnyRemainingDockPiece(state.dock)) {
+        sound.playFail();
+        setTimeout(() => {
+          showOutOfMovesModal();
+        }, 420);
+      }
+    }
+
+    function undoMove() {
+      if (state.history.length === 0 || state.levelCleared) return;
+      const prev = state.history.pop();
+      state.board = prev.board;
+      state.dock = prev.dock;
+      state.score = prev.score;
+      state.hits = prev.hits;
+      state.selectedDockIndex = prev.selectedDockIndex;
+      state.flashingSquares.clear();
+      hideOverlay();
+      sound.playSelect();
+      renderAll();
+    }
+
+    // --- GÖRSEL EFEKTLER & KATMANLAR ---
+    function triggerBoardShake(strong = false) {
+      const el = document.getElementById('boardContainer');
+      el.classList.remove('shake-board');
+      void el.offsetWidth;
+      el.classList.add('shake-board');
+      if (strong) {
+        el.style.boxShadow = '0 0 35px rgba(239, 68, 68, 0.55)';
+        setTimeout(() => {
+          el.style.boxShadow = '';
+        }, 320);
+      }
+    }
+
+    function spawnFloatingPopup(r, c, text, colorClass) {
+      const grid = document.getElementById('boardGrid');
+      const sqIndex = r * 8 + c;
+      const sqEl = grid.children[sqIndex];
+      if (!sqEl) return;
+
+      const popup = document.createElement('div');
+      popup.className = `floating-popup ${colorClass}`;
+      popup.textContent = text;
+      sqEl.appendChild(popup);
+
+      setTimeout(() => {
+        popup.remove();
+      }, 750);
+    }
+
+    function showWinModal() {
+      const modal = document.getElementById('overlayModal');
+      document.getElementById('modalIcon').textContent = '👑';
+      document.getElementById('modalTitle').textContent = 'Şahlar Devrildi!';
+      document.getElementById('modalDesc').textContent =
+        `${state.levelIndex + 1}. perde temizlendi. Sıradaki Şahları indirmeye hazır mısın?`;
+      document.getElementById('modalScore').textContent = state.score.toLocaleString('tr-TR');
+      document.getElementById('modalLevel').textContent = `${state.levelIndex + 1}`;
+
+      const btn = document.getElementById('modalPrimaryBtn');
+      btn.textContent = 'Sonraki Seviye →';
+      btn.onclick = () => {
+        loadLevel(state.levelIndex + 1, true);
+      };
+
+      modal.classList.remove('hidden');
+    }
+
+    function showOutOfMovesModal() {
+      const modal = document.getElementById('overlayModal');
+      const rem = countRemainingKings(state.board);
+      document.getElementById('modalIcon').textContent = '🛡️';
+      document.getElementById('modalTitle').textContent = 'Hamle / Alan Kalmadı';
+      document.getElementById('modalDesc').textContent =
+        `Hâlâ ${rem} Şah ayakta. Bölümü sıfırlayıp farklı bir dizilim dene!`;
+      document.getElementById('modalScore').textContent = state.score.toLocaleString('tr-TR');
+      document.getElementById('modalLevel').textContent = `${state.levelIndex + 1}`;
+
+      const btn = document.getElementById('modalPrimaryBtn');
+      btn.textContent = 'Bölümü Yeniden Dene';
+      btn.onclick = () => {
+        loadLevel(state.levelIndex, true);
+      };
+
+      modal.classList.remove('hidden');
+    }
+
+    function hideOverlay() {
+      document.getElementById('overlayModal').classList.add('hidden');
+    }
+
+    // --- RENDER FONKSİYONLARI ---
+    function renderHud() {
+      const lvl = createLevelData(state.levelIndex);
+      const remainingKings = countRemainingKings(state.board);
+
+      document.getElementById('hudLevel').textContent = lvl.levelNumber;
+      document.getElementById('hudKings').textContent = remainingKings;
+      document.getElementById('hudScore').textContent = state.score.toLocaleString('tr-TR');
+      document.getElementById('hudHits').textContent = state.hits;
+      document.getElementById('levelTitle').textContent = lvl.title;
+      document.getElementById('levelHint').textContent = lvl.hint;
+
+      document.getElementById('undoBtn').disabled = state.history.length === 0 || state.levelCleared;
+
+      const selectedType =
+        state.selectedDockIndex !== null ? state.dock[state.selectedDockIndex] : null;
+      const selText = document.getElementById('selectionText');
+      const prevStats = document.getElementById('previewStats');
+
+      if (!selectedType) {
+        selText.textContent = 'Seçili taş yok.';
+        prevStats.textContent = '';
+        return;
+      }
+
+      const def = PIECE_DEFS[selectedType];
+      selText.textContent = `Seçili: ${def.glyph} ${def.name} (${def.desc})`;
+
+      if (state.hoverSquare && state.board[state.hoverSquare.r][state.hoverSquare.c] === null) {
+        const pv = computeSmashPreview(
+          state.board,
+          selectedType,
+          state.hoverSquare.r,
+          state.hoverSquare.c
+        );
+        const kCount = pv.targets.filter(t => t.kind === 'KING').length;
+        const pCount = pv.targets.filter(t => t.kind === 'PAWN').length;
+        if (pv.targets.length > 0) {
+          const parts = [];
+          if (kCount > 0) parts.push(`${kCount} Şah`);
+          if (pCount > 0) parts.push(`${pCount} Piyon`);
+          prevStats.textContent = `Vurulacak: ${parts.join(' + ')}`;
+        } else {
+          prevStats.textContent = 'Hedef vurulmayacak';
+        }
+      } else {
+        prevStats.textContent = 'Boş kareye dokun';
+      }
+    }
+
+    function renderBoard() {
+      const grid = document.getElementById('boardGrid');
+      grid.innerHTML = '';
+
+      const selectedType =
+        state.selectedDockIndex !== null ? state.dock[state.selectedDockIndex] : null;
+
+      let activePreview = { pathSquares: [], targets: [], blockedByFriendly: [] };
+      if (
+        selectedType &&
+        state.hoverSquare &&
+        state.board[state.hoverSquare.r][state.hoverSquare.c] === null &&
+        !state.levelCleared
+      ) {
+        activePreview = computeSmashPreview(
+          state.board,
+          selectedType,
+          state.hoverSquare.r,
+          state.hoverSquare.c
+        );
+      }
+
+      const pathSet = new Set(activePreview.pathSquares.map(p => `${p.r},${p.c}`));
+      const targetMap = new Map(activePreview.targets.map(t => [`${t.r},${t.c}`, t.kind]));
+      const blockedSet = new Set(activePreview.blockedByFriendly.map(b => `${b.r},${b.c}`));
+
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const isLight = (r + c) % 2 === 0;
+          const key = `${r},${c}`;
+          const cell = state.board[r][c];
+          const isEmpty = cell === null;
+
+          const sq = document.createElement('button');
+          sq.type = 'button';
+          sq.className = `board-square ${isLight ? 'sq-light' : 'sq-dark'} ${
+            isEmpty && selectedType && !state.levelCleared ? 'cursor-pointer' : 'cursor-default'
+          }`;
+
+          if (state.flashingSquares.has(key)) {
+            sq.classList.add('square-hit-flash');
+          }
+
+          if (state.hoverSquare && state.hoverSquare.r === r && state.hoverSquare.c === c && isEmpty && selectedType) {
+            sq.classList.add('preview-hover-empty');
+          } else if (targetMap.has(key)) {
+            const tKind = targetMap.get(key);
+            sq.classList.add(tKind === 'KING' ? 'preview-king-target' : 'preview-target');
+          } else if (pathSet.has(key)) {
+            sq.classList.add('preview-path');
+          } else if (blockedSet.has(key)) {
+            sq.classList.add('preview-blocked');
+          }
+
+          // Kare içeriği
+          if (cell) {
+            const token = document.createElement('div');
+            token.className = 'w-[78%] h-[78%] rounded-xl flex flex-col items-center justify-center relative';
+
+            if (cell.kind === 'KING') {
+              token.classList.add('king-target-badge', 'king-idle');
+              token.innerHTML = `<span class="piece-glyph text-2xl sm:text-3xl">♚</span><span class="text-[8px] font-black tracking-tighter uppercase leading-none mt-0.5">ŞAH</span>`;
+            } else if (cell.kind === 'PAWN') {
+              token.classList.add('pawn-target-badge');
+              token.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">♟</span>`;
+            } else if (cell.kind === 'FRIENDLY') {
+              const pDef = PIECE_DEFS[cell.pieceType] || PIECE_DEFS.ROOK;
+              token.classList.add('friendly-badge');
+              if (cell.justPlaced) {
+                token.classList.add('smash-enter');
+                cell.justPlaced = false;
+              }
+              token.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">${pDef.glyph}</span><span class="text-[7px] font-bold uppercase tracking-tight leading-none opacity-90">ENGEL</span>`;
+            }
+
+            sq.appendChild(token);
+          } else if (
+            state.hoverSquare &&
+            state.hoverSquare.r === r &&
+            state.hoverSquare.c === c &&
+            selectedType &&
+            !state.levelCleared
+          ) {
+            // Seçili taşın yerleştirileceği yerin hayalet önizlemesi
+            const pDef = PIECE_DEFS[selectedType];
+            const ghost = document.createElement('span');
+            ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-55 text-amber-300';
+            ghost.textContent = pDef.glyph;
+            sq.appendChild(ghost);
+          }
+
+          // Fare ve dokunmatik etkileşimleri
+          sq.addEventListener('mouseenter', () => {
+            state.hoverSquare = { r, c };
+            renderHud();
+            renderBoard();
+          });
+
+          sq.addEventListener('click', () => {
+            if (isEmpty && selectedType && !state.levelCleared) {
+              placeAndSmash(r, c);
+            }
+          });
+
+          grid.appendChild(sq);
+        }
+      }
+
+      state.flashingSquares.clear();
+    }
+
+    function renderDock() {
+      const dockEl = document.getElementById('dockContainer');
+      dockEl.innerHTML = '';
+
+      state.dock.forEach((pieceType, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+
+        if (!pieceType) {
+          btn.disabled = true;
+          btn.className =
+            'dock-card rounded-2xl py-3 px-2 flex flex-col items-center justify-center opacity-30 cursor-not-allowed min-h-[86px] sm:min-h-[98px]';
+          btn.innerHTML = `<span class="text-xs font-bold text-gray-500">KULLANILDI</span>`;
+          dockEl.appendChild(btn);
+          return;
+        }
+
+        const def = PIECE_DEFS[pieceType];
+        const isSelected = state.selectedDockIndex === idx;
+
+        btn.className = `dock-card rounded-2xl py-2.5 px-2 sm:py-3 sm:px-3 flex flex-col items-center justify-center cursor-pointer min-h-[86px] sm:min-h-[98px] ${
+          isSelected ? 'selected' : ''
+        }`;
+
+        btn.innerHTML = `
+          <span class="piece-glyph text-3xl sm:text-4xl ${
+            isSelected ? 'text-amber-300' : 'text-white'
+          }">${def.glyph}</span>
+          <span class="mt-1 text-xs sm:text-sm font-extrabold ${
+            isSelected ? 'text-amber-300' : 'text-gray-100'
+          }">${def.name}</span>
+          <span class="text-[10px] text-gray-400 line-clamp-1">${def.desc}</span>
+        `;
+
+        btn.addEventListener('click', () => {
+          state.selectedDockIndex = idx;
+          sound.playSelect();
+          renderHud();
+          renderDock();
+          renderBoard();
+        });
+
+        dockEl.appendChild(btn);
+      });
+    }
+
+    function renderAll() {
+      renderHud();
+      renderDock();
+      renderBoard();
+    }
+
+    // --- OLAY DİNLEYİCİLERİ ---
+    document.getElementById('boardGrid').addEventListener('mouseleave', () => {
+      state.hoverSquare = null;
+      renderHud();
+      renderBoard();
+    });
+
+    document.getElementById('undoBtn').addEventListener('click', undoMove);
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      loadLevel(state.levelIndex, true);
+    });
+
+    document.getElementById('soundBtn').addEventListener('click', (e) => {
+      sound.muted = !sound.muted;
+      e.currentTarget.textContent = sound.muted ? '🔇' : '🔊';
+      if (!sound.muted) {
+        sound.playSelect();
+      }
+    });
+
+    const rulesModal = document.getElementById('rulesModal');
+    document.getElementById('rulesBtn').addEventListener('click', () => {
+      rulesModal.classList.remove('hidden');
+    });
+    document.getElementById('closeRulesBtn').addEventListener('click', () => {
+      rulesModal.classList.add('hidden');
+    });
+    document.getElementById('gotItBtn').addEventListener('click', () => {
+      rulesModal.classList.add('hidden');
+    });
+    rulesModal.addEventListener('click', (e) => {
+      if (e.target === rulesModal) {
+        rulesModal.classList.add('hidden');
+      }
+    });
+
+    // --- BAŞLATMA ---
+    window.addEventListener('DOMContentLoaded', () => {
+      loadLevel(0, false);
+    });
+  </script>
+</body>
+</html>
