@@ -103,6 +103,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      touch-action: manipulation;
       transition: transform 0.12s ease, filter 0.15s ease, box-shadow 0.15s ease;
     }
 
@@ -172,6 +173,7 @@
     .dock-card {
       background: linear-gradient(180deg, rgba(31, 36, 46, 0.96) 0%, rgba(21, 24, 31, 0.98) 100%);
       border: 1.5px solid rgba(255, 255, 255, 0.1);
+      touch-action: manipulation;
       transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
@@ -423,8 +425,6 @@
     const PIECE_POOL = ['ROOK', 'BISHOP', 'KNIGHT', 'QUEEN'];
 
     // --- EL YAPIMI BÖLÜMLER (1 - 7) ---
-    // Koordinatlar: r (0..7 yukarıdan aşağı), c (0..7 soldan sağa)
-    // type: 'KING' (Şah - seviye hedefi) | 'PAWN' (Piyon - bonus puan / hat açma-kapama)
     const HANDCRAFTED_LEVELS = [
       {
         title: '1. Perde: Tek Şah',
@@ -565,7 +565,6 @@
 
         const now = this.ctx.currentTime;
 
-        // Bowling / taş devirme tok darbesi
         const thud = this.ctx.createOscillator();
         const thudGain = this.ctx.createGain();
         thud.type = 'sine';
@@ -580,7 +579,6 @@
         thud.start(now);
         thud.stop(now + 0.2);
 
-        // Vuruş çıngırtısı / kombo tonu
         if (hitCount > 0) {
           const chime = this.ctx.createOscillator();
           const chimeGain = this.ctx.createGain();
@@ -646,16 +644,16 @@
 
     // --- OYUN DURUMU ---
     const state = {
-      levelIndex: 0, // 0 tabanlı seviye indeksi (0..6 el yapımı, 7+ sonsuz üretim)
+      levelIndex: 0,
       score: 0,
       hits: 0,
-      board: [], // 8x8 dizi: null veya { kind: 'KING' | 'PAWN' | 'FRIENDLY', pieceType?: string }
-      dock: [], // [pieceType, pieceType, pieceType] veya null (kullanılmış)
+      board: [],
+      dock: [],
       selectedDockIndex: null,
-      hoverSquare: null, // { r, c } veya null
-      history: [], // Geri alma (Undo) yığını
+      hoverSquare: null,
+      history: [],
       levelCleared: false,
-      flashingSquares: new Set() // Darbe animasyonu için kare anahtarları "r,c"
+      flashingSquares: new Set()
     };
 
     // --- BÖLÜM ÜRETİCİ ---
@@ -671,7 +669,6 @@
         };
       }
 
-      // 7. seviye sonrası sonsuz dinamik bölümler
       const lvlNum = idx + 1;
       const kingCount = Math.min(7, 3 + Math.floor((lvlNum - 7) / 2));
       const pawnCount = Math.min(10, 4 + ((lvlNum - 7) % 5));
@@ -751,17 +748,6 @@
     }
 
     // --- SATRANÇ VURUŞ / DEVİRME HESAPLAMA ---
-    /**
-     * Bir taşı (pieceType) boş (r, c) karesine koyduğumuzda:
-     * - pathSquares: taş ile hedef arasında veya vuruş çizgisindeki kareler
-     * - targets: devrilecek hedefler ({ r, c, kind })
-     * - blockedByFriendly: dost taşın yolu kestiği kareler
-     *
-     * Not: Bu "Place & Smash" mekaniğinde, yerleştirilen taş kendi satranç
-     * saldırı hatları boyunca ilerler; dost taşa ('FRIENDLY') çarparsa o yönde durur.
-     * Hedeflere ('KING' veya 'PAWN') çarptığında onları ezer/devirir ve hat boyunca devam eder
-     * (böylece tek bir Kale veya Vezir hattı birden fazla taşı devirebilir).
-     */
     function computeSmashPreview(board, pieceType, r, c) {
       const pathSquares = [];
       const targets = [];
@@ -778,7 +764,7 @@
           const cell = board[nr][nc];
           if (cell && cell.kind === 'FRIENDLY') {
             blockedByFriendly.push({ r: nr, c: nc });
-            break; // Yerleştirilmiş taş hattı keser
+            break;
           }
           pathSquares.push({ r: nr, c: nc });
           if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
@@ -876,14 +862,12 @@
 
       const preview = computeSmashPreview(state.board, pieceType, r, c);
 
-      // Taşı tahtaya yerleştir (vuruş sonrası tahtada engel/strateji taşı olarak kalır)
       state.board[r][c] = {
         kind: 'FRIENDLY',
         pieceType,
         justPlaced: true
       };
 
-      // Hedefleri devir
       let kingsSmashed = 0;
       let pawnsSmashed = 0;
       let earnedPoints = 0;
@@ -903,32 +887,27 @@
 
       const totalSmashed = kingsSmashed + pawnsSmashed;
       if (totalSmashed > 1) {
-        // Çoklu devirme bonusu
         earnedPoints += (totalSmashed - 1) * 75;
       }
 
       state.score += earnedPoints;
       state.hits += totalSmashed;
 
-      // Kullanılan taşı dock'tan çıkar
       state.dock[state.selectedDockIndex] = null;
+      state.hoverSquare = null;
 
-      // 3 taş da kullanıldıysa ve kalan şah varsa yeni 3 taş dağıt
       const remainingKingsAfter = countRemainingKings(state.board);
       if (remainingKingsAfter > 0 && !hasAnyRemainingDockPiece(state.dock)) {
         const lvl = createLevelData(state.levelIndex);
         state.dock = rollThreePieces(lvl.allowedPool);
       }
 
-      // Sonraki uygun taşı otomatik seç
       const nextIdx = state.dock.findIndex(item => item !== null);
       state.selectedDockIndex = nextIdx >= 0 ? nextIdx : null;
 
-      // Ses ve görsel darbe geri bildirimi
       sound.playSmash(totalSmashed, kingsSmashed > 0);
       triggerBoardShake(kingsSmashed > 0 || totalSmashed >= 2);
 
-      // Yüzen puan / devirme yazısı
       if (totalSmashed > 0) {
         const label =
           kingsSmashed > 0
@@ -941,7 +920,6 @@
 
       renderAll();
 
-      // Kazanma / Kaybetme kontrolü
       if (remainingKingsAfter === 0) {
         state.levelCleared = true;
         sound.playWin();
@@ -1145,10 +1123,9 @@
             sq.classList.add('preview-blocked');
           }
 
-          // Kare içeriği
           if (cell) {
             const token = document.createElement('div');
-            token.className = 'w-[78%] h-[78%] rounded-xl flex flex-col items-center justify-center relative';
+            token.className = 'w-[78%] h-[78%] rounded-xl flex flex-col items-center justify-center relative pointer-events-none';
 
             if (cell.kind === 'KING') {
               token.classList.add('king-target-badge', 'king-idle');
@@ -1174,19 +1151,21 @@
             selectedType &&
             !state.levelCleared
           ) {
-            // Seçili taşın yerleştirileceği yerin hayalet önizlemesi
             const pDef = PIECE_DEFS[selectedType];
             const ghost = document.createElement('span');
-            ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-55 text-amber-300';
+            ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-55 text-amber-300 pointer-events-none';
             ghost.textContent = pDef.glyph;
             sq.appendChild(ghost);
           }
 
-          // Fare ve dokunmatik etkileşimleri
-          sq.addEventListener('mouseenter', () => {
-            state.hoverSquare = { r, c };
-            renderHud();
-            renderBoard();
+          sq.addEventListener('pointerenter', (e) => {
+            if (e.pointerType === 'mouse') {
+              if (!state.hoverSquare || state.hoverSquare.r !== r || state.hoverSquare.c !== c) {
+                state.hoverSquare = { r, c };
+                renderHud();
+                renderBoard();
+              }
+            }
           });
 
           sq.addEventListener('click', () => {
@@ -1255,10 +1234,12 @@
     }
 
     // --- OLAY DİNLEYİCİLERİ ---
-    document.getElementById('boardGrid').addEventListener('mouseleave', () => {
-      state.hoverSquare = null;
-      renderHud();
-      renderBoard();
+    document.getElementById('boardGrid').addEventListener('pointerleave', () => {
+      if (state.hoverSquare !== null) {
+        state.hoverSquare = null;
+        renderHud();
+        renderBoard();
+      }
     });
 
     document.getElementById('undoBtn').addEventListener('click', undoMove);
