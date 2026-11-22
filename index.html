@@ -3,38 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Şahları da Vururlar</title>
+  <title>Şahları da Vururlar 2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg-charcoal: #0f1115;
-      --surface-dark: #171a21;
-      --surface-elevated: #1f242e;
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --accent-crimson: #ef4444;
-      --accent-amber: #f59e0b;
-      --accent-emerald: #10b981;
-      --light-square: #d8cfc2;
-      --dark-square: #5a6270;
-    }
+    :root { --light-square: #d8cfc2; --dark-square: #5a6270; }
     * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: radial-gradient(circle at 50% 0%, #1c212c 0%, #0f1115 65%);
-      color: #f3f4f6; min-height: 100vh; margin: 0; overflow-x: hidden;
-    }
+      color: #f3f4f6; min-height: 100vh; margin: 0; overflow-x: hidden; }
+
     @keyframes screenShake {
-      0%, 100% { transform: translate3d(0, 0, 0); }
-      20% { transform: translate3d(-5px, 3px, 0); }
-      40% { transform: translate3d(5px, -3px, 0); }
-      60% { transform: translate3d(-4px, -2px, 0); }
-      80% { transform: translate3d(3px, 2px, 0); }
+      0%, 100% { transform: translate3d(0,0,0); }
+      20% { transform: translate3d(-5px,3px,0); }
+      40% { transform: translate3d(5px,-3px,0); }
+      60% { transform: translate3d(-4px,-2px,0); }
+      80% { transform: translate3d(3px,2px,0); }
     }
     @keyframes kingShake {
-      0%, 100% { transform: translateX(0) rotate(0deg); }
+      0%, 100% { transform: translateX(0) rotate(0); }
       25% { transform: translateX(-3px) rotate(-3deg); }
       75% { transform: translateX(3px) rotate(3deg); }
     }
@@ -44,48 +33,75 @@
       100% { transform: scale(1); opacity: 1; }
     }
     @keyframes floatUp {
-      0% { transform: translate(-50%, 0) scale(0.8); opacity: 1; }
-      100% { transform: translate(-50%, -34px) scale(1.12); opacity: 0; }
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+      100% { transform: translate(-50%, -120%) scale(1.12); opacity: 0; }
     }
     @keyframes hitFlash {
-      0% { box-shadow: inset 0 0 0 999px rgba(239, 68, 68, 0.72), 0 0 22px rgba(239, 68, 68, 0.85); }
-      100% { box-shadow: inset 0 0 0 0 rgba(239, 68, 68, 0), 0 0 0 rgba(239, 68, 68, 0); }
+      0% { box-shadow: inset 0 0 0 999px rgba(239,68,68,0.72), 0 0 22px rgba(239,68,68,0.85); }
+      100% { box-shadow: inset 0 0 0 0 rgba(239,68,68,0), 0 0 0 rgba(239,68,68,0); }
     }
-    .shake-board { animation: screenShake 0.28s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+    @keyframes hintPulse {
+      0%, 100% { box-shadow: inset 0 0 0 4px #fbbf24, 0 0 24px rgba(251,191,36,0.85); }
+      50% { box-shadow: inset 0 0 0 4px #fbbf24, 0 0 44px rgba(251,191,36,1); }
+    }
+
+    .shake-board { animation: screenShake 0.28s cubic-bezier(0.36,0.07,0.19,0.97) both; }
     .king-idle { animation: kingShake 2.8s ease-in-out infinite; }
-    .smash-enter { animation: smashPop 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .smash-enter { animation: smashPop 0.24s cubic-bezier(0.22,1,0.36,1) forwards; }
     .square-hit-flash { animation: hitFlash 0.45s ease-out forwards; }
-    .floating-popup {
-      position: absolute; left: 50%; top: 18%; pointer-events: none; z-index: 40;
-      font-weight: 900; font-size: 0.95rem; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
-      animation: floatUp 0.72s cubic-bezier(0.16, 1, 0.3, 1) forwards; white-space: nowrap;
+
+    .floating-popup-fixed {
+      position: fixed; transform: translate(-50%, -50%); pointer-events: none; z-index: 100;
+      font-weight: 900; font-size: 0.95rem; text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+      animation: floatUp 0.72s cubic-bezier(0.16,1,0.3,1) forwards; white-space: nowrap;
     }
+
     .board-square {
-      position: relative; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center;
+      position: relative; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+      touch-action: manipulation;
       transition: transform 0.12s ease, filter 0.15s ease, box-shadow 0.15s ease;
     }
     .sq-light { background-color: var(--light-square); color: #181a1f; }
-    .sq-dark { background-color: var(--dark-square); color: #f9fafb; }
-    .preview-hover-empty { box-shadow: inset 0 0 0 3px rgba(251, 191, 36, 0.92); filter: brightness(1.07); }
-    .preview-path { box-shadow: inset 0 0 0 2px rgba(250, 204, 21, 0.45); background-image: radial-gradient(circle, rgba(250, 204, 21, 0.32) 22%, transparent 24%); }
-    .preview-target { box-shadow: inset 0 0 0 3px #ef4444, 0 0 16px rgba(239, 68, 68, 0.65) !important; background-color: rgba(220, 38, 38, 0.34) !important; }
-    .preview-king-target { box-shadow: inset 0 0 0 3.5px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.85) !important; background-color: rgba(245, 158, 11, 0.38) !important; }
-    .preview-blocked { box-shadow: inset 0 0 0 2px rgba(148, 163, 184, 0.45); }
-    .piece-glyph { line-height: 1; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45)); transition: transform 0.14s ease; }
-    .friendly-badge { background: linear-gradient(145deg, #10b981, #047857); color: #ecfdf5; border: 2px solid rgba(167, 243, 208, 0.85); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45); }
-    .king-target-badge { background: linear-gradient(145deg, #ef4444, #991b1b); color: #fffbeb; border: 2px solid #fde68a; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.55); }
-    .pawn-target-badge { background: linear-gradient(145deg, #f97316, #9a3412); color: #fff7ed; border: 2px solid rgba(254, 215, 170, 0.75); box-shadow: 0 3px 10px rgba(249, 115, 22, 0.45); }
+    .sq-dark  { background-color: var(--dark-square);  color: #f9fafb; }
+
+    .preview-hover-empty { box-shadow: inset 0 0 0 3px rgba(251,191,36,0.92); filter: brightness(1.07); }
+    .preview-path { box-shadow: inset 0 0 0 2px rgba(250,204,21,0.45);
+      background-image: radial-gradient(circle, rgba(250,204,21,0.32) 22%, transparent 24%); }
+    .preview-target { box-shadow: inset 0 0 0 3px #ef4444, 0 0 16px rgba(239,68,68,0.65) !important;
+      background-color: rgba(220,38,38,0.34) !important; }
+    .preview-king-target { box-shadow: inset 0 0 0 3.5px #f59e0b, 0 0 20px rgba(245,158,11,0.85) !important;
+      background-color: rgba(245,158,11,0.38) !important; }
+    .preview-blocked { box-shadow: inset 0 0 0 2px rgba(148,163,184,0.45); }
+    .preview-hint { animation: hintPulse 1s ease-in-out infinite; background-color: rgba(251,191,36,0.3) !important; }
+
+    .piece-glyph { line-height: 1; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.45)); transition: transform 0.14s ease; pointer-events: none; }
+    .friendly-badge { background: linear-gradient(145deg,#10b981,#047857); color:#ecfdf5;
+      border:2px solid rgba(167,243,208,0.85); box-shadow: 0 4px 12px rgba(16,185,129,0.45); pointer-events: none; }
+    .king-target-badge { background: linear-gradient(145deg,#ef4444,#991b1b); color:#fffbeb;
+      border:2px solid #fde68a; box-shadow: 0 4px 14px rgba(239,68,68,0.55); pointer-events: none; }
+    .pawn-target-badge { background: linear-gradient(145deg,#f97316,#9a3412); color:#fff7ed;
+      border:2px solid rgba(254,215,170,0.75); box-shadow: 0 3px 10px rgba(249,115,22,0.45); pointer-events: none; }
+
     .dock-card {
-      background: linear-gradient(180deg, rgba(31, 36, 46, 0.96) 0%, rgba(21, 24, 31, 0.98) 100%);
-      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(180deg, rgba(31,36,46,0.96) 0%, rgba(21,24,31,0.98) 100%);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      touch-action: manipulation;
       transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
-    .dock-card:hover:not(:disabled) { transform: translateY(-3px); border-color: rgba(251, 191, 36, 0.55); }
+    .dock-card:hover:not(:disabled) { transform: translateY(-3px); border-color: rgba(251,191,36,0.55); }
     .dock-card.selected {
       transform: translateY(-6px); border-color: #fbbf24;
-      box-shadow: 0 10px 24px -4px rgba(245, 158, 11, 0.35), 0 0 0 2px rgba(251, 191, 36, 0.35);
-      background: linear-gradient(180deg, rgba(45, 39, 26, 0.98) 0%, rgba(24, 24, 30, 0.98) 100%);
+      box-shadow: 0 10px 24px -4px rgba(245,158,11,0.35), 0 0 0 2px rgba(251,191,36,0.35);
+      background: linear-gradient(180deg, rgba(45,39,26,0.98) 0%, rgba(24,24,30,0.98) 100%);
     }
+
+    .util-btn {
+      padding: 0.4rem 0.6rem; border-radius: 0.6rem; font-size: 0.7rem; font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
+      color: #d1d5db; transition: all 0.15s ease; cursor: pointer;
+    }
+    .util-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+    .util-btn:disabled { opacity: 0.35; cursor: not-allowed; }
   </style>
 </head>
 <body class="flex flex-col items-center justify-between min-h-screen px-3 py-3 sm:px-6 sm:py-4">
@@ -95,18 +111,23 @@
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-red-500/15 border border-red-400/30 flex items-center justify-center text-2xl text-red-400 shadow-inner">♚</div>
         <div>
-          <h1 class="text-lg sm:text-xl font-black tracking-tight text-white leading-tight">Şahları da Vururlar 3</h1>
+          <h1 class="text-lg sm:text-xl font-black tracking-tight text-white leading-tight">Şahları da Vururlar 2</h1>
           <p class="text-[11px] sm:text-xs text-gray-400">Taşı seç, boş kareye koy ve hat boyunca devir!</p>
         </div>
       </div>
+
       <div class="flex items-center gap-1.5 sm:gap-2">
         <button id="undoBtn" type="button" title="Hamleyi Geri Al"
           class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-xs sm:text-sm font-semibold text-gray-200 transition flex items-center gap-1.5 disabled:opacity-35 disabled:pointer-events-none">
           <span>↩</span><span class="hidden sm:inline">Geri Al</span>
         </button>
-        <button id="resetBtn" type="button" title="Bölümü Yeniden Başlat"
+        <button id="resetBtn" type="button" title="Aynı Bölümü Yeniden Başlat"
           class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-xs sm:text-sm font-semibold text-gray-200 transition flex items-center gap-1.5">
           <span>↻</span><span class="hidden sm:inline">Yeniden</span>
+        </button>
+        <button id="hintBtn" type="button" title="İpucu Al (-50 puan)"
+          class="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 border border-amber-400/30 text-xs sm:text-sm font-bold text-amber-300 transition flex items-center gap-1.5">
+          <span>💡</span><span class="hidden sm:inline">İpucu</span>
         </button>
         <button id="soundBtn" type="button" title="Ses Aç/Kapat"
           class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-sm text-amber-300 transition">🔊</button>
@@ -135,7 +156,7 @@
     </div>
 
     <div class="flex items-center justify-between px-1 text-xs sm:text-sm text-gray-300">
-      <span id="levelTitle" class="font-bold text-white">1. Perde</span>
+      <span id="levelTitle" class="font-bold text-white truncate">1. Perde</span>
       <span id="levelHint" class="text-gray-400 text-right truncate ml-2">Hazırlanıyor...</span>
     </div>
   </header>
@@ -150,7 +171,7 @@
           <h2 id="modalTitle" class="text-xl sm:text-2xl font-black text-white mb-1">Şah Devrildi!</h2>
           <p id="modalDesc" class="text-xs sm:text-sm text-gray-300 mb-4">Tahtadaki tüm Şahlar vuruldu.</p>
           <div class="flex items-center justify-center gap-3 text-xs bg-black/30 rounded-xl p-2.5 mb-5 border border-white/5">
-            <div><span class="text-gray-400 block">Toplam Skor</span><strong id="modalScore" class="text-emerald-400 text-sm">0</strong></div>
+            <div><span class="text-gray-400 block">Skor</span><strong id="modalScore" class="text-emerald-400 text-sm">0</strong></div>
             <div class="h-6 w-px bg-white/10"></div>
             <div><span class="text-gray-400 block">Seviye</span><strong id="modalLevel" class="text-amber-400 text-sm">1</strong></div>
           </div>
@@ -158,22 +179,34 @@
             class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-400 hover:to-red-400 active:scale-[0.98] text-white font-extrabold text-sm sm:text-base shadow-lg transition cursor-pointer">
             Sonraki Seviye →
           </button>
+          <button id="modalSecondaryBtn" type="button"
+            class="mt-2 w-full py-2 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-semibold text-xs transition cursor-pointer hidden">
+            Ana Oyuna Dön
+          </button>
         </div>
       </div>
     </div>
 
-    <div id="selectionBar" class="mt-2 min-h-[34px] px-3.5 py-1.5 rounded-xl bg-[#171a21]/90 border border-white/10 flex items-center justify-between text-xs text-gray-300">
-      <span id="selectionText" class="font-medium text-amber-300">Alttan bir taş seçin.</span>
-      <span id="previewStats" class="font-bold text-red-400"></span>
+    <div id="selectionBar" class="mt-2 min-h-[34px] px-3.5 py-1.5 rounded-xl bg-[#171a21]/90 border border-white/10 flex items-center justify-between gap-2 text-xs text-gray-300">
+      <span id="selectionText" class="font-medium text-amber-300 truncate">Alttan bir taş seçin.</span>
+      <span id="previewStats" class="font-bold text-red-400 whitespace-nowrap"></span>
     </div>
   </main>
 
   <footer class="w-full max-w-xl mt-1">
     <div id="dockContainer" class="grid grid-cols-3 gap-2.5 sm:gap-4"></div>
+
     <div class="mt-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-gray-400">
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span> Şah (Hedef)</span>
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> Piyon (Bonus)</span>
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Yerleştirilen Taş</span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span> Şah</span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> Piyon</span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Engel</span>
+    </div>
+
+    <div class="mt-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+      <button id="newLevelBtn" type="button" class="util-btn">🎲 Yeni Level</button>
+      <button id="rerollBtn" type="button" class="util-btn">🔄 Taş Dağıt (−100)</button>
+      <button id="dailyBtn" type="button" class="util-btn">🎯 Günlük</button>
+      <button id="exitDailyBtn" type="button" class="util-btn hidden">← Ana Oyun</button>
     </div>
   </footer>
 
@@ -184,15 +217,20 @@
         <button id="closeRulesBtn" type="button" class="text-gray-400 hover:text-white text-xl font-bold px-2">✕</button>
       </div>
       <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 leading-relaxed">
-        <li><strong class="text-amber-400">1. Amaç:</strong> Tahtadaki tüm <strong class="text-red-400">Şah (♚)</strong> taşlarını devir.</li>
-        <li><strong class="text-amber-400">2. Koy &amp; Vur:</strong> Alttaki 3 taştan birini seç ve boş bir kareye bırak. Taş, kendi satranç vuruş hattındaki hedefleri anında ezer!</li>
-        <li><strong class="text-amber-400">3. Taşların Ömrü:</strong> Vuruşunu yapan taşın <strong class="text-emerald-400">tahtada kalır</strong> ve sonraki hatları kesen bir engele dönüşür.</li>
-        <li><strong class="text-amber-400">4. Satranç Hatları:</strong>
+        <li><strong class="text-amber-400">1. Amaç:</strong> Tüm <strong class="text-red-400">Şah (♚)</strong> taşlarını devir.</li>
+        <li><strong class="text-amber-400">2. Koy &amp; Vur:</strong> Alttan taş seç, boş kareye dokun. Taş, satranç vuruş hattındaki hedefleri ezer.</li>
+        <li><strong class="text-amber-400">3. Ömür:</strong> Vuran taş tahtada <strong class="text-emerald-400">engel</strong> olarak kalır.</li>
+        <li><strong class="text-amber-400">4. Hatlar:</strong>
           <span class="block text-gray-400 text-xs mt-0.5">
-            • <strong>Kale (♜):</strong> Yatay + dikey düz hat.<br/>
-            • <strong>Fil (♝):</strong> Çapraz hatlar.<br/>
-            • <strong>Vezir (♛):</strong> Düz + çapraz tüm hatlar.<br/>
-            • <strong>At (♞):</strong> L şeklinde atlar; üzerinden geçip L uçlarındaki hedefleri vurur.
+            • <strong>Kale (♜):</strong> Yatay + dikey<br/>
+            • <strong>Fil (♝):</strong> Çapraz<br/>
+            • <strong>Vezir (♛):</strong> Hepsi<br/>
+            • <strong>At (♞):</strong> L-atlayışı
+          </span>
+        </li>
+        <li><strong class="text-amber-400">5. Yardımcılar:</strong>
+          <span class="block text-gray-400 text-xs mt-0.5">
+            💡 İpucu (−50) · 🔄 Taş Dağıt (−100) · 🎲 Yeni Level · 🎯 Günlük Meydan Okuma
           </span>
         </li>
       </ul>
@@ -205,106 +243,133 @@
 
   <script>
     // ============================================================
-    // ŞAHLARI DA VURURLAR — Sonsuz Puzzle Motoru
+    // TAŞ TANIMLARI & SABİTLER
     // ============================================================
-
     const PIECE_DEFS = {
-      ROOK:   { id: 'ROOK',   name: 'Kale',  glyph: '♜', desc: 'Düz hat (yatay/dikey)', points: 100 },
-      BISHOP: { id: 'BISHOP', name: 'Fil',   glyph: '♝', desc: 'Çapraz hatlar',         points: 110 },
-      KNIGHT: { id: 'KNIGHT', name: 'At',    glyph: '♞', desc: 'L-atlayışı (8 nokta)',  points: 120 },
-      QUEEN:  { id: 'QUEEN',  name: 'Vezir', glyph: '♛', desc: 'Düz + çapraz hatlar',   points: 160 }
+      ROOK:   { id:'ROOK',   name:'Kale',  glyph:'♜', desc:'Düz hat (yatay/dikey)', points:100 },
+      BISHOP: { id:'BISHOP', name:'Fil',   glyph:'♝', desc:'Çapraz hatlar',         points:110 },
+      KNIGHT: { id:'KNIGHT', name:'At',    glyph:'♞', desc:'L-atlayışı (8 nokta)',  points:120 },
+      QUEEN:  { id:'QUEEN',  name:'Vezir', glyph:'♛', desc:'Düz + çapraz hatlar',   points:160 }
     };
-    const PIECE_POOL = ['ROOK', 'BISHOP', 'KNIGHT', 'QUEEN'];
+    const PIECE_POOL = ['ROOK','BISHOP','KNIGHT','QUEEN'];
+    const DAILY_BEST_KEY = 'sahlar2_daily_best';
+
+    // ============================================================
+    // TOHUMLU RASTGELE (Daily Challenge için)
+    // ============================================================
+    let rng = Math.random;
+    function mulberry32(seed) {
+      return function() {
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+    function todayStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function dailySeed() {
+      const d = new Date();
+      return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+    }
+    function dailyLevelNumber() {
+      const d = new Date();
+      const start = new Date(d.getFullYear(), 0, 0);
+      const dayOfYear = Math.floor((d - start) / 86400000);
+      return Math.max(3, Math.min(60, 3 + Math.floor(dayOfYear / 5)));
+    }
 
     // ============================================================
     // SES MOTORU
     // ============================================================
     class SoundEngine {
-      constructor() { this.ctx = null; this.muted = false; }
-      ensureContext() {
+      constructor(){ this.ctx = null; this.muted = false; }
+      ensureContext(){
         if (!this.ctx) {
           const AC = window.AudioContext || window.webkitAudioContext;
           if (AC) this.ctx = new AC();
         }
-        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(()=>{});
       }
-      playSelect() {
+      playSelect(){
         if (this.muted) return; this.ensureContext(); if (!this.ctx) return;
         const now = this.ctx.currentTime;
         const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-        o.type = 'triangle'; o.frequency.setValueAtTime(420, now);
-        o.frequency.exponentialRampToValueAtTime(620, now + 0.06);
-        g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
-        o.connect(g); g.connect(this.ctx.destination); o.start(now); o.stop(now + 0.07);
+        o.type='triangle'; o.frequency.setValueAtTime(420,now);
+        o.frequency.exponentialRampToValueAtTime(620,now+0.06);
+        g.gain.setValueAtTime(0.08,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.065);
+        o.connect(g); g.connect(this.ctx.destination); o.start(now); o.stop(now+0.07);
       }
-      playSmash(hitCount, hitKing) {
+      playSmash(hitCount, hitKing){
         if (this.muted) return; this.ensureContext(); if (!this.ctx) return;
         const now = this.ctx.currentTime;
         const t = this.ctx.createOscillator(), tg = this.ctx.createGain();
-        t.type = 'sine';
-        t.frequency.setValueAtTime(hitKing ? 150 : 120, now);
-        t.frequency.exponentialRampToValueAtTime(38, now + 0.18);
-        tg.gain.setValueAtTime(Math.min(0.28, 0.14 + hitCount * 0.04), now);
-        tg.gain.exponentialRampToValueAtTime(0.001, now + 0.19);
-        t.connect(tg); tg.connect(this.ctx.destination); t.start(now); t.stop(now + 0.2);
+        t.type='sine'; t.frequency.setValueAtTime(hitKing?150:120,now);
+        t.frequency.exponentialRampToValueAtTime(38,now+0.18);
+        tg.gain.setValueAtTime(Math.min(0.28,0.14+hitCount*0.04),now);
+        tg.gain.exponentialRampToValueAtTime(0.001,now+0.19);
+        t.connect(tg); tg.connect(this.ctx.destination); t.start(now); t.stop(now+0.2);
         if (hitCount > 0) {
           const c = this.ctx.createOscillator(), cg = this.ctx.createGain();
           c.type = hitKing ? 'sawtooth' : 'triangle';
-          const f = hitKing ? 520 : 340 + Math.min(hitCount, 5) * 65;
-          c.frequency.setValueAtTime(f, now + 0.02);
-          c.frequency.exponentialRampToValueAtTime(f * 1.35, now + 0.14);
-          cg.gain.setValueAtTime(hitKing ? 0.12 : 0.08, now + 0.02);
-          cg.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-          c.connect(cg); cg.connect(this.ctx.destination); c.start(now + 0.02); c.stop(now + 0.16);
+          const f = hitKing ? 520 : 340 + Math.min(hitCount,5)*65;
+          c.frequency.setValueAtTime(f,now+0.02);
+          c.frequency.exponentialRampToValueAtTime(f*1.35,now+0.14);
+          cg.gain.setValueAtTime(hitKing?0.12:0.08,now+0.02);
+          cg.gain.exponentialRampToValueAtTime(0.001,now+0.15);
+          c.connect(cg); cg.connect(this.ctx.destination); c.start(now+0.02); c.stop(now+0.16);
         }
       }
-      playWin() {
+      playWin(){
         if (this.muted) return; this.ensureContext(); if (!this.ctx) return;
-        [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
-          const s = this.ctx.currentTime + i * 0.08;
+        [523.25,659.25,783.99,1046.5].forEach((f,i)=>{
+          const s = this.ctx.currentTime + i*0.08;
           const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-          o.type = 'triangle'; o.frequency.setValueAtTime(f, s);
-          g.gain.setValueAtTime(0.11, s); g.gain.exponentialRampToValueAtTime(0.001, s + 0.22);
-          o.connect(g); g.connect(this.ctx.destination); o.start(s); o.stop(s + 0.24);
+          o.type='triangle'; o.frequency.setValueAtTime(f,s);
+          g.gain.setValueAtTime(0.11,s); g.gain.exponentialRampToValueAtTime(0.001,s+0.22);
+          o.connect(g); g.connect(this.ctx.destination); o.start(s); o.stop(s+0.24);
         });
       }
-      playFail() {
+      playFail(){
         if (this.muted) return; this.ensureContext(); if (!this.ctx) return;
-        [280, 220].forEach((f, i) => {
-          const s = this.ctx.currentTime + i * 0.14;
+        [280,220].forEach((f,i)=>{
+          const s = this.ctx.currentTime + i*0.14;
           const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-          o.type = 'sawtooth'; o.frequency.setValueAtTime(f, s);
-          g.gain.setValueAtTime(0.08, s); g.gain.exponentialRampToValueAtTime(0.001, s + 0.18);
-          o.connect(g); g.connect(this.ctx.destination); o.start(s); o.stop(s + 0.2);
+          o.type='sawtooth'; o.frequency.setValueAtTime(f,s);
+          g.gain.setValueAtTime(0.08,s); g.gain.exponentialRampToValueAtTime(0.001,s+0.18);
+          o.connect(g); g.connect(this.ctx.destination); o.start(s); o.stop(s+0.2);
         });
       }
     }
     const sound = new SoundEngine();
 
     // ============================================================
-    // OYUN DURUMU
+    // DURUM
     // ============================================================
     const state = {
       levelIndex: 0,
-      currentLevel: null,          // ← aktif level verisi
+      currentLevel: null,
       score: 0,
       hits: 0,
       board: [],
       dock: [],
       selectedDockIndex: null,
       hoverSquare: null,
+      hintMove: null,
       history: [],
       levelCleared: false,
-      flashingSquares: new Set()
+      flashingSquares: new Set(),
+      isDaily: false,
+      savedNormalState: null
     };
 
     // ============================================================
-    // SATRANÇ VURUŞ HESABI (DEĞİŞMEDİ)
+    // SATRANÇ VURUŞ HESABI
     // ============================================================
     function computeSmashPreview(board, pieceType, r, c) {
-      const pathSquares = [];
-      const targets = [];
-      const blockedByFriendly = [];
+      const pathSquares = [], targets = [], blockedByFriendly = [];
       if (r < 0 || r > 7 || c < 0 || c > 7 || board[r][c] !== null) {
         return { pathSquares, targets, blockedByFriendly };
       }
@@ -312,31 +377,27 @@
         let nr = r + dr, nc = c + dc;
         while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
           const cell = board[nr][nc];
-          if (cell && cell.kind === 'FRIENDLY') { blockedByFriendly.push({ r: nr, c: nc }); break; }
-          pathSquares.push({ r: nr, c: nc });
-          if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
-            targets.push({ r: nr, c: nc, kind: cell.kind });
-          }
+          if (cell && cell.kind === 'FRIENDLY') { blockedByFriendly.push({ r:nr, c:nc }); break; }
+          pathSquares.push({ r:nr, c:nc });
+          if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) targets.push({ r:nr, c:nc, kind:cell.kind });
           nr += dr; nc += dc;
         }
       };
       const ortho = [[-1,0],[1,0],[0,-1],[0,1]];
       const diag  = [[-1,-1],[-1,1],[1,-1],[1,1]];
-      const knightJumps = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+      const jumps = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
       if (pieceType === 'ROOK') ortho.forEach(([a,b]) => traceRay(a,b));
       else if (pieceType === 'BISHOP') diag.forEach(([a,b]) => traceRay(a,b));
       else if (pieceType === 'QUEEN') [...ortho, ...diag].forEach(([a,b]) => traceRay(a,b));
       else if (pieceType === 'KNIGHT') {
-        knightJumps.forEach(([dr, dc]) => {
+        jumps.forEach(([dr, dc]) => {
           const nr = r + dr, nc = c + dc;
           if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
             const cell = board[nr][nc];
-            if (cell && cell.kind === 'FRIENDLY') blockedByFriendly.push({ r: nr, c: nc });
+            if (cell && cell.kind === 'FRIENDLY') blockedByFriendly.push({ r:nr, c:nc });
             else {
-              pathSquares.push({ r: nr, c: nc });
-              if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
-                targets.push({ r: nr, c: nc, kind: cell.kind });
-              }
+              pathSquares.push({ r:nr, c:nc });
+              if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) targets.push({ r:nr, c:nc, kind:cell.kind });
             }
           }
         });
@@ -354,44 +415,34 @@
       return false;
     };
     const hasAnyRemainingDockPiece = (d) => d.some(x => x !== null);
-
-    // ============================================================
-    // ⭐ YENİ: DİNAMİK BÖLÜM ÜRETİMİ (Kanıtlanmış Çözümlü)
-    // ============================================================
     const EMPTY_BOARD = () => Array.from({ length: 8 }, () => Array(8).fill(null));
     const cloneB = (b) => b.map(row => row.map(c => c ? { ...c } : null));
 
-    /**
-     * Zorluk eğrisi. Her perdede:
-     *  - kral sayısı ve piyon sayısı artar (cap'li)
-     *  - "looseness" azalır → maxMoves sıkışır → combo zorunlu hale gelir
-     */
+    // ============================================================
+    // DİNAMİK SEVİYE ÜRETİMİ (Çözüm doğrulanmış)
+    // ============================================================
     function getDifficulty(levelNum) {
       const n = Math.max(0, levelNum - 1);
       const kings = Math.min(7, 1 + Math.floor(n / 3));
       const pawns = Math.min(10, Math.floor(n / 2));
-      // looseness: 0.9 → -0.3 arasında azalır (yüksek seviyelerde negatif = combo gerek)
       const looseness = Math.max(-0.3, 0.9 - n * 0.055);
       const maxMoves = Math.max(1, Math.ceil(kings * (1 + looseness)));
-      const pool = n < 2
-        ? ['ROOK', 'BISHOP', 'QUEEN']
-        : ['ROOK', 'BISHOP', 'QUEEN', 'KNIGHT'];
+      const pool = n < 2 ? ['ROOK','BISHOP','QUEEN'] : ['ROOK','BISHOP','QUEEN','KNIGHT'];
       return { kings, pawns, maxMoves, pool };
     }
 
     function placeTargets(board, kings, pawns) {
       const cells = [];
       for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) cells.push({ r, c });
-      // Fisher–Yates shuffle
       for (let i = cells.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(rng() * (i + 1));
         [cells[i], cells[j]] = [cells[j], cells[i]];
       }
       for (let i = 0; i < kings && i < cells.length; i++) {
         board[cells[i].r][cells[i].c] = { kind: 'KING' };
       }
-      for (let i = 0; i < pawns && (kings + i) < cells.length; i++) {
-        board[cells[kings + i].r][cells[kings + i].c] = { kind: 'PAWN' };
+      for (let i = 0; i < pawns && (kings+i) < cells.length; i++) {
+        board[cells[kings+i].r][cells[kings+i].c] = { kind: 'PAWN' };
       }
     }
 
@@ -404,16 +455,14 @@
     function findProductiveMoves(board, pool, minKings, minTargets) {
       const moves = [];
       for (const pieceType of pool) {
-        for (let r = 0; r < 8; r++) {
-          for (let c = 0; c < 8; c++) {
-            if (board[r][c] !== null) continue;
-            const pv = computeSmashPreview(board, pieceType, r, c);
-            if (pv.targets.length < minTargets) continue;
-            let k = 0;
-            for (const t of pv.targets) if (t.kind === 'KING') k++;
-            if (k < minKings) continue;
-            moves.push({ pieceType, r, c, kings: k, pawns: pv.targets.length - k });
-          }
+        for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+          if (board[r][c] !== null) continue;
+          const pv = computeSmashPreview(board, pieceType, r, c);
+          if (pv.targets.length < minTargets) continue;
+          let k = 0;
+          for (const t of pv.targets) if (t.kind === 'KING') k++;
+          if (k < minKings) continue;
+          moves.push({ pieceType, r, c, kings: k, pawns: pv.targets.length - k });
         }
       }
       return moves;
@@ -426,7 +475,7 @@
         let cand = findProductiveMoves(b, params.pool, 1, 1);
         if (cand.length === 0 && allowPawnOnly) cand = findProductiveMoves(b, params.pool, 0, 1);
         if (cand.length === 0) return null;
-        cand.sort((x, y) => (y.kings * 100 + y.pawns) - (x.kings * 100 + x.pawns));
+        cand.sort((x, y) => (y.kings*100 + y.pawns) - (x.kings*100 + x.pawns));
         executeMove(b, cand[0]);
         moves.push(cand[0]);
       }
@@ -441,11 +490,11 @@
         if (cand.length === 0) return null;
         let total = 0;
         for (const m of cand) total += m.kings * 6 + m.pawns;
-        let r = Math.random() * total;
+        let rv = rng() * total;
         let pick = cand[0];
         for (const m of cand) {
-          r -= (m.kings * 6 + m.pawns);
-          if (r <= 0) { pick = m; break; }
+          rv -= (m.kings * 6 + m.pawns);
+          if (rv <= 0) { pick = m; break; }
         }
         executeMove(b, pick);
         moves.push(pick);
@@ -456,8 +505,7 @@
     function generateLevel(levelNum, depth = 0) {
       const base = getDifficulty(levelNum);
       for (let attempt = 0; attempt < 50; attempt++) {
-        const params = { ...base };
-        // Son çare: birkaç tur sonra maxMoves'u gevşet (üretim başarısızsa)
+        const params = { ...base, pool: [...base.pool] };
         if (attempt >= 20) params.maxMoves += 1;
         if (attempt >= 35) params.maxMoves += 1;
 
@@ -480,12 +528,7 @@
           }
           return {
             levelNumber: levelNum,
-            title: `${levelNum}. Perde${
-              levelNum <= 3 ? ': Isınma' :
-              levelNum <= 8 ? ': Pusu' :
-              levelNum <= 15 ? ': Ustalık' :
-              levelNum <= 25 ? ': Şahların Gazabı' : ': Sonsuz Devrim'
-            }`,
+            title: `${levelNum}. Perde${levelNum<=3?': Isınma':levelNum<=8?': Pusu':levelNum<=15?': Ustalık':levelNum<=25?': Gazap':': Sonsuz Devrim'}`,
             hint: `En az ${solution.length} hamlede temizle (${params.kings} şah).`,
             allowedPool: [...params.pool],
             targets,
@@ -494,7 +537,6 @@
           };
         }
       }
-      // Hard fallback: zorluğu düşürerek tekrar dene (depth 3'te trivial'e iner)
       if (depth > 3) return createTrivialLevel(levelNum);
       return generateLevel(Math.max(1, levelNum - 2), depth + 1);
     }
@@ -506,51 +548,38 @@
         levelNumber: levelNum,
         title: `${levelNum}. Perde`,
         hint: 'Tek şahı devir.',
-        allowedPool: ['ROOK', 'QUEEN'],
-        targets: [{ r: 3, c: 3, type: 'KING' }],
-        solution: [{ pieceType: 'ROOK', r: 3, c: 0, kings: 1, pawns: 0 }],
-        params: { kings: 1, pawns: 0, maxMoves: 2, pool: ['ROOK', 'QUEEN'] }
+        allowedPool: ['ROOK','QUEEN'],
+        targets: [{ r:3, c:3, type:'KING' }],
+        solution: [{ pieceType:'ROOK', r:3, c:0, kings:1, pawns:0 }],
+        params: { kings:1, pawns:0, maxMoves:2, pool:['ROOK','QUEEN'] }
       };
     }
 
-    /**
-     * Akıllı dock: en az 1 taş, mevcut bir şahı vurabilecek tipte olsun.
-     * (RNG gazabını engeller, ama hâlâ rastgelelik sunar.)
-     */
     function smartRollDock(pool, board) {
       const useful = new Set();
       for (const pt of pool) {
         outer:
-        for (let r = 0; r < 8; r++) {
-          for (let c = 0; c < 8; c++) {
-            if (board[r][c] !== null) continue;
-            const pv = computeSmashPreview(board, pt, r, c);
-            if (pv.targets.some(t => t.kind === 'KING')) {
-              useful.add(pt);
-              break outer;
-            }
-          }
+        for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+          if (board[r][c] !== null) continue;
+          const pv = computeSmashPreview(board, pt, r, c);
+          if (pv.targets.some(t => t.kind === 'KING')) { useful.add(pt); break outer; }
         }
       }
       const uArr = [...useful];
-      const dock = [0, 1, 2].map(() => pool[Math.floor(Math.random() * pool.length)]);
+      const dock = [0,1,2].map(() => pool[Math.floor(rng() * pool.length)]);
       if (uArr.length > 0) {
-        dock[0] = uArr[Math.floor(Math.random() * uArr.length)];
-        // %40 ihtimalle ikinci taşı da faydalı yap (yeni başlayanlara daha nazik)
-        if (Math.random() < 0.4) {
-          dock[1] = uArr[Math.floor(Math.random() * uArr.length)];
-        }
+        dock[0] = uArr[Math.floor(rng() * uArr.length)];
+        if (rng() < 0.4) dock[1] = uArr[Math.floor(rng() * uArr.length)];
       }
-      // Shuffle
       for (let i = 2; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(rng() * (i + 1));
         [dock[i], dock[j]] = [dock[j], dock[i]];
       }
       return dock;
     }
 
     // ============================================================
-    // OYUN YÜKLEME
+    // YÜKLEME / GEÇİŞLER
     // ============================================================
     function saveHistorySnapshot() {
       state.history.push({
@@ -562,24 +591,98 @@
       });
     }
 
-    function loadLevel(idx, keepScore = true) {
-      state.levelIndex = idx;
-      if (!keepScore) { state.score = 0; state.hits = 0; }
-
-      const lvl = generateLevel(idx + 1);
+    function setupLevelFromData(lvl) {
       state.currentLevel = lvl;
-
       state.board = EMPTY_BOARD();
       lvl.targets.forEach(t => { state.board[t.r][t.c] = { kind: t.type }; });
       state.dock = smartRollDock(lvl.allowedPool, state.board);
       state.selectedDockIndex = state.dock.findIndex(d => d !== null);
       state.hoverSquare = null;
+      state.hintMove = null;
       state.history = [];
       state.levelCleared = false;
       state.flashingSquares.clear();
+      hideOverlay();
+      updateFooterButtons();
+      renderAll();
+    }
 
+    function loadLevel(idx, keepScore = true) {
+      state.levelIndex = idx;
+      state.isDaily = false;
+      if (!keepScore) { state.score = 0; state.hits = 0; }
+      const lvl = generateLevel(idx + 1);
+      setupLevelFromData(lvl);
+    }
+
+    function retryLevel() {
+      if (!state.currentLevel) return;
+      // Aynı target dizilimini koru, dock'u yeniden dağıt
+      const lvl = state.currentLevel;
+      state.board = EMPTY_BOARD();
+      lvl.targets.forEach(t => { state.board[t.r][t.c] = { kind: t.type }; });
+      state.dock = smartRollDock(lvl.allowedPool, state.board);
+      state.selectedDockIndex = state.dock.findIndex(d => d !== null);
+      state.hoverSquare = null;
+      state.hintMove = null;
+      state.history = [];
+      state.levelCleared = false;
+      state.flashingSquares.clear();
       hideOverlay();
       renderAll();
+    }
+
+    function loadDailyChallenge() {
+      // Normal oyuna dönüş için snapshot
+      if (!state.isDaily) {
+        state.savedNormalState = {
+          levelIndex: state.levelIndex,
+          score: state.score,
+          hits: state.hits
+        };
+      }
+      state.isDaily = true;
+
+      const savedRng = rng;
+      rng = mulberry32(dailySeed());
+      try {
+        const lvlNum = dailyLevelNumber();
+        const lvl = generateLevel(lvlNum);
+        lvl.title = `🎯 Günlük: ${todayStr()}`;
+        lvl.hint = `Herkesle aynı tahta. ${lvl.params.kings} şah seni bekliyor!`;
+        state.score = 0;
+        state.hits = 0;
+        setupLevelFromData(lvl);
+      } finally {
+        rng = savedRng;
+      }
+    }
+
+    function exitDaily() {
+      state.isDaily = false;
+      if (state.savedNormalState) {
+        state.levelIndex = state.savedNormalState.levelIndex;
+        state.score = state.savedNormalState.score;
+        state.hits = state.savedNormalState.hits;
+        state.savedNormalState = null;
+      } else {
+        state.levelIndex = 0;
+        state.score = 0;
+        state.hits = 0;
+      }
+      loadLevel(state.levelIndex, true);
+    }
+
+    function updateFooterButtons() {
+      const exitBtn = document.getElementById('exitDailyBtn');
+      const dailyBtn = document.getElementById('dailyBtn');
+      if (state.isDaily) {
+        exitBtn.classList.remove('hidden');
+        dailyBtn.classList.add('hidden');
+      } else {
+        exitBtn.classList.add('hidden');
+        dailyBtn.classList.remove('hidden');
+      }
     }
 
     // ============================================================
@@ -612,16 +715,16 @@
       state.score += earnedPoints;
       state.hits += totalSmashed;
       state.dock[state.selectedDockIndex] = null;
+      state.hintMove = null;
 
       const remainingKingsAfter = countRemainingKings(state.board);
-
-      // Yenileme: dock boşaldıysa ve hâlâ şah kaldıysa → akıllı dağıtım
       if (remainingKingsAfter > 0 && !hasAnyRemainingDockPiece(state.dock)) {
         state.dock = smartRollDock(state.currentLevel.allowedPool, state.board);
       }
-
       const nextIdx = state.dock.findIndex(x => x !== null);
       state.selectedDockIndex = nextIdx >= 0 ? nextIdx : null;
+
+      renderAll();
 
       sound.playSmash(totalSmashed, kingsSmashed > 0);
       triggerBoardShake(kingsSmashed > 0 || totalSmashed >= 2);
@@ -635,11 +738,13 @@
         spawnFloatingPopup(r, c, 'TAŞ KONDU', 'text-emerald-300');
       }
 
-      renderAll();
-
       if (remainingKingsAfter === 0) {
         state.levelCleared = true;
         sound.playWin();
+        if (state.isDaily) {
+          const best = getDailyBest();
+          if (best === null || state.score > best) setDailyBest(state.score);
+        }
         setTimeout(showWinModal, 420);
       } else if (!hasAnyEmptySquare(state.board) || !hasAnyRemainingDockPiece(state.dock)) {
         sound.playFail();
@@ -655,8 +760,62 @@
       state.score = prev.score;
       state.hits = prev.hits;
       state.selectedDockIndex = prev.selectedDockIndex;
+      state.hintMove = null;
       state.flashingSquares.clear();
       hideOverlay();
+      sound.playSelect();
+      renderAll();
+    }
+
+    // ============================================================
+    // İPUCU / YENİDEN DAĞIT
+    // ============================================================
+    function useHint() {
+      if (state.levelCleared || !state.currentLevel) return;
+      if (state.score < 50) {
+        flashToast('İpucu için en az 50 puan gerekli.', 'text-rose-300');
+        return;
+      }
+      const params = { ...state.currentLevel.params, maxMoves: 30, pool: [...state.currentLevel.params.pool] };
+      let sol = solveGreedy(state.board, params, true) || solveGreedy(state.board, params, false);
+      if (!sol || sol.length === 0) {
+        flashToast('Bu pozisyonda ipucu bulunamadı. Geri alıp tekrar dene.', 'text-rose-300');
+        return;
+      }
+      state.score -= 50;
+      const move = sol[0];
+      state.hintMove = move;
+      renderAll();
+
+      const def = PIECE_DEFS[move.pieceType];
+      const file = String.fromCharCode(65 + move.c);
+      const rank = 8 - move.r;
+      flashToast(`💡 ${def.name} → ${file}${rank}`, 'text-amber-300');
+
+      setTimeout(() => {
+        state.hintMove = null;
+        renderAll();
+      }, 4000);
+    }
+
+    function rerollDock() {
+      if (state.levelCleared || !state.currentLevel) return;
+      if (state.score < 100) {
+        flashToast('Yeniden dağıtım için 100 puan gerekli.', 'text-rose-300');
+        return;
+      }
+      const usedCount = state.dock.filter(x => x === null).length;
+      if (usedCount === 3) {
+        flashToast('Tüm taşlar kullanıldı. Yeni dağıtım otomatik gelir.', 'text-rose-300');
+        return;
+      }
+      state.score -= 100;
+      const newDock = smartRollDock(state.currentLevel.allowedPool, state.board);
+      for (let i = 0; i < 3; i++) {
+        if (state.dock[i] !== null) state.dock[i] = newDock[i];
+      }
+      state.selectedDockIndex = state.dock.findIndex(x => x !== null);
+      state.hintMove = null;
       sound.playSelect();
       renderAll();
     }
@@ -670,7 +829,7 @@
       void el.offsetWidth;
       el.classList.add('shake-board');
       if (strong) {
-        el.style.boxShadow = '0 0 35px rgba(239, 68, 68, 0.55)';
+        el.style.boxShadow = '0 0 35px rgba(239,68,68,0.55)';
         setTimeout(() => { el.style.boxShadow = ''; }, 320);
       }
     }
@@ -679,38 +838,120 @@
       const grid = document.getElementById('boardGrid');
       const sqEl = grid.children[r * 8 + c];
       if (!sqEl) return;
+      const rect = sqEl.getBoundingClientRect();
       const popup = document.createElement('div');
-      popup.className = `floating-popup ${colorClass}`;
+      popup.className = `floating-popup-fixed ${colorClass}`;
+      popup.style.left = `${rect.left + rect.width / 2}px`;
+      popup.style.top = `${rect.top + rect.height / 2}px`;
       popup.textContent = text;
-      sqEl.appendChild(popup);
+      document.body.appendChild(popup);
       setTimeout(() => popup.remove(), 750);
     }
 
+    function flashToast(text, colorClass = 'text-amber-300') {
+      const t = document.createElement('div');
+      t.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[120] px-4 py-2 rounded-xl bg-[#1a1e27] border border-white/15 font-bold text-sm shadow-2xl ${colorClass}`;
+      t.textContent = text;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2200);
+    }
+
+    function getDailyBest() {
+      try {
+        const raw = localStorage.getItem(DAILY_BEST_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (data.date === todayStr()) return data.best;
+      } catch {}
+      return null;
+    }
+    function setDailyBest(score) {
+      try {
+        localStorage.setItem(DAILY_BEST_KEY, JSON.stringify({ date: todayStr(), best: score }));
+      } catch {}
+    }
+
+    // ============================================================
+    // MODAL
+    // ============================================================
     function showWinModal() {
-      document.getElementById('modalIcon').textContent = '👑';
-      document.getElementById('modalTitle').textContent = 'Şahlar Devrildi!';
-      document.getElementById('modalDesc').textContent =
-        `${state.levelIndex + 1}. perde temizlendi. Sıradaki Şahlar seni bekliyor.`;
+      const modal = document.getElementById('overlayModal');
+      document.getElementById('modalIcon').textContent = state.isDaily ? '🎯' : '👑';
+      document.getElementById('modalTitle').textContent = state.isDaily ? 'Günlük Tamamlandı!' : 'Şahlar Devrildi!';
+
+      let desc;
+      if (state.isDaily) {
+        const best = getDailyBest();
+        const isNewBest = best === state.score;
+        desc = isNewBest
+          ? `Yeni rekor! Günlük meydan okumayı ${state.score} puanla bitirdin.`
+          : `Bugünün en iyisi: ${best ?? 0} puan · Senin skorun: ${state.score}`;
+      } else {
+        desc = `${state.levelIndex + 1}. perde temizlendi. Sıradaki Şahlar seni bekliyor.`;
+      }
+      document.getElementById('modalDesc').textContent = desc;
       document.getElementById('modalScore').textContent = state.score.toLocaleString('tr-TR');
-      document.getElementById('modalLevel').textContent = `${state.levelIndex + 1}`;
-      const btn = document.getElementById('modalPrimaryBtn');
-      btn.textContent = 'Sonraki Seviye →';
-      btn.onclick = () => loadLevel(state.levelIndex + 1, true);
-      document.getElementById('overlayModal').classList.remove('hidden');
+      document.getElementById('modalLevel').textContent =
+        state.isDaily ? todayStr() : `${state.levelIndex + 1}`;
+
+      const primaryBtn = document.getElementById('modalPrimaryBtn');
+      const secondaryBtn = document.getElementById('modalSecondaryBtn');
+
+      if (state.isDaily) {
+        primaryBtn.textContent = '← Ana Oyuna Dön';
+        primaryBtn.onclick = () => {
+          modal.classList.add('hidden');
+          exitDaily();
+        };
+        secondaryBtn.classList.add('hidden');
+      } else {
+        primaryBtn.textContent = 'Sonraki Seviye →';
+        primaryBtn.onclick = () => {
+          modal.classList.add('hidden');
+          loadLevel(state.levelIndex + 1, true);
+        };
+        secondaryBtn.classList.remove('hidden');
+        secondaryBtn.textContent = '🔄 Aynı Perdeyi Tekrar Oyna';
+        secondaryBtn.onclick = () => {
+          modal.classList.add('hidden');
+          retryLevel();
+        };
+      }
+
+      modal.classList.remove('hidden');
     }
 
     function showOutOfMovesModal() {
+      const modal = document.getElementById('overlayModal');
       const rem = countRemainingKings(state.board);
       document.getElementById('modalIcon').textContent = '🛡️';
       document.getElementById('modalTitle').textContent = 'Hamle / Alan Kalmadı';
       document.getElementById('modalDesc').textContent =
-        `Hâlâ ${rem} Şah ayakta. Bölümü sıfırlayıp farklı bir dizilim dene.`;
+        `Hâlâ ${rem} Şah ayakta. Geri alıp farklı bir hamle dene.`;
       document.getElementById('modalScore').textContent = state.score.toLocaleString('tr-TR');
-      document.getElementById('modalLevel').textContent = `${state.levelIndex + 1}`;
-      const btn = document.getElementById('modalPrimaryBtn');
-      btn.textContent = 'Bölümü Yeniden Dene';
-      btn.onclick = () => loadLevel(state.levelIndex, true);
-      document.getElementById('overlayModal').classList.remove('hidden');
+      document.getElementById('modalLevel').textContent =
+        state.isDaily ? todayStr() : `${state.levelIndex + 1}`;
+
+      const primaryBtn = document.getElementById('modalPrimaryBtn');
+      const secondaryBtn = document.getElementById('modalSecondaryBtn');
+
+      primaryBtn.textContent = 'Bölümü Yeniden Dene';
+      primaryBtn.onclick = () => {
+        modal.classList.add('hidden');
+        retryLevel();
+      };
+      if (state.isDaily) {
+        secondaryBtn.classList.remove('hidden');
+        secondaryBtn.textContent = '← Ana Oyuna Dön';
+        secondaryBtn.onclick = () => {
+          modal.classList.add('hidden');
+          exitDaily();
+        };
+      } else {
+        secondaryBtn.classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
     }
 
     function hideOverlay() {
@@ -725,15 +966,16 @@
       if (!lvl) return;
       const remainingKings = countRemainingKings(state.board);
 
-      document.getElementById('hudLevel').textContent = lvl.levelNumber;
+      document.getElementById('hudLevel').textContent = state.isDaily ? '🎯' : lvl.levelNumber;
       document.getElementById('hudKings').textContent = remainingKings;
       document.getElementById('hudScore').textContent = state.score.toLocaleString('tr-TR');
       document.getElementById('hudHits').textContent = state.hits;
       document.getElementById('levelTitle').textContent = lvl.title;
       document.getElementById('levelHint').textContent = lvl.hint;
 
-      document.getElementById('undoBtn').disabled =
-        state.history.length === 0 || state.levelCleared;
+      document.getElementById('undoBtn').disabled = state.history.length === 0 || state.levelCleared;
+      document.getElementById('hintBtn').disabled = state.levelCleared || state.score < 50;
+      document.getElementById('rerollBtn').disabled = state.levelCleared || state.score < 100;
 
       const selectedType =
         state.selectedDockIndex !== null ? state.dock[state.selectedDockIndex] : null;
@@ -749,10 +991,7 @@
       selText.textContent = `Seçili: ${def.glyph} ${def.name} (${def.desc})`;
 
       if (state.hoverSquare && state.board[state.hoverSquare.r][state.hoverSquare.c] === null) {
-        const pv = computeSmashPreview(
-          state.board, selectedType,
-          state.hoverSquare.r, state.hoverSquare.c
-        );
+        const pv = computeSmashPreview(state.board, selectedType, state.hoverSquare.r, state.hoverSquare.c);
         const kCount = pv.targets.filter(t => t.kind === 'KING').length;
         const pCount = pv.targets.filter(t => t.kind === 'PAWN').length;
         if (pv.targets.length > 0) {
@@ -779,14 +1018,13 @@
       if (selectedType && state.hoverSquare &&
           state.board[state.hoverSquare.r][state.hoverSquare.c] === null &&
           !state.levelCleared) {
-        activePreview = computeSmashPreview(
-          state.board, selectedType,
-          state.hoverSquare.r, state.hoverSquare.c
-        );
+        activePreview = computeSmashPreview(state.board, selectedType, state.hoverSquare.r, state.hoverSquare.c);
       }
+
       const pathSet = new Set(activePreview.pathSquares.map(p => `${p.r},${p.c}`));
       const targetMap = new Map(activePreview.targets.map(t => [`${t.r},${t.c}`, t.kind]));
       const blockedSet = new Set(activePreview.blockedByFriendly.map(b => `${b.r},${b.c}`));
+      const hintKey = state.hintMove ? `${state.hintMove.r},${state.hintMove.c}` : null;
 
       for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
@@ -797,10 +1035,14 @@
 
           const sq = document.createElement('button');
           sq.type = 'button';
+          sq.dataset.r = r;
+          sq.dataset.c = c;
           sq.className = `board-square ${isLight ? 'sq-light' : 'sq-dark'} ${
             isEmpty && selectedType && !state.levelCleared ? 'cursor-pointer' : 'cursor-default'
           }`;
+
           if (state.flashingSquares.has(key)) sq.classList.add('square-hit-flash');
+          if (hintKey === key) sq.classList.add('preview-hint');
 
           if (state.hoverSquare && state.hoverSquare.r === r && state.hoverSquare.c === c && isEmpty && selectedType) {
             sq.classList.add('preview-hover-empty');
@@ -815,7 +1057,7 @@
 
           if (cell) {
             const token = document.createElement('div');
-            token.className = 'w-[78%] h-[78%] rounded-xl flex flex-col items-center justify-center relative';
+            token.className = 'w-[78%] h-[78%] rounded-xl flex flex-col items-center justify-center relative pointer-events-none';
             if (cell.kind === 'KING') {
               token.classList.add('king-target-badge', 'king-idle');
               token.innerHTML = `<span class="piece-glyph text-2xl sm:text-3xl">♚</span><span class="text-[8px] font-black tracking-tighter uppercase leading-none mt-0.5">ŞAH</span>`;
@@ -829,23 +1071,20 @@
               token.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">${pDef.glyph}</span><span class="text-[7px] font-bold uppercase tracking-tight leading-none opacity-90">ENGEL</span>`;
             }
             sq.appendChild(token);
+          } else if (hintKey === key && state.hintMove) {
+            const pDef = PIECE_DEFS[state.hintMove.pieceType];
+            const ghost = document.createElement('span');
+            ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-90 text-amber-200 pointer-events-none';
+            ghost.textContent = pDef.glyph;
+            sq.appendChild(ghost);
           } else if (state.hoverSquare && state.hoverSquare.r === r &&
                      state.hoverSquare.c === c && selectedType && !state.levelCleared) {
             const pDef = PIECE_DEFS[selectedType];
             const ghost = document.createElement('span');
-            ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-55 text-amber-300';
+            ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-55 text-amber-300 pointer-events-none';
             ghost.textContent = pDef.glyph;
             sq.appendChild(ghost);
           }
-
-          sq.addEventListener('mouseenter', () => {
-            state.hoverSquare = { r, c };
-            renderHud();
-            renderBoard();
-          });
-          sq.addEventListener('click', () => {
-            if (isEmpty && selectedType && !state.levelCleared) placeAndSmash(r, c);
-          });
 
           grid.appendChild(sq);
         }
@@ -859,6 +1098,7 @@
       state.dock.forEach((pieceType, idx) => {
         const btn = document.createElement('button');
         btn.type = 'button';
+        btn.dataset.dockIdx = idx;
         if (!pieceType) {
           btn.disabled = true;
           btn.className = 'dock-card rounded-2xl py-3 px-2 flex flex-col items-center justify-center opacity-30 cursor-not-allowed min-h-[86px] sm:min-h-[98px]';
@@ -868,18 +1108,11 @@
         }
         const def = PIECE_DEFS[pieceType];
         const isSelected = state.selectedDockIndex === idx;
-        btn.className = `dock-card rounded-2xl py-2.5 px-2 sm:py-3 sm:px-3 flex flex-col items-center justify-center cursor-pointer min-h-[86px] sm:min-h-[98px] ${
-          isSelected ? 'selected' : ''
-        }`;
+        btn.className = `dock-card rounded-2xl py-2.5 px-2 sm:py-3 sm:px-3 flex flex-col items-center justify-center cursor-pointer min-h-[86px] sm:min-h-[98px] ${isSelected ? 'selected' : ''}`;
         btn.innerHTML = `
           <span class="piece-glyph text-3xl sm:text-4xl ${isSelected ? 'text-amber-300' : 'text-white'}">${def.glyph}</span>
           <span class="mt-1 text-xs sm:text-sm font-extrabold ${isSelected ? 'text-amber-300' : 'text-gray-100'}">${def.name}</span>
           <span class="text-[10px] text-gray-400 line-clamp-1">${def.desc}</span>`;
-        btn.addEventListener('click', () => {
-          state.selectedDockIndex = idx;
-          sound.playSelect();
-          renderHud(); renderDock(); renderBoard();
-        });
         dockEl.appendChild(btn);
       });
     }
@@ -887,16 +1120,73 @@
     function renderAll() { renderHud(); renderDock(); renderBoard(); }
 
     // ============================================================
-    // OLAY DİNLEYİCİLERİ
+    // ⭐ OLAY DİNLEYİCİLERİ — Event Delegation (Bırakma hatası düzeltmesi)
     // ============================================================
-    document.getElementById('boardGrid').addEventListener('mouseleave', () => {
-      state.hoverSquare = null;
-      renderHud(); renderBoard();
+    const grid = document.getElementById('boardGrid');
+    const dockContainer = document.getElementById('dockContainer');
+
+    // Tıklama: hangi eleman olursa olsun, üst kaptan yakala
+    grid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.board-square');
+      if (!btn) return;
+      const r = parseInt(btn.dataset.r, 10);
+      const c = parseInt(btn.dataset.c, 10);
+      if (isNaN(r) || isNaN(c)) return;
+      if (state.levelCleared) return;
+      if (state.selectedDockIndex === null) return;
+      const pType = state.dock[state.selectedDockIndex];
+      if (!pType) return;
+      if (state.board[r][c] !== null) return;
+      placeAndSmash(r, c);
     });
+
+    // Hover: SADECE mouse (dokunmatikte preview yok)
+    grid.addEventListener('pointerover', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const btn = e.target.closest('.board-square');
+      if (!btn) return;
+      const r = parseInt(btn.dataset.r, 10);
+      const c = parseInt(btn.dataset.c, 10);
+      if (isNaN(r) || isNaN(c)) return;
+      if (state.hoverSquare && state.hoverSquare.r === r && state.hoverSquare.c === c) return;
+      state.hoverSquare = { r, c };
+      renderHud();
+      renderBoard();
+    });
+
+    grid.addEventListener('pointerleave', () => {
+      if (state.hoverSquare !== null) {
+        state.hoverSquare = null;
+        renderHud();
+        renderBoard();
+      }
+    });
+
+    // Dock: delegasyon
+    dockContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.dock-card');
+      if (!btn || btn.disabled) return;
+      const idx = parseInt(btn.dataset.dockIdx, 10);
+      if (isNaN(idx)) return;
+      if (!state.dock[idx]) return;
+      state.selectedDockIndex = idx;
+      sound.playSelect();
+      renderHud();
+      renderDock();
+      renderBoard();
+    });
+
     document.getElementById('undoBtn').addEventListener('click', undoMove);
-    document.getElementById('resetBtn').addEventListener('click', () => {
+    document.getElementById('resetBtn').addEventListener('click', retryLevel);
+    document.getElementById('hintBtn').addEventListener('click', useHint);
+    document.getElementById('rerollBtn').addEventListener('click', rerollDock);
+    document.getElementById('newLevelBtn').addEventListener('click', () => {
+      if (state.isDaily) exitDaily();
       loadLevel(state.levelIndex, true);
     });
+    document.getElementById('dailyBtn').addEventListener('click', loadDailyChallenge);
+    document.getElementById('exitDailyBtn').addEventListener('click', exitDaily);
+
     document.getElementById('soundBtn').addEventListener('click', (e) => {
       sound.muted = !sound.muted;
       e.currentTarget.textContent = sound.muted ? '🔇' : '🔊';
