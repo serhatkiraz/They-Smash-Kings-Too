@@ -3,64 +3,91 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<meta name="theme-color" content="#0f1115" />
+<meta name="theme-color" content="#000000" />
 <title>Şahları da Vururlar</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 <style>
-  :root {
-    --light-square: #d8cfc2;
-    --dark-square: #5a6270;
-    --bg-main: #0f1115;
-    --bg-surface: #171a21;
-    --bg-elevated: #1f242e;
-    --amber: #f59e0b;
-    --red: #ef4444;
-    --emerald: #10b981;
-    --purple: #8b5cf6;
+  :root { color-scheme: dark; }
+
+  body.dark {
+    --bg-main: #000;
+    --bg-surface: #0d0d0d;
+    --bg-elevated: #1a1a1a;
+    --bg-hover: #262626;
+    --text-primary: #fff;
+    --text-secondary: #a3a3a3;
+    --text-muted: #666;
+    --border: rgba(255,255,255,0.14);
+    --border-strong: rgba(255,255,255,0.55);
+    --sq-light: #1f1f1f;
+    --sq-dark: #0a0a0a;
+    --btn-active: #fff;
+    --btn-active-text: #000;
+    --hover-fill: rgba(255,255,255,0.09);
+    --target-fill: rgba(255,255,255,0.2);
+    color-scheme: dark;
   }
+
+  body.light {
+    --bg-main: #fff;
+    --bg-surface: #f5f5f5;
+    --bg-elevated: #e8e8e8;
+    --bg-hover: #dcdcdc;
+    --text-primary: #000;
+    --text-secondary: #4a4a4a;
+    --text-muted: #888;
+    --border: rgba(0,0,0,0.14);
+    --border-strong: rgba(0,0,0,0.55);
+    --sq-light: #f2f2f2;
+    --sq-dark: #cfcfcf;
+    --btn-active: #000;
+    --btn-active-text: #fff;
+    --hover-fill: rgba(0,0,0,0.09);
+    --target-fill: rgba(0,0,0,0.18);
+    color-scheme: light;
+  }
+
   * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; overscroll-behavior: none; }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: radial-gradient(circle at 50% 0%, #1c212c 0%, var(--bg-main) 65%);
-    color: #f3f4f6;
+    background: var(--bg-main);
+    color: var(--text-primary);
     min-height: 100vh;
     min-height: 100dvh;
     overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
+
   @keyframes smashPop {
-    0% { transform: scale(0.45); opacity: 0; }
-    65% { transform: scale(1.18); opacity: 1; }
+    0% { transform: scale(0.5); opacity: 0; }
+    65% { transform: scale(1.15); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
   }
   @keyframes kingPulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+    50% { transform: scale(1.06); }
   }
   @keyframes hitFlash {
-    0% { box-shadow: inset 0 0 0 999px rgba(239,68,68,0.7); }
-    100% { box-shadow: inset 0 0 0 0 rgba(239,68,68,0); }
+    0% { background-color: var(--border-strong); }
+    100% { background-color: transparent; }
   }
   @keyframes floatUp {
     0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
-    100% { transform: translate(-50%, -120%) scale(1.15); opacity: 0; }
+    100% { transform: translate(-50%, -130%) scale(1.15); opacity: 0; }
   }
   @keyframes slideUp {
-    0% { transform: translateY(30px); opacity: 0; }
+    0% { transform: translateY(24px); opacity: 0; }
     100% { transform: translateY(0); opacity: 1; }
-  }
-  @keyframes hintPulse {
-    0%, 100% { box-shadow: inset 0 0 0 4px #fbbf24, 0 0 24px rgba(251,191,36,0.85); }
-    50% { box-shadow: inset 0 0 0 4px #fbbf24, 0 0 44px rgba(251,191,36,1); }
   }
 
   .smash-enter { animation: smashPop 0.24s cubic-bezier(0.22,1,0.36,1); }
-  .king-target-badge { animation: kingPulse 2.2s ease-in-out infinite; }
-  .square-hit-flash { animation: hitFlash 0.45s ease-out forwards; }
-  .slide-up { animation: slideUp 0.32s cubic-bezier(0.22,1,0.36,1); }
+  .king-pulse { animation: kingPulse 2.2s ease-in-out infinite; }
+  .square-hit-flash { animation: hitFlash 0.4s ease-out forwards; }
+  .slide-up { animation: slideUp 0.28s cubic-bezier(0.22,1,0.36,1); }
 
   .board-square {
     position: relative;
@@ -69,52 +96,97 @@
     align-items: center;
     justify-content: center;
     touch-action: manipulation;
-    transition: box-shadow 0.15s ease, filter 0.15s ease;
+    transition: box-shadow 0.12s ease;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: default;
   }
-  .sq-light { background-color: var(--light-square); }
-  .sq-dark { background-color: var(--dark-square); }
-  .preview-hover-empty { box-shadow: inset 0 0 0 3px rgba(251,191,36,0.92); filter: brightness(1.07); }
-  .preview-path { box-shadow: inset 0 0 0 2px rgba(250,204,21,0.45); background-image: radial-gradient(circle, rgba(250,204,21,0.3) 22%, transparent 24%); }
-  .preview-target { box-shadow: inset 0 0 0 3px var(--red), 0 0 16px rgba(239,68,68,0.65) !important; background-color: rgba(220,38,38,0.34) !important; }
-  .preview-king-target { box-shadow: inset 0 0 0 3.5px var(--amber), 0 0 20px rgba(245,158,11,0.85) !important; background-color: rgba(245,158,11,0.38) !important; }
-  .preview-blocked { box-shadow: inset 0 0 0 2px rgba(148,163,184,0.5); }
-  .preview-hint { animation: hintPulse 1s ease-in-out infinite; background-color: rgba(251,191,36,0.3) !important; }
+  .sq-light { background-color: var(--sq-light); }
+  .sq-dark { background-color: var(--sq-dark); }
+  .board-square.valid-target { cursor: pointer; }
 
-  .piece-glyph { line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); pointer-events: none; }
+  /* Hover / preview stilleri — sadece siyah-beyaz */
+  .preview-hover {
+    box-shadow: inset 0 0 0 3px var(--border-strong);
+    background-color: var(--hover-fill) !important;
+  }
+  .preview-path {
+    box-shadow: inset 0 0 0 1.5px var(--border-strong);
+    opacity: 0.65;
+  }
+  .preview-target {
+    box-shadow: inset 0 0 0 3px var(--border-strong);
+    background-color: var(--target-fill) !important;
+  }
 
-  .badge-king-enemy { background: linear-gradient(145deg, #ef4444, #991b1b); color: #fffbeb; border: 2px solid #fde68a; box-shadow: 0 3px 10px rgba(239,68,68,0.5); pointer-events: none; }
-  .badge-king-ally { background: linear-gradient(145deg, #a78bfa, #6d28d9); color: #fff; border: 2px solid #ddd6fe; box-shadow: 0 3px 10px rgba(139,92,246,0.5); pointer-events: none; }
-  .badge-pawn { background: linear-gradient(145deg, #f97316, #9a3412); color: #fff7ed; border: 2px solid rgba(254,215,170,0.8); box-shadow: 0 2px 8px rgba(249,115,22,0.45); pointer-events: none; }
-  .badge-friendly { background: linear-gradient(145deg, #10b981, #047857); color: #ecfdf5; border: 2px solid rgba(167,243,208,0.85); box-shadow: 0 2px 8px rgba(16,185,129,0.4); pointer-events: none; }
+  .piece-glyph {
+    line-height: 1;
+    pointer-events: none;
+    color: var(--text-primary);
+  }
+
+  .piece-box {
+    width: 78%;
+    height: 78%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: background-color 0.15s ease;
+  }
+  .piece-box.enemy {
+    background: var(--text-primary);
+    color: var(--bg-main);
+  }
+  .piece-box.enemy .piece-glyph { color: var(--bg-main); }
+  .piece-box.pawn {
+    background: var(--bg-elevated);
+    border: 1.5px solid var(--border-strong);
+  }
+  .piece-box.ally {
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border);
+  }
+  .piece-box.shadow-king {
+    background: var(--bg-surface);
+    border: 2.5px solid var(--text-primary);
+    box-shadow: 0 0 0 1px var(--bg-main), 0 0 12px rgba(255,255,255,0.15);
+  }
+  body.light .piece-box.shadow-king {
+    box-shadow: 0 0 0 1px var(--bg-main), 0 0 12px rgba(0,0,0,0.15);
+  }
 
   .dock-card {
-    background: linear-gradient(180deg, rgba(31,36,46,0.96), rgba(21,24,31,0.98));
-    border: 1.5px solid rgba(255,255,255,0.1);
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border);
     touch-action: manipulation;
-    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
   }
-  .dock-card:not(:disabled):active { transform: scale(0.97); }
+  .dock-card:not(:disabled):active { transform: scale(0.96); }
   .dock-card.selected {
-    transform: translateY(-4px);
-    border-color: #fbbf24;
-    box-shadow: 0 10px 24px -4px rgba(245,158,11,0.35), 0 0 0 2px rgba(251,191,36,0.35);
-    background: linear-gradient(180deg, rgba(45,39,26,0.98), rgba(24,24,30,0.98));
+    transform: translateY(-3px);
+    border-color: var(--text-primary);
+    border-width: 2px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
   }
 
-  .tab-btn { transition: color 0.15s ease, background-color 0.15s ease; }
-  .tab-btn.active { color: var(--amber); }
-  .tab-btn.active .tab-icon { transform: scale(1.15); }
-  .tab-icon { transition: transform 0.15s ease; }
+  .tab-btn { transition: color 0.15s ease; color: var(--text-secondary); }
+  .tab-btn.active { color: var(--text-primary); }
+  .tab-btn.active .tab-icon { transform: scale(1.12); }
+  .tab-icon { transition: transform 0.15s ease; display: inline-block; }
 
   .menu-card {
-    background: linear-gradient(180deg, rgba(31,36,46,0.96), rgba(21,24,31,0.98));
-    border: 1.5px solid rgba(255,255,255,0.1);
-    transition: transform 0.15s ease, border-color 0.15s ease;
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border);
+    transition: transform 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
     cursor: pointer;
+    color: var(--text-primary);
   }
   .menu-card:not(.disabled):active { transform: scale(0.98); }
-  .menu-card:not(.disabled):hover { border-color: rgba(251,191,36,0.4); }
-  .menu-card.disabled { opacity: 0.45; cursor: not-allowed; }
+  .menu-card:not(.disabled):hover { background: var(--bg-elevated); border-color: var(--border-strong); }
+  .menu-card.disabled { opacity: 0.35; cursor: not-allowed; }
 
   .floating-popup-fixed {
     position: fixed;
@@ -122,71 +194,96 @@
     pointer-events: none;
     z-index: 100;
     font-weight: 900;
-    font-size: 0.95rem;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
     animation: floatUp 0.75s cubic-bezier(0.16,1,0.3,1) forwards;
     white-space: nowrap;
+    background: var(--bg-elevated);
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  body.light .floating-popup-fixed {
+    text-shadow: 0 2px 8px rgba(255,255,255,0.8);
   }
 
-  .progress-bar { background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; height: 8px; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); transition: width 0.6s cubic-bezier(0.22,1,0.36,1); border-radius: 999px; }
-
-  .util-btn {
-    padding: 0.4rem 0.5rem;
-    border-radius: 0.55rem;
-    font-size: 0.7rem;
+  .modal-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+  .modal-btn-primary {
+    background: var(--btn-active);
+    color: var(--btn-active-text);
+    font-weight: 800;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+  }
+  .modal-btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+  .modal-btn-secondary {
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
     font-weight: 700;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.05);
-    color: #d1d5db;
-    transition: background-color 0.15s ease, transform 0.1s ease;
-    white-space: nowrap;
+    transition: background-color 0.15s ease;
   }
-  .util-btn:not(:disabled):active { transform: scale(0.95); background: rgba(255,255,255,0.12); }
-  .util-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .modal-btn-secondary:active { background: var(--bg-hover); }
+
+  .field-input {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    outline: none;
+  }
+  .field-input:focus { border-color: var(--text-primary); }
+  .field-input::placeholder { color: var(--text-muted); }
+
+  .theme-btn {
+    background: var(--bg-surface);
+    border: 1.5px solid var(--border);
+    color: var(--text-primary);
+    transition: border-color 0.12s ease;
+  }
+  .theme-btn.active { border-color: var(--text-primary); border-width: 2px; }
+
+  .toast-msg {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+  }
 </style>
 </head>
-<body>
+<body class="dark">
 
 <!-- ============================================================ -->
-<!-- ANA UYGULAMA (Sekmeler) -->
+<!-- ANA UYGULAMA -->
 <!-- ============================================================ -->
 <div id="mainApp" class="flex flex-col" style="min-height: 100dvh;">
 
-  <!-- Üst Bar -->
-  <header class="px-4 pt-3 pb-2 flex items-center justify-between">
-    <div class="flex items-center gap-2.5">
-      <div class="w-9 h-9 rounded-xl bg-red-500/15 border border-red-400/30 flex items-center justify-center text-xl text-red-400">♚</div>
-      <div>
-        <h1 class="text-base font-black tracking-tight leading-tight">Şahları da Vururlar 6</h1>
-        <p id="headerSubtitle" class="text-[10px] text-gray-400">Ana Sayfa</p>
-      </div>
-    </div>
-    <div id="headerBalance" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-400/20">
-      <span class="text-sm">♔</span>
-      <span id="balanceVal" class="text-xs font-extrabold text-amber-300">0</span>
-    </div>
+  <!-- Üst Bar (minimal) -->
+  <header class="px-4 pt-3 pb-1 flex items-center gap-2">
+    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg" style="background: var(--bg-surface); border: 1px solid var(--border);">♚</div>
+    <h1 class="text-sm font-black tracking-tight">Şahları da Vururlar 7</h1>
   </header>
 
-  <!-- Ana İçerik -->
+  <!-- İçerik -->
   <main class="flex-1 overflow-y-auto px-4 pb-2">
     <section id="homeScreen" class="flex flex-col gap-3 py-2"></section>
     <section id="profileScreen" class="hidden flex-col gap-3 py-2"></section>
     <section id="settingsScreen" class="hidden flex-col gap-3 py-2"></section>
   </main>
 
-  <!-- Alt Sekme -->
-  <nav class="flex items-center justify-around bg-[#171a21]/95 border-t border-white/10 px-2" style="padding-top: 0.4rem; padding-bottom: calc(0.4rem + env(safe-area-inset-bottom));">
-    <button data-tab="home" class="tab-btn active flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg">
-      <span class="tab-icon text-xl">🏠</span>
-      <span class="text-[10px] font-bold">Ana</span>
-    </button>
-    <button data-tab="profile" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg text-gray-400">
-      <span class="tab-icon text-xl">👤</span>
+  <!-- Alt Sekme: Profil (sol) - Ana (orta, büyük) - Ayarlar (sağ) -->
+  <nav class="flex items-end justify-around px-2" style="background: var(--bg-surface); border-top: 1px solid var(--border); padding-top: 0.4rem; padding-bottom: calc(0.4rem + env(safe-area-inset-bottom));">
+    <button data-tab="profile" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-4 rounded-lg">
+      <span class="tab-icon text-lg">👤</span>
       <span class="text-[10px] font-bold">Profil</span>
     </button>
-    <button data-tab="settings" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg text-gray-400">
-      <span class="tab-icon text-xl">⚙️</span>
+    <button data-tab="home" class="tab-btn active flex flex-col items-center gap-0.5 py-1 px-6 rounded-lg" style="transform: translateY(-4px);">
+      <span class="tab-icon text-2xl">🏠</span>
+      <span class="text-[11px] font-bold">Ana</span>
+    </button>
+    <button data-tab="settings" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-4 rounded-lg">
+      <span class="tab-icon text-lg">⚙️</span>
       <span class="text-[10px] font-bold">Ayarlar</span>
     </button>
   </nav>
@@ -195,86 +292,77 @@
 <!-- ============================================================ -->
 <!-- OYUN EKRANI -->
 <!-- ============================================================ -->
-<div id="gameScreen" class="hidden fixed inset-0 z-20 flex flex-col" style="background: radial-gradient(circle at 50% 0%, #1c212c 0%, var(--bg-main) 65%); padding-top: env(safe-area-inset-top);">
+<div id="gameScreen" class="hidden fixed inset-0 z-20 flex flex-col" style="background: var(--bg-main); padding-top: env(safe-area-inset-top);">
 
-  <!-- Üst -->
-  <div class="px-3 pt-2 pb-1 flex items-center justify-between">
-    <button id="backBtn" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-base text-gray-300">←</button>
+  <!-- Üst: 3 sütun - geri | başlık | boşluk -->
+  <div class="grid grid-cols-3 items-center px-3 pt-2 pb-1">
+    <div class="flex justify-start">
+      <button id="backBtn" class="w-9 h-9 rounded-xl flex items-center justify-center text-base" style="background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-primary);">←</button>
+    </div>
     <div class="text-center">
-      <div id="gameTitle" class="text-sm font-black text-white">Seviye 2</div>
-      <div id="gameSubtitle" class="text-[10px] text-gray-400">3 Şah kaldı</div>
+      <div id="gameTitle" class="text-sm font-black">Seviye 1</div>
     </div>
-    <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-400/20">
-      <span class="text-xs">♔</span>
-      <span id="gameBalance" class="text-xs font-extrabold text-amber-300">0</span>
-    </div>
+    <div></div>
   </div>
 
   <!-- Tahta -->
   <div class="flex-1 flex items-center justify-center px-3 py-2">
     <div class="w-full" style="max-width: min(94vw, 480px);">
-      <div id="boardContainer" class="relative w-full aspect-square rounded-xl overflow-hidden border-2 border-white/15 bg-[#14171d]" style="box-shadow: 0 12px 32px rgba(0,0,0,0.55);">
+      <div id="boardContainer" class="relative w-full aspect-square rounded-xl overflow-hidden" style="border: 2px solid var(--border-strong);">
         <div id="boardGrid" class="grid grid-cols-8 grid-rows-8 w-full h-full"></div>
       </div>
     </div>
   </div>
 
-  <!-- Alt: Dock + Butonlar -->
-  <div class="px-3 pb-2" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
-    <div id="dockContainer" class="grid grid-cols-3 gap-2 mb-2" style="max-width: min(94vw, 480px); margin-left: auto; margin-right: auto;"></div>
-    <div class="flex items-center justify-center gap-1.5" style="max-width: min(94vw, 480px); margin-left: auto; margin-right: auto;">
-      <button id="undoBtn" class="util-btn flex-1">↩ Geri</button>
-      <button id="retryBtn" class="util-btn flex-1">↻ Yeniden</button>
-      <button id="hintBtn" class="util-btn flex-1" style="border-color: rgba(245,158,11,0.4); color: #fbbf24;">💡 1♔</button>
-      <button id="rerollBtn" class="util-btn flex-1" style="border-color: rgba(245,158,11,0.4); color: #fbbf24;">🎲 1♔</button>
-    </div>
+  <!-- Alt: Sadece Dock -->
+  <div class="px-3 pb-3" style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));">
+    <div id="dockContainer" class="grid gap-2"></div>
   </div>
 </div>
 
 <!-- ============================================================ -->
-<!-- MODAL (Genel) -->
+<!-- MODAL -->
 <!-- ============================================================ -->
-<div id="modalOverlay" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-  <div id="modalContent" class="w-full max-w-sm bg-[#1a1e27] border border-white/15 rounded-2xl p-5 text-center shadow-2xl slide-up">
+<div id="modalOverlay" class="hidden fixed inset-0 z-40 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);">
+  <div class="modal-card w-full max-w-sm rounded-2xl p-5 text-center slide-up">
     <div id="modalIcon" class="text-4xl mb-2">👑</div>
-    <h2 id="modalTitle" class="text-lg font-black text-white mb-1">Başlık</h2>
-    <p id="modalDesc" class="text-xs text-gray-300 mb-4 leading-relaxed"></p>
-    <div id="modalStats" class="hidden items-center justify-center gap-3 text-xs bg-black/30 rounded-xl p-2.5 mb-4 border border-white/5"></div>
-    <button id="modalPrimaryBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-red-500 text-white font-extrabold text-sm shadow-lg">Devam</button>
-    <button id="modalSecondaryBtn" class="mt-2 w-full py-2 rounded-xl bg-white/5 text-gray-300 font-semibold text-xs hidden">İkincil</button>
+    <h2 id="modalTitle" class="text-lg font-black mb-1">Başlık</h2>
+    <p id="modalDesc" class="text-xs mb-4 leading-relaxed" style="color: var(--text-secondary);"></p>
+    <div id="modalStats" class="hidden items-center justify-center gap-3 text-xs rounded-xl p-2.5 mb-4" style="background: var(--bg-elevated); border: 1px solid var(--border);"></div>
+    <button id="modalPrimaryBtn" class="modal-btn-primary w-full py-3 rounded-xl text-sm">Devam</button>
+    <button id="modalSecondaryBtn" class="modal-btn-secondary mt-2 w-full py-2 rounded-xl text-xs hidden">İkincil</button>
   </div>
 </div>
 
 <!-- ============================================================ -->
-<!-- İSİM DEĞİŞTİRME MODAL -->
+<!-- İSİM DEĞİŞTİRME -->
 <!-- ============================================================ -->
-<div id="nameOverlay" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-  <div class="w-full max-w-sm bg-[#1a1e27] border border-white/15 rounded-2xl p-5 shadow-2xl slide-up">
-    <h3 class="text-base font-extrabold text-white mb-1">İsmini Değiştir</h3>
-    <p class="text-[11px] text-gray-400 mb-3">Bu işlem <strong class="text-amber-300">1 şah puanı</strong> harcar.</p>
-    <input id="nameInput" type="text" maxlength="20" placeholder="İsmin..." class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/15 text-sm text-white placeholder-gray-500 outline-none focus:border-amber-400 mb-3" />
+<div id="nameOverlay" class="hidden fixed inset-0 z-40 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);">
+  <div class="modal-card w-full max-w-sm rounded-2xl p-5 slide-up">
+    <h3 class="text-base font-extrabold mb-3">İsmini Değiştir</h3>
+    <input id="nameInput" type="text" maxlength="20" placeholder="İsmin..." class="field-input w-full px-3 py-2.5 rounded-xl text-sm mb-3" />
     <div class="flex gap-2">
-      <button id="nameCancelBtn" class="flex-1 py-2 rounded-xl bg-white/5 text-gray-300 font-bold text-xs">Vazgeç</button>
-      <button id="nameConfirmBtn" class="flex-1 py-2 rounded-xl bg-amber-500 text-gray-950 font-extrabold text-xs">1♔ Onayla</button>
+      <button id="nameCancelBtn" class="modal-btn-secondary flex-1 py-2 rounded-xl text-xs">Vazgeç</button>
+      <button id="nameConfirmBtn" class="modal-btn-primary flex-1 py-2 rounded-xl text-xs">Kaydet</button>
     </div>
   </div>
 </div>
 
 <!-- ============================================================ -->
-<!-- KURALLAR MODAL -->
+<!-- KURALLAR -->
 <!-- ============================================================ -->
-<div id="rulesOverlay" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-  <div class="w-full max-w-md bg-[#1a1e27] border border-white/15 rounded-2xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto slide-up">
+<div id="rulesOverlay" class="hidden fixed inset-0 z-40 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);">
+  <div class="modal-card w-full max-w-md rounded-2xl p-5 max-h-[85vh] overflow-y-auto slide-up">
     <div class="flex items-center justify-between mb-3">
-      <h3 class="text-base font-extrabold text-white">Nasıl Oynanır?</h3>
-      <button id="rulesCloseBtn" class="text-gray-400 text-xl font-bold px-2">✕</button>
+      <h3 class="text-base font-extrabold">Nasıl Oynanır?</h3>
+      <button id="rulesCloseBtn" class="text-xl font-bold px-2" style="color: var(--text-secondary);">✕</button>
     </div>
-    <ul class="space-y-2.5 text-xs text-gray-300 leading-relaxed">
-      <li><strong class="text-amber-400">Amaç:</strong> Tahtadaki tüm <strong class="text-red-400">kırmızı Şah (♚)</strong> taşlarını devir.</li>
-      <li><strong class="text-amber-400">Koy &amp; Vur:</strong> Alttaki taşlardan birini seç, boş kareye dokun. Taş, satranç hattındaki ilk hedefi ezer.</li>
-      <li><strong class="text-amber-400">Satranç Kuralı:</strong> Kendi taşların da yolu keser. At hariç — at her şeyin üzerinden atlar.</li>
-      <li><strong class="text-amber-400">Taş Menzilleri:</strong>
-        <span class="block text-gray-400 text-[11px] mt-1">
+    <ul class="space-y-2.5 text-xs leading-relaxed" style="color: var(--text-secondary);">
+      <li><strong style="color: var(--text-primary);">Amaç:</strong> Tahtadaki tüm <strong style="color: var(--text-primary);">siyah-beyaz dolu Şah taşlarını (♚)</strong> devir.</li>
+      <li><strong style="color: var(--text-primary);">Koy &amp; Vur:</strong> Alttaki taşlardan birini seç, boş kareye dokun. Taş satranç hattındaki ilk hedefi ezer.</li>
+      <li><strong style="color: var(--text-primary);">Satranç Kuralı:</strong> Kendi taşların da yolu keser. At hariç — at her şeyin üzerinden atlar.</li>
+      <li><strong style="color: var(--text-primary);">Taş Menzilleri:</strong>
+        <span class="block text-[11px] mt-1">
           ♜ <strong>Kale:</strong> 4 yön, ilk engelde durur<br/>
           ♝ <strong>Fil:</strong> 4 çapraz, ilk engelde durur<br/>
           ♛ <strong>Vezir:</strong> 8 yön, ilk engelde durur<br/>
@@ -283,41 +371,32 @@
           ♔ <strong>Gölge Şah:</strong> 8 komşu kare
         </span>
       </li>
-      <li><strong class="text-amber-400">Temiz Zafer:</strong> Tüm şahları ve piyonları temizlersen <strong class="text-emerald-400">+1 bonus şah</strong> kazanırsın.</li>
-      <li><strong class="text-amber-400">Şah Puanı:</strong> Vurulan her Şah +1 puan verir. Bunları ipucu (1), taş değiştirme (1) veya isim değiştirmek (1) için harcayabilirsin. Rank'ın harcamadan etkilenmez.</li>
+      <li><strong style="color: var(--text-primary);">Yerleştirilen Taşlar:</strong> Tahtada kalır ve engel olur.</li>
     </ul>
-    <button id="rulesOkBtn" class="mt-4 w-full py-2.5 rounded-xl bg-amber-500 text-gray-950 font-extrabold text-sm">Anladım</button>
+    <button id="rulesOkBtn" class="modal-btn-primary mt-4 w-full py-2.5 rounded-xl text-sm">Anladım</button>
   </div>
 </div>
 
 <script>
 // ============================================================
-// 🎯 TAŞ TANIMLARI & SABİTLER
+// 🎯 TAŞ TANIMLARI
 // ============================================================
 const PIECE_DEFS = {
-  ROOK:        { id: 'ROOK',        name: 'Kale',       glyph: '♜', desc: '4 yön · 1 hedef' },
-  BISHOP:      { id: 'BISHOP',      name: 'Fil',        glyph: '♝', desc: '4 çapraz · 1 hedef' },
-  KNIGHT:      { id: 'KNIGHT',      name: 'At',         glyph: '♞', desc: '8 L karesi · blok yok' },
-  QUEEN:       { id: 'QUEEN',       name: 'Vezir',      glyph: '♛', desc: '8 yön · 1 hedef' },
-  PAWN:        { id: 'PAWN',        name: 'Piyon',      glyph: '♟', desc: '4 çapraz komşu' },
-  SHADOW_KING: { id: 'SHADOW_KING', name: 'Gölge Şah',  glyph: '♔', desc: '8 komşu kare' }
+  ROOK:        { id: 'ROOK',        name: 'Kale',      glyph: '♜' },
+  BISHOP:      { id: 'BISHOP',      name: 'Fil',       glyph: '♝' },
+  KNIGHT:      { id: 'KNIGHT',      name: 'At',        glyph: '♞' },
+  QUEEN:       { id: 'QUEEN',       name: 'Vezir',     glyph: '♛' },
+  PAWN:        { id: 'PAWN',        name: 'Piyon',     glyph: '♟' },
+  SHADOW_KING: { id: 'SHADOW_KING', name: 'Gölge Şah', glyph: '♔' }
 };
 const ALL_PIECES = ['ROOK','BISHOP','KNIGHT','QUEEN','PAWN','SHADOW_KING'];
 const DOCK_WEIGHTS = { ROOK: 20, BISHOP: 20, KNIGHT: 20, QUEEN: 15, PAWN: 15, SHADOW_KING: 10 };
 
-const RANKS = [
-  { name: 'Piyon', glyph: '♟', threshold: 0 },
-  { name: 'At',    glyph: '♞', threshold: 15 },
-  { name: 'Fil',   glyph: '♝', threshold: 40 },
-  { name: 'Kale',  glyph: '♜', threshold: 80 },
-  { name: 'Vezir', glyph: '♛', threshold: 140 },
-  { name: 'Şah',   glyph: '♚', threshold: 220 }
-];
-
-const PROFILE_KEY = 'sahlar_v2_profile';
+const PROFILE_KEY = 'sahlar_v3_profile';
+const THEME_KEY = 'sahlar_v3_theme';
 
 // ============================================================
-// 🎲 TOHUMLU RASTGELE
+// 🎲 TOHUMLU RANDOM
 // ============================================================
 let rng = Math.random;
 function mulberry32(seed) {
@@ -341,10 +420,10 @@ class SoundEngine {
     }
     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(()=>{});
   }
-  tone(freq, dur, type='triangle', vol=0.08, startOffset=0) {
+  tone(freq, dur, type='triangle', vol=0.08, offset=0) {
     if (this.muted) return;
     this.ensure(); if (!this.ctx) return;
-    const start = this.ctx.currentTime + startOffset;
+    const start = this.ctx.currentTime + offset;
     const o = this.ctx.createOscillator(), g = this.ctx.createGain();
     o.type = type; o.frequency.setValueAtTime(freq, start);
     g.gain.setValueAtTime(vol, start);
@@ -357,15 +436,8 @@ class SoundEngine {
     this.tone(king ? 160 : 130, 0.18, 'sine', 0.18 + Math.min(count,4)*0.04);
     if (count > 0) this.tone(king ? 660 : 440 + Math.min(count,4)*60, 0.14, king?'sawtooth':'triangle', 0.1, 0.02);
   }
-  win() {
-    [523.25, 659.25, 783.99, 1046.5].forEach((f,i)=>this.tone(f, 0.22, 'triangle', 0.1, i*0.08));
-  }
-  fail() {
-    [280, 220].forEach((f,i)=>this.tone(f, 0.2, 'sawtooth', 0.08, i*0.14));
-  }
-  rankUp() {
-    [659.25, 783.99, 1046.5, 1318.5].forEach((f,i)=>this.tone(f, 0.28, 'triangle', 0.11, i*0.09));
-  }
+  win() { [523.25, 659.25, 783.99, 1046.5].forEach((f,i)=>this.tone(f, 0.22, 'triangle', 0.1, i*0.08)); }
+  fail() { [280, 220].forEach((f,i)=>this.tone(f, 0.2, 'sawtooth', 0.08, i*0.14)); }
 }
 const sound = new SoundEngine();
 
@@ -374,32 +446,24 @@ const sound = new SoundEngine();
 // ============================================================
 const state = {
   screen: 'home',
+  theme: 'dark',
   profile: {
     name: 'İsimsiz Piyon',
-    totalKings: 0,
-    balance: 0,
-    currentLevel: 2,
-    maxLevel: 1,
-    winStreak: 0,
-    bestCombo: 0,
+    currentLevel: 1,
     tutorialDone: false,
     fermanState: null
   },
-  gameMode: 'sefer',
+  gameMode: null,
   levelData: null,
   board: [],
   dock: [],
   selectedDockIndex: null,
-  hoverSquare: null,
-  history: [],
   levelCleared: false,
-  retryUsed: false,
-  hintMove: null,
   flashingSquares: new Set()
 };
 
 // ============================================================
-// 💾 KAYIT / YÜKLEME
+// 💾 KAYIT
 // ============================================================
 function saveProfile() {
   try { localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile)); } catch {}
@@ -407,35 +471,26 @@ function saveProfile() {
 function loadProfile() {
   try {
     const raw = localStorage.getItem(PROFILE_KEY);
-    if (raw) {
-      const p = JSON.parse(raw);
-      Object.assign(state.profile, p);
-    }
+    if (raw) Object.assign(state.profile, JSON.parse(raw));
   } catch {}
   if (state.profile.fermanState && state.profile.fermanState.status === 'in_progress') {
     state.profile.fermanState.status = 'failed';
     saveProfile();
   }
 }
-
-// ============================================================
-// 📊 RANK
-// ============================================================
-function getCurrentRank(totalKings) {
-  let r = RANKS[0];
-  for (const rank of RANKS) if (totalKings >= rank.threshold) r = rank; else break;
-  return r;
+function saveTheme() {
+  try { localStorage.setItem(THEME_KEY, state.theme); } catch {}
 }
-function getNextRank(totalKings) {
-  for (const rank of RANKS) if (totalKings < rank.threshold) return rank;
-  return null;
+function loadTheme() {
+  try {
+    const t = localStorage.getItem(THEME_KEY);
+    if (t === 'dark' || t === 'light') state.theme = t;
+  } catch {}
 }
-function getRankProgress(totalKings) {
-  const curr = getCurrentRank(totalKings);
-  const next = getNextRank(totalKings);
-  if (!next) return 100;
-  const span = next.threshold - curr.threshold;
-  return Math.min(100, ((totalKings - curr.threshold) / span) * 100);
+function applyTheme() {
+  document.body.classList.remove('dark', 'light');
+  document.body.classList.add(state.theme);
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', state.theme === 'dark' ? '#000000' : '#ffffff');
 }
 
 // ============================================================
@@ -521,22 +576,9 @@ function computeAttack(board, pieceType, r, c) {
 // ============================================================
 const EMPTY_BOARD = () => Array.from({ length: 8 }, () => Array(8).fill(null));
 const cloneB = b => b.map(row => row.map(c => c ? { ...c } : null));
-function countKings(board) {
-  let n = 0;
-  for (const row of board) for (const c of row) if (c && c.kind === 'KING') n++;
-  return n;
-}
-function countPawns(board) {
-  let n = 0;
-  for (const row of board) for (const c of row) if (c && c.kind === 'PAWN') n++;
-  return n;
-}
-function hasEmpty(board) {
-  for (const row of board) for (const c of row) if (c === null) return true;
-  return false;
-}
-function hasDock(dock) { return dock.some(x => x !== null); }
-
+function countKings(b) { let n = 0; for (const row of b) for (const c of row) if (c && c.kind === 'KING') n++; return n; }
+function hasEmpty(b) { for (const row of b) for (const c of row) if (c === null) return true; return false; }
+function hasDock(d) { return d.some(x => x !== null); }
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
@@ -546,7 +588,7 @@ function shuffle(arr) {
 }
 
 // ============================================================
-// 🏗️ SEFER ÜRETİMİ
+// 🏗️ SEFER
 // ============================================================
 function getSeferParams(levelNum) {
   const n = levelNum - 1;
@@ -559,32 +601,27 @@ function placeTargets(board, kings, pawns) {
   const cells = [];
   for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) cells.push({ r, c });
   shuffle(cells);
-  for (let i = 0; i < kings && i < cells.length; i++) {
-    board[cells[i].r][cells[i].c] = { kind: 'KING' };
-  }
-  for (let i = 0; i < pawns && (kings + i) < cells.length; i++) {
-    board[cells[kings + i].r][cells[kings + i].c] = { kind: 'PAWN' };
-  }
+  for (let i = 0; i < kings && i < cells.length; i++) board[cells[i].r][cells[i].c] = { kind: 'KING' };
+  for (let i = 0; i < pawns && (kings + i) < cells.length; i++) board[cells[kings + i].r][cells[kings + i].c] = { kind: 'PAWN' };
 }
 
 function executeSim(board, pieceType, r, c) {
   const { targets } = computeAttack(board, pieceType, r, c);
   board[r][c] = { kind: 'FRIENDLY', pieceType };
   targets.forEach(t => { board[t.r][t.c] = null; });
-  return targets;
 }
 
 function findProductiveMoves(board, pool, minKings) {
   const moves = [];
-  for (const pieceType of pool) {
+  for (const pt of pool) {
     for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
       if (board[r][c] !== null) continue;
-      const { targets } = computeAttack(board, pieceType, r, c);
+      const { targets } = computeAttack(board, pt, r, c);
       if (targets.length === 0) continue;
       let k = 0;
       for (const t of targets) if (t.kind === 'KING') k++;
       if (k < minKings) continue;
-      moves.push({ pieceType, r, c, kings: k, total: targets.length });
+      moves.push({ pieceType: pt, r, c, kings: k, total: targets.length });
     }
   }
   return moves;
@@ -598,9 +635,9 @@ function solveGreedy(board, pool, maxMoves) {
     if (cand.length === 0) cand = findProductiveMoves(b, pool, 0);
     if (cand.length === 0) return null;
     cand.sort((x, y) => (y.kings * 100 + y.total) - (x.kings * 100 + x.total));
-    const move = cand[0];
-    executeSim(b, move.pieceType, move.r, move.c);
-    moves.push(move);
+    const m = cand[0];
+    executeSim(b, m.pieceType, m.r, m.c);
+    moves.push(m);
   }
   return countKings(b) === 0 ? moves : null;
 }
@@ -615,10 +652,7 @@ function solveRandom(board, pool, maxMoves) {
     for (const m of cand) total += m.kings * 6 + m.total;
     let rv = rng() * total;
     let pick = cand[0];
-    for (const m of cand) {
-      rv -= (m.kings * 6 + m.total);
-      if (rv <= 0) { pick = m; break; }
-    }
+    for (const m of cand) { rv -= (m.kings * 6 + m.total); if (rv <= 0) { pick = m; break; } }
     executeSim(b, pick.pieceType, pick.r, pick.c);
     moves.push(pick);
   }
@@ -637,23 +671,14 @@ function generateSeferLevel(levelNum, depth = 0) {
 
     let solution = solveGreedy(board, ALL_PIECES, params.maxMoves);
     if (!solution) {
-      for (let i = 0; i < 3; i++) {
-        solution = solveRandom(board, ALL_PIECES, params.maxMoves);
-        if (solution) break;
-      }
+      for (let i = 0; i < 3; i++) { solution = solveRandom(board, ALL_PIECES, params.maxMoves); if (solution) break; }
     }
     if (solution) {
       const targets = [];
       for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
         if (board[r][c]) targets.push({ r, c, type: board[r][c].kind });
       }
-      return {
-        levelNum, targets,
-        minMoves: solution.length,
-        kings: params.kings,
-        title: `${levelNum}. Sefer`,
-        subtitle: `${params.kings} şahı devir`
-      };
+      return { levelNum, targets, minMoves: solution.length, kings: params.kings };
     }
   }
   if (depth > 3) return createTrivialLevel(levelNum);
@@ -663,12 +688,7 @@ function generateSeferLevel(levelNum, depth = 0) {
 function createTrivialLevel(levelNum) {
   const board = EMPTY_BOARD();
   board[3][3] = { kind: 'KING' };
-  return {
-    levelNum, targets: [{ r: 3, c: 3, type: 'KING' }],
-    minMoves: 1, kings: 1,
-    title: `${levelNum}. Sefer`,
-    subtitle: 'Tek şahı devir'
-  };
+  return { levelNum, targets: [{ r: 3, c: 3, type: 'KING' }], minMoves: 1, kings: 1 };
 }
 
 // ============================================================
@@ -678,10 +698,7 @@ function weightedPick(pool) {
   const weights = pool.map(p => DOCK_WEIGHTS[p] || 10);
   const total = weights.reduce((a,b)=>a+b, 0);
   let rv = rng() * total;
-  for (let i = 0; i < pool.length; i++) {
-    rv -= weights[i];
-    if (rv <= 0) return pool[i];
-  }
+  for (let i = 0; i < pool.length; i++) { rv -= weights[i]; if (rv <= 0) return pool[i]; }
   return pool[pool.length - 1];
 }
 
@@ -703,10 +720,7 @@ function smartRollDock(board) {
   }
   let skCount = dock.filter(p => p === 'SHADOW_KING').length;
   for (let i = 2; i >= 0 && skCount > 1; i--) {
-    if (dock[i] === 'SHADOW_KING') {
-      dock[i] = weightedPick(ALL_PIECES.filter(p => p !== 'SHADOW_KING'));
-      skCount--;
-    }
+    if (dock[i] === 'SHADOW_KING') { dock[i] = weightedPick(ALL_PIECES.filter(p => p !== 'SHADOW_KING')); skCount--; }
   }
   shuffle(dock);
   return dock;
@@ -725,9 +739,7 @@ function getFermanDate() {
   else if (day === 3) back = 1;
   else if (day === 4) back = 2;
   else if (day === 6) back = 1;
-  const target = new Date(d);
-  target.setDate(target.getDate() - back);
-  return target;
+  const t = new Date(d); t.setDate(t.getDate() - back); return t;
 }
 function fermanDateStr() {
   const d = getFermanDate();
@@ -747,38 +759,20 @@ function generateFerman() {
       placeTargets(board, 3, 5);
       let solution = solveGreedy(board, ALL_PIECES, 3);
       if (!solution) {
-        for (let i = 0; i < 3; i++) {
-          solution = solveRandom(board, ALL_PIECES, 3);
-          if (solution) break;
-        }
+        for (let i = 0; i < 3; i++) { solution = solveRandom(board, ALL_PIECES, 3); if (solution) break; }
       }
       if (solution && solution.length <= 3) {
         const targets = [];
         for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
           if (board[r][c]) targets.push({ r, c, type: board[r][c].kind });
         }
-        const dock = solution.map(m => m.pieceType);
-        return {
-          targets,
-          fixedDock: dock,
-          date: fermanDateStr(),
-          title: 'Ferman',
-          subtitle: '3 taşla 3 şahı devir'
-        };
+        return { targets, fixedDock: solution.map(m => m.pieceType), date: fermanDateStr() };
       }
     }
-  } finally {
-    rng = oldRng;
-  }
+  } finally { rng = oldRng; }
   const board = EMPTY_BOARD();
   board[3][3] = { kind: 'KING' };
-  return {
-    targets: [{ r: 3, c: 3, type: 'KING' }],
-    fixedDock: ['QUEEN', 'ROOK', 'BISHOP'],
-    date: fermanDateStr(),
-    title: 'Ferman',
-    subtitle: 'Tek şahı devir'
-  };
+  return { targets: [{ r: 3, c: 3, type: 'KING' }], fixedDock: ['QUEEN', 'ROOK', 'BISHOP'], date: fermanDateStr() };
 }
 
 // ============================================================
@@ -786,27 +780,22 @@ function generateFerman() {
 // ============================================================
 function startGame(mode) {
   state.gameMode = mode;
-  state.history = [];
   state.levelCleared = false;
-  state.retryUsed = false;
-  state.hintMove = null;
   state.flashingSquares.clear();
   state.selectedDockIndex = null;
-  state.hoverSquare = null;
 
   if (mode === 'tutorial') {
     state.board = EMPTY_BOARD();
     state.board[3][3] = { kind: 'KING' };
-    state.dock = ['KNIGHT', 'KNIGHT', 'KNIGHT'];
-    state.levelData = { title: 'Eğitim', subtitle: 'Atı koy, Şahı vur' };
+    state.dock = ['KNIGHT'];
+    state.levelData = { title: 'Eğitim' };
     state.selectedDockIndex = 0;
   }
   else if (mode === 'ferman') {
-    // Çift ödül koruması
     if (state.profile.fermanState &&
         state.profile.fermanState.date === fermanDateStr() &&
         state.profile.fermanState.status === 'solved') {
-      toast('Bu ferman zaten çözüldü.', 'text-rose-300');
+      toast('Bu ferman zaten çözüldü.');
       state.gameMode = null;
       return;
     }
@@ -857,7 +846,7 @@ function exitGame() {
 }
 
 // ============================================================
-// 🎮 HAMLE UYGULAMA
+// 🎮 HAMLE
 // ============================================================
 function placeAndSmash(r, c) {
   if (state.levelCleared) return;
@@ -866,163 +855,52 @@ function placeAndSmash(r, c) {
   if (!pieceType) return;
   if (state.board[r][c] !== null) return;
 
-  state.history.push({
-    board: cloneB(state.board),
-    dock: [...state.dock],
-    selectedDockIndex: state.selectedDockIndex
-  });
-
+  // Tutorial: sadece geçerli at karesine izin ver
   const { targets } = computeAttack(state.board, pieceType, r, c);
+  if (state.gameMode === 'tutorial' && targets.length === 0) {
+    toast('Atı Şahın L karesine koy.');
+    return;
+  }
+
   state.board[r][c] = { kind: 'FRIENDLY', pieceType, justPlaced: true };
 
-  let kingsKilled = 0, pawnsKilled = 0;
+  let killed = 0;
   targets.forEach(t => {
-    const cell = state.board[t.r][t.c];
-    if (cell && cell.kind === 'KING') kingsKilled++;
-    else if (cell && cell.kind === 'PAWN') pawnsKilled++;
     state.board[t.r][t.c] = null;
     state.flashingSquares.add(`${t.r},${t.c}`);
+    killed++;
   });
-  const total = kingsKilled + pawnsKilled;
-
-  if (kingsKilled > 0) {
-    state.profile.totalKings += kingsKilled;
-    state.profile.balance += kingsKilled;
-    const oldRank = getCurrentRank(state.profile.totalKings - kingsKilled);
-    const newRank = getCurrentRank(state.profile.totalKings);
-    if (newRank.threshold > oldRank.threshold) {
-      setTimeout(() => showRankUp(oldRank, newRank), 800);
-    }
-  }
-  if (total > state.profile.bestCombo) state.profile.bestCombo = total;
-  saveProfile();
 
   state.dock[state.selectedDockIndex] = null;
-  state.hintMove = null;
-
   const remainingKings = countKings(state.board);
 
-  if (state.gameMode !== 'ferman' && remainingKings > 0 && !hasDock(state.dock)) {
+  // Sefer: dock boşalınca 3 yeni taş
+  if (state.gameMode === 'sefer' && remainingKings > 0 && !hasDock(state.dock)) {
     state.dock = smartRollDock(state.board);
   }
   const nextIdx = state.dock.findIndex(x => x !== null);
   state.selectedDockIndex = nextIdx >= 0 ? nextIdx : null;
 
   renderGame();
+  sound.smash(killed, targets.some(t => t.kind === 'KING'));
 
-  sound.smash(total, kingsKilled > 0);
-  if (total > 0) {
-    const label = kingsKilled > 0 ? `👑 ${kingsKilled} Şah!` : `💥 ${total} vuruş!`;
-    spawnPopup(r, c, label, kingsKilled > 0 ? 'text-amber-300' : 'text-red-400');
+  if (killed > 0) {
+    const popup = targets.some(t => t.kind === 'KING') ? '👑 Şah!' : `💥 ${killed}`;
+    spawnPopup(r, c, popup);
   }
 
   if (remainingKings === 0) {
     state.levelCleared = true;
     sound.win();
-
-    // Temiz zafer bonusu: piyon da kalmadıysa +1
-    const pawnsLeft = countPawns(state.board);
-    if (pawnsLeft === 0 && state.gameMode !== 'tutorial') {
-      state.profile.balance += 1;
-      saveProfile();
-      setTimeout(() => toast('✨ Temiz Zafer! +1 bonus şah', 'text-emerald-300'), 300);
-    }
-
-    setTimeout(showWinModal, 420);
-  } else if (!hasEmpty(state.board) || (!hasDock(state.dock) && state.gameMode === 'ferman')) {
+    setTimeout(showWinModal, 400);
+  } else if (!hasEmpty(state.board) || !hasDock(state.dock)) {
     sound.fail();
-    setTimeout(showFailModal, 420);
+    setTimeout(showFailModal, 400);
   }
-}
-
-function undoMove() {
-  if (state.history.length === 0 || state.levelCleared) return;
-  const prev = state.history.pop();
-  state.board = prev.board;
-  state.dock = prev.dock;
-  state.selectedDockIndex = prev.selectedDockIndex;
-  state.hintMove = null;
-  state.flashingSquares.clear();
-  sound.select();
-  renderGame();
-}
-
-function retryLevel() {
-  if (state.levelCleared) return;
-  state.retryUsed = true;
-  const lvl = state.levelData;
-  state.board = EMPTY_BOARD();
-  lvl.targets.forEach(t => { state.board[t.r][t.c] = { kind: t.type }; });
-
-  if (state.gameMode === 'ferman') {
-    state.profile.fermanState = { date: fermanDateStr(), status: 'failed' };
-    saveProfile();
-    showFailModal();
-    return;
-  }
-  state.dock = smartRollDock(state.board);
-  state.selectedDockIndex = state.dock.findIndex(x => x !== null);
-  state.history = [];
-  state.hintMove = null;
-  sound.select();
-  renderGame();
-}
-
-function useHint() {
-  if (state.levelCleared) return;
-  if (state.profile.balance < 1) {
-    toast('Yeterli şah puanın yok. Önce şah vur.', 'text-rose-300');
-    return;
-  }
-  const sol = solveGreedy(state.board, ALL_PIECES, 30);
-  if (!sol || sol.length === 0) {
-    toast('Bu pozisyonda ipucu bulunamadı.', 'text-rose-300');
-    return;
-  }
-  state.profile.balance -= 1;
-  saveProfile();
-  const move = sol[0];
-  state.hintMove = move;
-  renderGame();
-  const def = PIECE_DEFS[move.pieceType];
-  const file = String.fromCharCode(65 + move.c);
-  const rank = 8 - move.r;
-  toast(`💡 ${def.name} → ${file}${rank}`, 'text-amber-300');
-  setTimeout(() => {
-    state.hintMove = null;
-    renderGame();
-  }, 4000);
-}
-
-function rerollDock() {
-  if (state.levelCleared) return;
-  if (state.gameMode === 'ferman') {
-    toast('Fermanda taş değiştirilemez.', 'text-rose-300');
-    return;
-  }
-  if (state.profile.balance < 1) {
-    toast('Yeterli şah puanın yok.', 'text-rose-300');
-    return;
-  }
-  if (!hasDock(state.dock)) {
-    toast('Değiştirilecek taş yok.', 'text-rose-300');
-    return;
-  }
-  state.profile.balance -= 1;
-  saveProfile();
-  const newDock = smartRollDock(state.board);
-  for (let i = 0; i < 3; i++) {
-    if (state.dock[i] !== null) state.dock[i] = newDock[i];
-  }
-  const nextIdx = state.dock.findIndex(x => x !== null);
-  state.selectedDockIndex = nextIdx >= 0 ? nextIdx : null;
-  state.hintMove = null;
-  sound.select();
-  renderGame();
 }
 
 // ============================================================
-// 🎉 MODALLAR
+// 🎉 MODAL
 // ============================================================
 function showModal(config) {
   document.getElementById('modalIcon').textContent = config.icon || '👑';
@@ -1035,10 +913,10 @@ function showModal(config) {
     statsEl.classList.add('flex');
     statsEl.innerHTML = config.stats.map(s => `
       <div class="text-center">
-        <span class="text-gray-400 block text-[10px]">${s.label}</span>
-        <strong class="${s.color || 'text-white'} text-sm">${s.value}</strong>
+        <span class="block text-[10px]" style="color: var(--text-secondary);">${s.label}</span>
+        <strong class="text-sm">${s.value}</strong>
       </div>
-    `).join('<div class="h-6 w-px bg-white/10"></div>');
+    `).join('<div class="h-6 w-px" style="background: var(--border);"></div>');
   } else {
     statsEl.classList.add('hidden');
     statsEl.classList.remove('flex');
@@ -1048,27 +926,19 @@ function showModal(config) {
   const secondaryBtn = document.getElementById('modalSecondaryBtn');
 
   primaryBtn.textContent = config.primaryText || 'Devam';
-  primaryBtn.onclick = () => {
-    closeModal();
-    if (config.onPrimary) config.onPrimary();
-  };
+  primaryBtn.onclick = () => { closeModal(); if (config.onPrimary) config.onPrimary(); };
 
   if (config.secondaryText) {
     secondaryBtn.classList.remove('hidden');
     secondaryBtn.textContent = config.secondaryText;
-    secondaryBtn.onclick = () => {
-      closeModal();
-      if (config.onSecondary) config.onSecondary();
-    };
+    secondaryBtn.onclick = () => { closeModal(); if (config.onSecondary) config.onSecondary(); };
   } else {
     secondaryBtn.classList.add('hidden');
   }
 
   document.getElementById('modalOverlay').classList.remove('hidden');
 }
-function closeModal() {
-  document.getElementById('modalOverlay').classList.add('hidden');
-}
+function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); }
 
 function showWinModal() {
   const mode = state.gameMode;
@@ -1080,16 +950,9 @@ function showWinModal() {
     showModal({
       icon: '🎉',
       title: 'Harika!',
-      desc: 'Atını koydun ve Şahı devirdin. +1 şah puanı kazandın. Artık oyuna hazırsın!',
-      stats: [
-        { label: 'Bakiye', value: `${state.profile.balance} ♔`, color: 'text-amber-300' }
-      ],
+      desc: 'Atını koydun ve Şahı devirdin. Artık Sefere hazırsın!',
       primaryText: 'Ana Sayfaya Dön',
-      onPrimary: () => {
-        state.gameMode = null;
-        state.levelCleared = false;
-        hideGameScreen();
-      }
+      onPrimary: () => { state.gameMode = null; state.levelCleared = false; hideGameScreen(); }
     });
     return;
   }
@@ -1100,50 +963,28 @@ function showWinModal() {
     showModal({
       icon: '📜',
       title: 'Ferman Çözüldü!',
-      desc: 'Bu haftanın fermanını başarıyla tamamladın. Yeni ferman için biraz bekle.',
-      stats: [
-        { label: 'Bakiye', value: `${state.profile.balance} ♔`, color: 'text-amber-300' },
-        { label: 'En İyi Combo', value: `${state.profile.bestCombo}`, color: 'text-sky-300' }
-      ],
+      desc: 'Bu haftanın fermanını tamamladın. Yeni ferman için Salı veya Cuma gününü bekle.',
       primaryText: 'Ana Sayfa',
-      onPrimary: () => {
-        state.gameMode = null;
-        state.levelCleared = false;
-        hideGameScreen();
-      }
+      onPrimary: () => { state.gameMode = null; state.levelCleared = false; hideGameScreen(); }
     });
     return;
   }
 
   // Sefer
   state.profile.currentLevel = state.levelData.levelNum + 1;
-  state.profile.maxLevel = Math.max(state.profile.maxLevel, state.levelData.levelNum);
-  if (!state.retryUsed) state.profile.winStreak += 1;
-  else state.profile.winStreak = 0;
   saveProfile();
-
   showModal({
     icon: '👑',
     title: 'Perde Temizlendi!',
-    desc: 'Tüm şahları devirdin. Bir sonraki perde seni bekliyor.',
-    stats: [
-      { label: 'Seviye', value: `${state.levelData.levelNum}`, color: 'text-amber-300' },
-      { label: 'Bakiye', value: `${state.profile.balance} ♔`, color: 'text-amber-300' },
-      { label: 'Seri', value: `${state.profile.winStreak}🔥`, color: 'text-orange-300' }
-    ],
+    desc: 'Tüm şahları devirdin. Sıradaki perde seni bekliyor.',
     primaryText: 'Sonraki Perde →',
     onPrimary: () => {
       state.gameMode = 'sefer';
       state.levelCleared = false;
-      state.retryUsed = false;
       startGame('sefer');
     },
     secondaryText: 'Ana Sayfa',
-    onSecondary: () => {
-      state.gameMode = null;
-      state.levelCleared = false;
-      hideGameScreen();
-    }
+    onSecondary: () => { state.gameMode = null; state.levelCleared = false; hideGameScreen(); }
   });
 }
 
@@ -1153,67 +994,34 @@ function showFailModal() {
     showModal({
       icon: '📜',
       title: 'Ferman Başarısız',
-      desc: `Bu fermanı geçemedin. Yeni ferman için salı veya cumayı bekle.`,
-      stats: [
-        { label: 'Kalan Şah', value: `${rem}`, color: 'text-red-300' }
-      ],
+      desc: 'Bu fermanı geçemedin. Yeni ferman için Salı veya Cuma gününü bekle.',
       primaryText: 'Ana Sayfa',
-      onPrimary: () => {
-        state.gameMode = null;
-        state.levelCleared = false;
-        hideGameScreen();
-      }
+      onPrimary: () => { state.gameMode = null; state.levelCleared = false; hideGameScreen(); }
     });
   } else {
     showModal({
       icon: '🛡️',
       title: 'Hamle Kalmadı',
-      desc: `Hâlâ ${rem} şah ayakta. Tekrar dene veya geri al.`,
+      desc: `Hâlâ ${rem} şah ayakta. Aynı seviyeyi tekrar dene.`,
       primaryText: 'Tekrar Dene',
       onPrimary: () => {
-        retryLevel();
+        state.levelCleared = false;
+        startGame(state.gameMode === 'tutorial' ? 'tutorial' : 'sefer');
       },
       secondaryText: 'Ana Sayfa',
-      onSecondary: () => {
-        state.gameMode = null;
-        state.levelCleared = false;
-        hideGameScreen();
-      }
+      onSecondary: () => { state.gameMode = null; state.levelCleared = false; hideGameScreen(); }
     });
   }
-}
-
-function showRankUp(oldRank, newRank) {
-  sound.rankUp();
-  toast(`⬆️ Terfi! ${oldRank.name} → ${newRank.name}`, 'text-amber-300');
 }
 
 // ============================================================
 // 🎨 RENDER
 // ============================================================
 function renderAll() {
-  renderHeader();
   renderHome();
   renderProfile();
   renderSettings();
   updateTabBar();
-}
-
-function renderHeader() {
-  const bal = state.profile.balance;
-  const balEl = document.getElementById('headerBalance');
-  const balVal = document.getElementById('balanceVal');
-  if (bal > 0 || state.screen !== 'home') {
-    balEl.classList.remove('hidden');
-    balEl.classList.add('flex');
-    balVal.textContent = bal;
-  } else {
-    balEl.classList.add('hidden');
-    balEl.classList.remove('flex');
-  }
-
-  const subtitle = { home: 'Ana Sayfa', profile: 'Profil', settings: 'Ayarlar' }[state.screen] || '';
-  document.getElementById('headerSubtitle').textContent = subtitle;
 }
 
 function renderHome() {
@@ -1223,61 +1031,51 @@ function renderHome() {
 
   const fDate = fermanDateStr();
   let fermanStatus = 'available';
-  if (p.fermanState && p.fermanState.date === fDate) {
-    fermanStatus = p.fermanState.status;
-  }
+  if (p.fermanState && p.fermanState.date === fDate) fermanStatus = p.fermanState.status;
 
   const fermanSubtitle = {
-    available: 'Yeni ferman yayınlandı — oyna',
+    available: 'Yeni ferman yayınlandı',
     in_progress: 'Devam ediyor',
-    solved: 'Bu ferman çözüldü ✓',
-    failed: 'Bu ferman başarısız — yeni fermanı bekle'
+    solved: 'Çözüldü ✓',
+    failed: 'Başarısız — yeni fermanı bekle'
   }[fermanStatus];
 
   const fermanDisabled = fermanStatus === 'solved' || fermanStatus === 'failed';
-  const fermanBadge = fermanStatus === 'available' ? '✨' : fermanStatus === 'solved' ? '✓' : '';
 
   el.innerHTML = `
-    <div class="flex items-center justify-between px-1 mt-1">
-      <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Merhaba, ${escapeHtml(p.name)}</div>
-      <div class="text-[11px] text-amber-300 font-bold flex items-center gap-1">${getCurrentRank(p.totalKings).glyph} ${getCurrentRank(p.totalKings).name}</div>
-    </div>
-
-    <button data-mode="sefer" class="menu-card rounded-2xl p-3.5 flex items-center gap-3 text-left w-full">
-      <div class="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-2xl">⚔️</div>
+    <button data-mode="ferman" class="menu-card rounded-2xl p-4 flex items-center gap-3 text-left w-full ${fermanDisabled ? 'disabled' : ''}" ${fermanDisabled ? 'disabled' : ''}>
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-2xl" style="background: var(--bg-elevated); border: 1px solid var(--border);">📜</div>
       <div class="flex-1 min-w-0">
-        <div class="text-sm font-extrabold text-white">Sefere Çık</div>
-        <div class="text-[11px] text-gray-400 truncate">Seviye ${p.currentLevel} · Devam et</div>
+        <div class="text-sm font-extrabold">Ferman Yayınlandı</div>
+        <div class="text-[11px] mt-0.5" style="color: var(--text-secondary);">${fermanSubtitle}</div>
       </div>
-      <div class="text-amber-400 text-lg">›</div>
+      <div class="text-lg" style="color: var(--text-secondary);">›</div>
     </button>
 
-    <button data-mode="ferman" class="menu-card rounded-2xl p-3.5 flex items-center gap-3 text-left w-full ${fermanDisabled ? 'disabled' : ''}" ${fermanDisabled ? 'disabled' : ''}>
-      <div class="w-11 h-11 rounded-xl bg-purple-500/15 border border-purple-400/30 flex items-center justify-center text-2xl">📜</div>
+    <button data-mode="sefer" class="menu-card rounded-2xl p-4 flex items-center gap-3 text-left w-full">
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-2xl" style="background: var(--bg-elevated); border: 1px solid var(--border);">⚔️</div>
       <div class="flex-1 min-w-0">
-        <div class="text-sm font-extrabold text-white">Ferman Yayınlandı ${fermanBadge}</div>
-        <div class="text-[11px] text-gray-400 truncate">${fermanSubtitle}</div>
+        <div class="text-sm font-extrabold">Sefere Çık</div>
+        <div class="text-[11px] mt-0.5" style="color: var(--text-secondary);">Seviye ${p.currentLevel} · Devam et</div>
       </div>
-      <div class="text-purple-400 text-lg">›</div>
+      <div class="text-lg" style="color: var(--text-secondary);">›</div>
     </button>
 
-    <div class="menu-card rounded-2xl p-3.5 flex items-center gap-3 disabled">
-      <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl">🏆</div>
+    <div class="menu-card rounded-2xl p-4 flex items-center gap-3 disabled">
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-2xl" style="background: var(--bg-elevated); border: 1px solid var(--border);">🏆</div>
       <div class="flex-1">
-        <div class="text-sm font-extrabold text-white">Turnuva</div>
-        <div class="text-[11px] text-gray-400">Yakında</div>
+        <div class="text-sm font-extrabold">Turnuva</div>
+        <div class="text-[11px] mt-0.5" style="color: var(--text-secondary);">Yakında</div>
       </div>
     </div>
 
-    <div class="menu-card rounded-2xl p-3.5 flex items-center gap-3 disabled">
-      <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl">🎯</div>
+    <div class="menu-card rounded-2xl p-4 flex items-center gap-3 disabled">
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center text-2xl" style="background: var(--bg-elevated); border: 1px solid var(--border);">🎯</div>
       <div class="flex-1">
-        <div class="text-sm font-extrabold text-white">Düello</div>
-        <div class="text-[11px] text-gray-400">Yakında</div>
+        <div class="text-sm font-extrabold">Düello</div>
+        <div class="text-[11px] mt-0.5" style="color: var(--text-secondary);">Yakında</div>
       </div>
     </div>
-
-    <div class="text-center text-[10px] text-gray-600 mt-2">Şahları da Vururlar v2</div>
   `;
 
   el.querySelectorAll('[data-mode]').forEach(btn => {
@@ -1285,16 +1083,10 @@ function renderHome() {
     btn.addEventListener('click', () => {
       const mode = btn.dataset.mode;
       if (mode === 'sefer') {
-        if (!state.profile.tutorialDone) {
-          startGame('tutorial');
-        } else {
-          startGame('sefer');
-        }
+        if (!state.profile.tutorialDone) startGame('tutorial');
+        else startGame('sefer');
       } else if (mode === 'ferman') {
-        if (!state.profile.tutorialDone) {
-          toast('Önce eğitimi tamamla.', 'text-rose-300');
-          return;
-        }
+        if (!state.profile.tutorialDone) { toast('Önce eğitimi tamamla.'); return; }
         startGame('ferman');
       }
     });
@@ -1305,60 +1097,25 @@ function renderProfile() {
   const el = document.getElementById('profileScreen');
   if (!el || state.screen !== 'profile') return;
   const p = state.profile;
-  const rank = getCurrentRank(p.totalKings);
-  const next = getNextRank(p.totalKings);
-  const progress = getRankProgress(p.totalKings);
 
   el.innerHTML = `
-    <div class="rounded-2xl bg-[#171a21] border border-white/10 p-4 flex flex-col items-center gap-2 slide-up">
-      <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500/30 to-red-500/20 border-2 border-amber-400/40 flex items-center justify-center text-4xl" style="box-shadow: 0 6px 20px rgba(245,158,11,0.25);">
-        ${rank.glyph}
-      </div>
+    <div class="rounded-2xl p-5 flex flex-col items-center gap-3 slide-up" style="background: var(--bg-surface); border: 1px solid var(--border);">
+      <div class="w-16 h-16 rounded-full flex items-center justify-center text-3xl" style="background: var(--bg-elevated); border: 1.5px solid var(--border-strong);">👤</div>
       <div class="text-center">
-        <div class="text-base font-black text-white">${escapeHtml(p.name)}</div>
-        <div class="text-xs text-amber-300 font-bold">${rank.glyph} ${rank.name}</div>
+        <div class="text-base font-black">${escapeHtml(p.name)}</div>
       </div>
-      <button id="changeNameBtn" class="mt-1 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-bold text-gray-300 flex items-center gap-1.5">
-        ✏️ İsim Değiştir (1♔)
+      <button id="changeNameBtn" class="px-4 py-2 rounded-lg text-xs font-bold" style="background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-primary);">
+        ✏️ İsim Değiştir
       </button>
-    </div>
-
-    <div class="rounded-2xl bg-[#171a21] border border-white/10 p-4">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-bold text-gray-300">İlerleme</span>
-        <span class="text-xs font-bold text-amber-300">${next ? `${next.glyph} ${next.name}` : 'Maksimum'}</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" style="width: ${progress}%;"></div>
-      </div>
-      <div class="text-[10px] text-gray-500 mt-1.5">Sonraki rütbeye ilerleme</div>
-    </div>
-
-    <div class="grid grid-cols-2 gap-2">
-      <div class="rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
-        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Vurulan Şah</span>
-        <span class="text-lg font-black text-red-300 mt-0.5">${p.totalKings}</span>
-      </div>
-      <div class="rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
-        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Bakiye</span>
-        <span class="text-lg font-black text-amber-300 mt-0.5">${p.balance} ♔</span>
-      </div>
-      <div class="rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
-        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Kazanma Serisi</span>
-        <span class="text-lg font-black text-orange-300 mt-0.5">${p.winStreak}🔥</span>
-      </div>
-      <div class="rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
-        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">En Yüksek Combo</span>
-        <span class="text-lg font-black text-sky-300 mt-0.5">${p.bestCombo}</span>
-      </div>
-      <div class="col-span-2 rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
-        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">En Yüksek Seviye</span>
-        <span class="text-lg font-black text-purple-300 mt-0.5">${p.maxLevel}</span>
-      </div>
     </div>
   `;
 
-  document.getElementById('changeNameBtn').addEventListener('click', openNameModal);
+  document.getElementById('changeNameBtn').addEventListener('click', () => {
+    const input = document.getElementById('nameInput');
+    input.value = state.profile.name;
+    document.getElementById('nameOverlay').classList.remove('hidden');
+    setTimeout(() => input.focus(), 50);
+  });
 }
 
 function renderSettings() {
@@ -1366,38 +1123,46 @@ function renderSettings() {
   if (!el || state.screen !== 'settings') return;
 
   el.innerHTML = `
-    <div class="rounded-2xl bg-[#171a21] border border-white/10 divide-y divide-white/5">
-      <button id="soundToggle" class="w-full p-3.5 flex items-center justify-between text-left">
+    <div class="rounded-2xl overflow-hidden slide-up" style="background: var(--bg-surface); border: 1px solid var(--border);">
+      <button id="soundToggle" class="w-full p-4 flex items-center justify-between text-left" style="border-bottom: 1px solid var(--border);">
         <div class="flex items-center gap-3">
-          <span class="text-lg">🔊</span>
-          <span class="text-sm font-bold text-white">Ses</span>
+          <span class="text-lg">${sound.muted ? '🔇' : '🔊'}</span>
+          <span class="text-sm font-bold">Ses</span>
         </div>
-        <span id="soundStatus" class="text-xs font-bold ${sound.muted ? 'text-gray-500' : 'text-emerald-400'}">${sound.muted ? 'Kapalı' : 'Açık'}</span>
+        <span class="text-xs font-bold" style="color: ${sound.muted ? 'var(--text-muted)' : 'var(--text-primary)'};">${sound.muted ? 'Kapalı' : 'Açık'}</span>
       </button>
 
-      <button id="rulesToggle" class="w-full p-3.5 flex items-center justify-between text-left">
+      <button id="rulesToggle" class="w-full p-4 flex items-center justify-between text-left" style="border-bottom: 1px solid var(--border);">
         <div class="flex items-center gap-3">
           <span class="text-lg">📖</span>
-          <span class="text-sm font-bold text-white">Nasıl Oynanır?</span>
+          <span class="text-sm font-bold">Nasıl Oynanır?</span>
         </div>
-        <span class="text-gray-500 text-lg">›</span>
+        <span class="text-lg" style="color: var(--text-secondary);">›</span>
       </button>
 
-      <button id="resetToggle" class="w-full p-3.5 flex items-center justify-between text-left">
+      <button id="resetToggle" class="w-full p-4 flex items-center justify-between text-left">
         <div class="flex items-center gap-3">
           <span class="text-lg">🗑️</span>
-          <span class="text-sm font-bold text-rose-400">İlerlemeyi Sıfırla</span>
+          <span class="text-sm font-bold">İlerlemeyi Sıfırla</span>
         </div>
       </button>
     </div>
 
-    <div class="rounded-2xl bg-[#171a21] border border-white/10 p-4 text-center">
-      <div class="text-[11px] text-gray-400 leading-relaxed">
-        <div class="font-bold text-white mb-1">Şahları da Vururlar</div>
-        <div>Versiyon 2.0</div>
-        <div class="mt-2 text-gray-500">Bir bulmaca oyunu</div>
+    <div class="rounded-2xl p-4" style="background: var(--bg-surface); border: 1px solid var(--border);">
+      <div class="text-xs font-bold mb-3" style="color: var(--text-secondary);">TEMA</div>
+      <div class="grid grid-cols-2 gap-2">
+        <button data-theme="dark" class="theme-btn ${state.theme === 'dark' ? 'active' : ''} rounded-xl py-3 flex flex-col items-center gap-1">
+          <span class="text-lg">🌙</span>
+          <span class="text-xs font-bold">Siyah</span>
+        </button>
+        <button data-theme="light" class="theme-btn ${state.theme === 'light' ? 'active' : ''} rounded-xl py-3 flex flex-col items-center gap-1">
+          <span class="text-lg">☀️</span>
+          <span class="text-xs font-bold">Beyaz</span>
+        </button>
       </div>
     </div>
+
+    <div class="text-center text-[10px] mt-2" style="color: var(--text-muted);">Şahları da Vururlar · v2.0</div>
   `;
 
   document.getElementById('soundToggle').addEventListener('click', () => {
@@ -1414,27 +1179,27 @@ function renderSettings() {
     showModal({
       icon: '⚠️',
       title: 'İlerlemeyi Sıfırla',
-      desc: 'Tüm rank, bakiye ve istatistikler silinir. Emin misin?',
+      desc: 'Tüm ilerleme silinir. Emin misin?',
       primaryText: 'Evet, Sil',
-      onPrimary: () => {
-        localStorage.removeItem(PROFILE_KEY);
-        location.reload();
-      },
+      onPrimary: () => { localStorage.removeItem(PROFILE_KEY); location.reload(); },
       secondaryText: 'Vazgeç'
+    });
+  });
+
+  document.querySelectorAll('[data-theme]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.theme = btn.dataset.theme;
+      saveTheme();
+      applyTheme();
+      renderSettings();
     });
   });
 }
 
 function updateTabBar() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
-    const tab = btn.dataset.tab;
-    if (tab === state.screen) {
-      btn.classList.add('active');
-      btn.classList.remove('text-gray-400');
-    } else {
-      btn.classList.remove('active');
-      btn.classList.add('text-gray-400');
-    }
+    if (btn.dataset.tab === state.screen) btn.classList.add('active');
+    else btn.classList.remove('active');
   });
 }
 
@@ -1444,20 +1209,10 @@ function updateTabBar() {
 function renderGame() {
   if (state.screen !== 'game' || !state.levelData) return;
 
-  const lvl = state.levelData;
-  const remKings = countKings(state.board);
-
   document.getElementById('gameTitle').textContent =
-    state.gameMode === 'ferman' ? `📜 Ferman` :
+    state.gameMode === 'ferman' ? '📜 Ferman' :
     state.gameMode === 'tutorial' ? 'Eğitim' :
-    `Seviye ${lvl.levelNum}`;
-  document.getElementById('gameSubtitle').textContent = `${remKings} şah kaldı`;
-  document.getElementById('gameBalance').textContent = state.profile.balance;
-
-  document.getElementById('undoBtn').disabled = state.history.length === 0 || state.levelCleared;
-  document.getElementById('hintBtn').disabled = state.levelCleared || state.profile.balance < 1;
-  document.getElementById('retryBtn').disabled = state.levelCleared;
-  document.getElementById('rerollBtn').disabled = state.levelCleared || state.profile.balance < 1 || state.gameMode === 'ferman';
+    `Seviye ${state.levelData.levelNum}`;
 
   renderBoard();
   renderDock();
@@ -1470,15 +1225,13 @@ function renderBoard() {
   const selectedType = state.selectedDockIndex !== null ? state.dock[state.selectedDockIndex] : null;
 
   let activeAttack = { targets: [], paths: [] };
-  if (selectedType && state.hoverSquare &&
-      state.board[state.hoverSquare.r][state.hoverSquare.c] === null &&
-      !state.levelCleared) {
-    activeAttack = computeAttack(state.board, selectedType, state.hoverSquare.r, state.hoverSquare.c);
+  if (selectedType && !state.levelCleared) {
+    // Sadece hover değil, geçerli tüm tıklanabilir kareleri gösterebiliriz
+    // Ancak sadeleştirme için hover olmadan göstermiyoruz (mobil öncelikli)
   }
 
   const pathSet = new Set(activeAttack.paths.map(p => `${p.r},${p.c}`));
   const targetMap = new Map(activeAttack.targets.map(t => [`${t.r},${t.c}`, t.kind]));
-  const hintKey = state.hintMove ? `${state.hintMove.r},${state.hintMove.c}` : null;
 
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
@@ -1492,52 +1245,26 @@ function renderBoard() {
       sq.dataset.r = r;
       sq.dataset.c = c;
       sq.className = `board-square ${isLight ? 'sq-light' : 'sq-dark'}`;
-
+      if (isEmpty && selectedType && !state.levelCleared) sq.classList.add('valid-target');
       if (state.flashingSquares.has(key)) sq.classList.add('square-hit-flash');
-      if (hintKey === key) sq.classList.add('preview-hint');
-
-      if (state.hoverSquare && state.hoverSquare.r === r && state.hoverSquare.c === c && isEmpty && selectedType) {
-        sq.classList.add('preview-hover-empty');
-      } else if (targetMap.has(key)) {
-        const tKind = targetMap.get(key);
-        sq.classList.add(tKind === 'KING' ? 'preview-king-target' : 'preview-target');
-      } else if (pathSet.has(key)) {
-        sq.classList.add('preview-path');
-      }
 
       if (cell) {
-        const token = document.createElement('div');
-        token.className = 'w-[80%] h-[80%] rounded-lg flex flex-col items-center justify-center relative pointer-events-none';
+        const box = document.createElement('div');
+        box.className = 'piece-box';
         if (cell.kind === 'KING') {
-          token.classList.add('badge-king-enemy', 'king-target-badge');
-          token.innerHTML = `<span class="piece-glyph text-2xl sm:text-3xl">♚</span>`;
+          box.classList.add('enemy', 'king-pulse');
+          box.innerHTML = `<span class="piece-glyph text-2xl sm:text-3xl">♚</span>`;
         } else if (cell.kind === 'PAWN') {
-          token.classList.add('badge-pawn');
-          token.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">♟</span>`;
+          box.classList.add('pawn');
+          box.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">♟</span>`;
         } else if (cell.kind === 'FRIENDLY') {
           const def = PIECE_DEFS[cell.pieceType] || PIECE_DEFS.ROOK;
-          if (cell.pieceType === 'SHADOW_KING') {
-            token.classList.add('badge-king-ally');
-          } else {
-            token.classList.add('badge-friendly');
-          }
-          if (cell.justPlaced) { token.classList.add('smash-enter'); cell.justPlaced = false; }
-          token.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">${def.glyph}</span>`;
+          if (cell.pieceType === 'SHADOW_KING') box.classList.add('shadow-king');
+          else box.classList.add('ally');
+          if (cell.justPlaced) { box.classList.add('smash-enter'); cell.justPlaced = false; }
+          box.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">${def.glyph}</span>`;
         }
-        sq.appendChild(token);
-      } else if (hintKey === key && state.hintMove) {
-        const def = PIECE_DEFS[state.hintMove.pieceType];
-        const ghost = document.createElement('span');
-        ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-90 text-amber-200 pointer-events-none';
-        ghost.textContent = def.glyph;
-        sq.appendChild(ghost);
-      } else if (state.hoverSquare && state.hoverSquare.r === r &&
-                 state.hoverSquare.c === c && selectedType && !state.levelCleared) {
-        const def = PIECE_DEFS[selectedType];
-        const ghost = document.createElement('span');
-        ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-60 text-amber-300 pointer-events-none';
-        ghost.textContent = def.glyph;
-        sq.appendChild(ghost);
+        sq.appendChild(box);
       }
 
       grid.appendChild(sq);
@@ -1549,27 +1276,35 @@ function renderBoard() {
 function renderDock() {
   const el = document.getElementById('dockContainer');
   el.innerHTML = '';
-  state.dock.forEach((pieceType, idx) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.dataset.dockIdx = idx;
 
-    if (!pieceType) {
-      btn.disabled = true;
-      btn.className = 'dock-card rounded-xl py-2 px-1 flex flex-col items-center justify-center opacity-25 cursor-not-allowed min-h-[72px]';
-      btn.innerHTML = `<span class="text-[10px] font-bold text-gray-500">KULLANILDI</span>`;
-      el.appendChild(btn);
-      return;
-    }
+  const filled = state.dock.filter(x => x !== null);
+  const count = filled.length;
+
+  // Dinamik grid: 1→1, 2→2, 3→3 sütun
+  let gridCols = 'grid-cols-3';
+  let maxW = '100%';
+  if (count === 1) { gridCols = 'grid-cols-1'; maxW = '92px'; }
+  else if (count === 2) { gridCols = 'grid-cols-2'; maxW = '200px'; }
+
+  el.className = `grid ${gridCols} gap-2`;
+  el.style.maxWidth = maxW;
+  el.style.marginLeft = 'auto';
+  el.style.marginRight = 'auto';
+
+  state.dock.forEach((pieceType, idx) => {
+    if (!pieceType) return;
 
     const def = PIECE_DEFS[pieceType];
     const isSelected = state.selectedDockIndex === idx;
     const isShadow = pieceType === 'SHADOW_KING';
 
-    btn.className = `dock-card rounded-xl py-2 px-1 flex flex-col items-center justify-center cursor-pointer min-h-[72px] ${isSelected ? 'selected' : ''}`;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.dataset.dockIdx = idx;
+    btn.className = `dock-card rounded-xl py-3 px-2 flex flex-col items-center justify-center cursor-pointer min-h-[76px] ${isSelected ? 'selected' : ''}`;
     btn.innerHTML = `
-      <span class="piece-glyph text-2xl sm:text-3xl ${isShadow ? 'text-purple-300' : isSelected ? 'text-amber-300' : 'text-white'}">${def.glyph}</span>
-      <span class="mt-0.5 text-[10px] font-extrabold ${isSelected ? 'text-amber-300' : 'text-gray-200'}">${def.name}</span>
+      <span class="piece-glyph text-2xl sm:text-3xl ${isShadow ? 'font-bold' : ''}">${def.glyph}</span>
+      <span class="mt-0.5 text-[10px] font-extrabold" style="color: var(--text-secondary);">${def.name}</span>
     `;
     el.appendChild(btn);
   });
@@ -1578,10 +1313,7 @@ function renderDock() {
 // ============================================================
 // 🎯 EVENT HANDLERS
 // ============================================================
-const grid = document.getElementById('boardGrid');
-const dockContainer = document.getElementById('dockContainer');
-
-grid.addEventListener('click', (e) => {
+document.getElementById('boardGrid').addEventListener('click', (e) => {
   const btn = e.target.closest('.board-square');
   if (!btn) return;
   const r = parseInt(btn.dataset.r, 10);
@@ -1595,43 +1327,19 @@ grid.addEventListener('click', (e) => {
   placeAndSmash(r, c);
 });
 
-grid.addEventListener('pointerover', (e) => {
-  if (e.pointerType !== 'mouse') return;
-  const btn = e.target.closest('.board-square');
-  if (!btn) return;
-  const r = parseInt(btn.dataset.r, 10);
-  const c = parseInt(btn.dataset.c, 10);
-  if (isNaN(r) || isNaN(c)) return;
-  if (state.hoverSquare && state.hoverSquare.r === r && state.hoverSquare.c === c) return;
-  state.hoverSquare = { r, c };
-  renderBoard();
-});
-
-grid.addEventListener('pointerleave', () => {
-  if (state.hoverSquare !== null) {
-    state.hoverSquare = null;
-    renderBoard();
-  }
-});
-
-dockContainer.addEventListener('click', (e) => {
+document.getElementById('dockContainer').addEventListener('click', (e) => {
   const btn = e.target.closest('.dock-card');
   if (!btn || btn.disabled) return;
   const idx = parseInt(btn.dataset.dockIdx, 10);
   if (isNaN(idx) || !state.dock[idx]) return;
   state.selectedDockIndex = idx;
   sound.select();
-  renderBoard();
-  renderDock();
+  renderGame();
 });
 
-document.getElementById('undoBtn').addEventListener('click', undoMove);
-document.getElementById('retryBtn').addEventListener('click', retryLevel);
-document.getElementById('hintBtn').addEventListener('click', useHint);
-document.getElementById('rerollBtn').addEventListener('click', rerollDock);
-document.getElementById('backBtn').addEventListener('click', () => exitGame());
+document.getElementById('backBtn').addEventListener('click', exitGame);
 
-// Sekme geçişleri
+// Sekmeler
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     state.screen = btn.dataset.tab;
@@ -1645,33 +1353,21 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// İsim değiştirme
-function openNameModal() {
-  if (state.profile.balance < 1) {
-    toast('Yeterli şah puanın yok.', 'text-rose-300');
-    return;
-  }
-  const input = document.getElementById('nameInput');
-  input.value = state.profile.name;
-  document.getElementById('nameOverlay').classList.remove('hidden');
-  setTimeout(() => input.focus(), 50);
-}
+// İsim
 document.getElementById('nameCancelBtn').addEventListener('click', () => {
   document.getElementById('nameOverlay').classList.add('hidden');
 });
 document.getElementById('nameConfirmBtn').addEventListener('click', () => {
   const val = document.getElementById('nameInput').value.trim();
-  if (!val) { toast('İsim boş olamaz.', 'text-rose-300'); return; }
-  if (state.profile.balance < 1) { toast('Yeterli bakiyen yok.', 'text-rose-300'); return; }
-  state.profile.balance -= 1;
+  if (!val) { toast('İsim boş olamaz.'); return; }
   state.profile.name = val.substring(0, 20);
   saveProfile();
   document.getElementById('nameOverlay').classList.add('hidden');
-  toast('İsmin değiştirildi ✓', 'text-emerald-300');
+  toast('İsmin değiştirildi ✓');
   renderAll();
 });
 
-// Kurallar modal
+// Kurallar
 document.getElementById('rulesCloseBtn').addEventListener('click', () => {
   document.getElementById('rulesOverlay').classList.add('hidden');
 });
@@ -1682,13 +1378,13 @@ document.getElementById('rulesOkBtn').addEventListener('click', () => {
 // ============================================================
 // 🎉 YARDIMCILAR
 // ============================================================
-function spawnPopup(r, c, text, colorClass) {
+function spawnPopup(r, c, text) {
   const grid = document.getElementById('boardGrid');
   const sqEl = grid.children[r * 8 + c];
   if (!sqEl) return;
   const rect = sqEl.getBoundingClientRect();
   const popup = document.createElement('div');
-  popup.className = `floating-popup-fixed ${colorClass}`;
+  popup.className = 'floating-popup-fixed';
   popup.style.left = `${rect.left + rect.width / 2}px`;
   popup.style.top = `${rect.top + rect.height / 2}px`;
   popup.textContent = text;
@@ -1696,9 +1392,9 @@ function spawnPopup(r, c, text, colorClass) {
   setTimeout(() => popup.remove(), 750);
 }
 
-function toast(text, colorClass = 'text-amber-300') {
+function toast(text) {
   const t = document.createElement('div');
-  t.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[120] px-4 py-2 rounded-xl bg-[#1a1e27] border border-white/15 font-bold text-sm shadow-2xl ${colorClass}`;
+  t.className = 'toast-msg fixed top-4 left-1/2 -translate-x-1/2 z-[120] px-4 py-2 rounded-xl font-bold text-xs shadow-2xl';
   t.style.maxWidth = '90vw';
   t.textContent = text;
   document.body.appendChild(t);
@@ -1715,9 +1411,11 @@ function escapeHtml(s) {
 // 🚀 BAŞLAT
 // ============================================================
 window.addEventListener('DOMContentLoaded', () => {
+  loadTheme();
+  applyTheme();
   loadProfile();
-  state.screen = 'home';
 
+  state.screen = 'home';
   document.getElementById('homeScreen').classList.add('flex');
   document.getElementById('homeScreen').classList.remove('hidden');
   document.getElementById('profileScreen').classList.add('hidden');
@@ -1726,9 +1424,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('settingsScreen').classList.remove('flex');
 
   if (!state.profile.tutorialDone) {
-    setTimeout(() => {
-      startGame('tutorial');
-    }, 200);
+    setTimeout(() => startGame('tutorial'), 250);
   } else {
     renderAll();
   }
