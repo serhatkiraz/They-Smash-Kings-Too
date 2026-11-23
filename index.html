@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta name="theme-color" content="#0f1115" />
-<title>Şahları da Vururlar</title>
+<title>Şahları da Vururlar 2</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -132,14 +132,15 @@
   .progress-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); transition: width 0.6s cubic-bezier(0.22,1,0.36,1); border-radius: 999px; }
 
   .util-btn {
-    padding: 0.4rem 0.7rem;
+    padding: 0.4rem 0.5rem;
     border-radius: 0.55rem;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
     border: 1px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.05);
     color: #d1d5db;
     transition: background-color 0.15s ease, transform 0.1s ease;
+    white-space: nowrap;
   }
   .util-btn:not(:disabled):active { transform: scale(0.95); background: rgba(255,255,255,0.12); }
   .util-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -157,7 +158,7 @@
     <div class="flex items-center gap-2.5">
       <div class="w-9 h-9 rounded-xl bg-red-500/15 border border-red-400/30 flex items-center justify-center text-xl text-red-400">♚</div>
       <div>
-        <h1 class="text-base font-black tracking-tight leading-tight">Şahları da Vururlar 5</h1>
+        <h1 class="text-base font-black tracking-tight leading-tight">Şahları da Vururlar</h1>
         <p id="headerSubtitle" class="text-[10px] text-gray-400">Ana Sayfa</p>
       </div>
     </div>
@@ -169,11 +170,8 @@
 
   <!-- Ana İçerik -->
   <main class="flex-1 overflow-y-auto px-4 pb-2">
-    <!-- HOME -->
     <section id="homeScreen" class="flex flex-col gap-3 py-2"></section>
-    <!-- PROFILE -->
     <section id="profileScreen" class="hidden flex-col gap-3 py-2"></section>
-    <!-- SETTINGS -->
     <section id="settingsScreen" class="hidden flex-col gap-3 py-2"></section>
   </main>
 
@@ -227,7 +225,8 @@
     <div class="flex items-center justify-center gap-1.5" style="max-width: min(94vw, 480px); margin-left: auto; margin-right: auto;">
       <button id="undoBtn" class="util-btn flex-1">↩ Geri</button>
       <button id="retryBtn" class="util-btn flex-1">↻ Yeniden</button>
-      <button id="hintBtn" class="util-btn flex-1" style="border-color: rgba(245,158,11,0.4); color: #fbbf24;">💡 İpucu (1♔)</button>
+      <button id="hintBtn" class="util-btn flex-1" style="border-color: rgba(245,158,11,0.4); color: #fbbf24;">💡 1♔</button>
+      <button id="rerollBtn" class="util-btn flex-1" style="border-color: rgba(245,158,11,0.4); color: #fbbf24;">🎲 1♔</button>
     </div>
   </div>
 </div>
@@ -240,7 +239,7 @@
     <div id="modalIcon" class="text-4xl mb-2">👑</div>
     <h2 id="modalTitle" class="text-lg font-black text-white mb-1">Başlık</h2>
     <p id="modalDesc" class="text-xs text-gray-300 mb-4 leading-relaxed"></p>
-    <div id="modalStats" class="hidden flex items-center justify-center gap-3 text-xs bg-black/30 rounded-xl p-2.5 mb-4 border border-white/5"></div>
+    <div id="modalStats" class="hidden items-center justify-center gap-3 text-xs bg-black/30 rounded-xl p-2.5 mb-4 border border-white/5"></div>
     <button id="modalPrimaryBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-red-500 text-white font-extrabold text-sm shadow-lg">Devam</button>
     <button id="modalSecondaryBtn" class="mt-2 w-full py-2 rounded-xl bg-white/5 text-gray-300 font-semibold text-xs hidden">İkincil</button>
   </div>
@@ -272,7 +271,7 @@
     </div>
     <ul class="space-y-2.5 text-xs text-gray-300 leading-relaxed">
       <li><strong class="text-amber-400">Amaç:</strong> Tahtadaki tüm <strong class="text-red-400">kırmızı Şah (♚)</strong> taşlarını devir.</li>
-      <li><strong class="text-amber-400">Koy & Vur:</strong> Alttaki taşlardan birini seç, boş kareye dokun. Taş, satranç hattındaki ilk hedefi ezer.</li>
+      <li><strong class="text-amber-400">Koy &amp; Vur:</strong> Alttaki taşlardan birini seç, boş kareye dokun. Taş, satranç hattındaki ilk hedefi ezer.</li>
       <li><strong class="text-amber-400">Satranç Kuralı:</strong> Kendi taşların da yolu keser. At hariç — at her şeyin üzerinden atlar.</li>
       <li><strong class="text-amber-400">Taş Menzilleri:</strong>
         <span class="block text-gray-400 text-[11px] mt-1">
@@ -284,8 +283,8 @@
           ♔ <strong>Gölge Şah:</strong> 8 komşu kare
         </span>
       </li>
-      <li><strong class="text-amber-400">Yerleştirilen Taşlar:</strong> Tahtada kalır ve engel olur.</li>
-      <li><strong class="text-amber-400">Şah Puanı:</strong> Vurulan her Şah +1 puan verir. Bunları ipucu (1) veya isim değiştirmek (1) için harcayabilirsin. Rank'ın harcamadan etkilenmez.</li>
+      <li><strong class="text-amber-400">Temiz Zafer:</strong> Tüm şahları ve piyonları temizlersen <strong class="text-emerald-400">+1 bonus şah</strong> kazanırsın.</li>
+      <li><strong class="text-amber-400">Şah Puanı:</strong> Vurulan her Şah +1 puan verir. Bunları ipucu (1), taş değiştirme (1) veya isim değiştirmek (1) için harcayabilirsin. Rank'ın harcamadan etkilenmez.</li>
     </ul>
     <button id="rulesOkBtn" class="mt-4 w-full py-2.5 rounded-xl bg-amber-500 text-gray-950 font-extrabold text-sm">Anladım</button>
   </div>
@@ -374,20 +373,19 @@ const sound = new SoundEngine();
 // 📦 DURUM
 // ============================================================
 const state = {
-  screen: 'home', // 'home' | 'profile' | 'settings' | 'game'
+  screen: 'home',
   profile: {
     name: 'İsimsiz Piyon',
     totalKings: 0,
     balance: 0,
-    currentLevel: 2,     // Sefer'de devam edilecek seviye
+    currentLevel: 2,
     maxLevel: 1,
     winStreak: 0,
     bestCombo: 0,
     tutorialDone: false,
-    fermanState: null    // { date: 'YYYY-MM-DD', status: 'in_progress'|'solved'|'failed' }
+    fermanState: null
   },
-  // Oyun durumu
-  gameMode: 'sefer',    // 'sefer' | 'ferman' | 'tutorial'
+  gameMode: 'sefer',
   levelData: null,
   board: [],
   dock: [],
@@ -414,7 +412,6 @@ function loadProfile() {
       Object.assign(state.profile, p);
     }
   } catch {}
-  // in_progress ferman → sayfa yenilendiyse failed say
   if (state.profile.fermanState && state.profile.fermanState.status === 'in_progress') {
     state.profile.fermanState.status = 'failed';
     saveProfile();
@@ -422,7 +419,7 @@ function loadProfile() {
 }
 
 // ============================================================
-// 📊 RANK SİSTEMİ
+// 📊 RANK
 // ============================================================
 function getCurrentRank(totalKings) {
   let r = RANKS[0];
@@ -442,13 +439,8 @@ function getRankProgress(totalKings) {
 }
 
 // ============================================================
-// 🎯 MEKANİK: SATRANÇ IŞIN HESABI
+// 🎯 MEKANİK
 // ============================================================
-/**
- * Bir taşın (r,c)'ye konduğunda vurabileceği hedefleri hesaplar.
- * Yeni kural: her yönde İLK engelde durur. Düşman → yık+dur, dost → dur.
- * At: blok yok, sadece 8 L karesi.
- */
 function computeAttack(board, pieceType, r, c) {
   const targets = [];
   const paths = [];
@@ -456,8 +448,7 @@ function computeAttack(board, pieceType, r, c) {
 
   function rayCheck(nr, nc) {
     const cell = board[nr][nc];
-    if (cell && cell.kind === 'FRIENDLY') return 'block';
-    if (cell && cell.kind === 'ALLY_KING') return 'block';
+    if (cell && (cell.kind === 'FRIENDLY' || cell.kind === 'ALLY_KING')) return 'block';
     paths.push({ r: nr, c: nc });
     if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
       targets.push({ r: nr, c: nc, kind: cell.kind });
@@ -535,6 +526,11 @@ function countKings(board) {
   for (const row of board) for (const c of row) if (c && c.kind === 'KING') n++;
   return n;
 }
+function countPawns(board) {
+  let n = 0;
+  for (const row of board) for (const c of row) if (c && c.kind === 'PAWN') n++;
+  return n;
+}
 function hasEmpty(board) {
   for (const row of board) for (const c of row) if (c === null) return true;
   return false;
@@ -550,7 +546,7 @@ function shuffle(arr) {
 }
 
 // ============================================================
-// 🏗️ SEVİYE ÜRETİMİ (Sefer)
+// 🏗️ SEFER ÜRETİMİ
 // ============================================================
 function getSeferParams(levelNum) {
   const n = levelNum - 1;
@@ -676,7 +672,7 @@ function createTrivialLevel(levelNum) {
 }
 
 // ============================================================
-// 🎲 DOCK DAĞITIMI
+// 🎲 DOCK
 // ============================================================
 function weightedPick(pool) {
   const weights = pool.map(p => DOCK_WEIGHTS[p] || 10);
@@ -701,12 +697,10 @@ function smartRollDock(board) {
   }
   const uArr = [...useful];
   const dock = [0, 1, 2].map(() => weightedPick(ALL_PIECES));
-  // En az 1 faydalı taş garantile
   if (uArr.length > 0) {
     dock[0] = uArr[Math.floor(rng() * uArr.length)];
     if (rng() < 0.4) dock[1] = uArr[Math.floor(rng() * uArr.length)];
   }
-  // En fazla 1 SHADOW_KING
   let skCount = dock.filter(p => p === 'SHADOW_KING').length;
   for (let i = 2; i >= 0 && skCount > 1; i--) {
     if (dock[i] === 'SHADOW_KING') {
@@ -751,7 +745,6 @@ function generateFerman() {
     for (let attempt = 0; attempt < 300; attempt++) {
       const board = EMPTY_BOARD();
       placeTargets(board, 3, 5);
-      // 3 taşla çözülebilmeli
       let solution = solveGreedy(board, ALL_PIECES, 3);
       if (!solution) {
         for (let i = 0; i < 3; i++) {
@@ -767,7 +760,7 @@ function generateFerman() {
         const dock = solution.map(m => m.pieceType);
         return {
           targets,
-          fixedDock: dock, // ferman 3 taşla sınırlı
+          fixedDock: dock,
           date: fermanDateStr(),
           title: 'Ferman',
           subtitle: '3 taşla 3 şahı devir'
@@ -777,7 +770,6 @@ function generateFerman() {
   } finally {
     rng = oldRng;
   }
-  // Fallback: tek şah tek vezir
   const board = EMPTY_BOARD();
   board[3][3] = { kind: 'KING' };
   return {
@@ -803,7 +795,6 @@ function startGame(mode) {
   state.hoverSquare = null;
 
   if (mode === 'tutorial') {
-    // Eğitim: tek şah, dock'ta 3 at
     state.board = EMPTY_BOARD();
     state.board[3][3] = { kind: 'KING' };
     state.dock = ['KNIGHT', 'KNIGHT', 'KNIGHT'];
@@ -811,6 +802,14 @@ function startGame(mode) {
     state.selectedDockIndex = 0;
   }
   else if (mode === 'ferman') {
+    // Çift ödül koruması
+    if (state.profile.fermanState &&
+        state.profile.fermanState.date === fermanDateStr() &&
+        state.profile.fermanState.status === 'solved') {
+      toast('Bu ferman zaten çözüldü.', 'text-rose-300');
+      state.gameMode = null;
+      return;
+    }
     const ferman = generateFerman();
     state.levelData = ferman;
     state.board = EMPTY_BOARD();
@@ -818,12 +817,10 @@ function startGame(mode) {
     state.dock = [...ferman.fixedDock];
     shuffle(state.dock);
     state.selectedDockIndex = 0;
-    // Ferman başladı olarak işaretle
     state.profile.fermanState = { date: fermanDateStr(), status: 'in_progress' };
     saveProfile();
   }
   else {
-    // Sefer
     const lvl = generateSeferLevel(state.profile.currentLevel);
     state.levelData = lvl;
     state.board = EMPTY_BOARD();
@@ -834,7 +831,6 @@ function startGame(mode) {
 
   state.screen = 'game';
   showGameScreen();
-  renderGame();
 }
 
 function showGameScreen() {
@@ -844,20 +840,19 @@ function showGameScreen() {
 }
 
 function hideGameScreen() {
+  state.screen = 'home';
   document.getElementById('gameScreen').classList.add('hidden');
   document.getElementById('mainApp').classList.remove('hidden');
   renderAll();
 }
 
-function exitGame(mode) {
-  // Fermandan çıkıyorsa ve henüz bitmemişse → failed
+function exitGame() {
   if (state.gameMode === 'ferman' && !state.levelCleared) {
     if (state.profile.fermanState && state.profile.fermanState.status === 'in_progress') {
       state.profile.fermanState.status = 'failed';
       saveProfile();
     }
   }
-  state.screen = 'home';
   hideGameScreen();
 }
 
@@ -871,7 +866,6 @@ function placeAndSmash(r, c) {
   if (!pieceType) return;
   if (state.board[r][c] !== null) return;
 
-  // Snapshot
   state.history.push({
     board: cloneB(state.board),
     dock: [...state.dock],
@@ -891,7 +885,6 @@ function placeAndSmash(r, c) {
   });
   const total = kingsKilled + pawnsKilled;
 
-  // Kazançlar
   if (kingsKilled > 0) {
     state.profile.totalKings += kingsKilled;
     state.profile.balance += kingsKilled;
@@ -904,13 +897,11 @@ function placeAndSmash(r, c) {
   if (total > state.profile.bestCombo) state.profile.bestCombo = total;
   saveProfile();
 
-  // Dock güncelle
   state.dock[state.selectedDockIndex] = null;
   state.hintMove = null;
 
   const remainingKings = countKings(state.board);
 
-  // Ferman: yenileme yok. Sefer/Eğitim: yenileme var
   if (state.gameMode !== 'ferman' && remainingKings > 0 && !hasDock(state.dock)) {
     state.dock = smartRollDock(state.board);
   }
@@ -928,6 +919,15 @@ function placeAndSmash(r, c) {
   if (remainingKings === 0) {
     state.levelCleared = true;
     sound.win();
+
+    // Temiz zafer bonusu: piyon da kalmadıysa +1
+    const pawnsLeft = countPawns(state.board);
+    if (pawnsLeft === 0 && state.gameMode !== 'tutorial') {
+      state.profile.balance += 1;
+      saveProfile();
+      setTimeout(() => toast('✨ Temiz Zafer! +1 bonus şah', 'text-emerald-300'), 300);
+    }
+
     setTimeout(showWinModal, 420);
   } else if (!hasEmpty(state.board) || (!hasDock(state.dock) && state.gameMode === 'ferman')) {
     sound.fail();
@@ -955,7 +955,6 @@ function retryLevel() {
   lvl.targets.forEach(t => { state.board[t.r][t.c] = { kind: t.type }; });
 
   if (state.gameMode === 'ferman') {
-    // Ferman: retry deneme sayılır → fail
     state.profile.fermanState = { date: fermanDateStr(), status: 'failed' };
     saveProfile();
     showFailModal();
@@ -975,8 +974,7 @@ function useHint() {
     toast('Yeterli şah puanın yok. Önce şah vur.', 'text-rose-300');
     return;
   }
-  const params = { pool: ALL_PIECES, maxMoves: 30 };
-  let sol = solveGreedy(state.board, ALL_PIECES, 30);
+  const sol = solveGreedy(state.board, ALL_PIECES, 30);
   if (!sol || sol.length === 0) {
     toast('Bu pozisyonda ipucu bulunamadı.', 'text-rose-300');
     return;
@@ -994,6 +992,33 @@ function useHint() {
     state.hintMove = null;
     renderGame();
   }, 4000);
+}
+
+function rerollDock() {
+  if (state.levelCleared) return;
+  if (state.gameMode === 'ferman') {
+    toast('Fermanda taş değiştirilemez.', 'text-rose-300');
+    return;
+  }
+  if (state.profile.balance < 1) {
+    toast('Yeterli şah puanın yok.', 'text-rose-300');
+    return;
+  }
+  if (!hasDock(state.dock)) {
+    toast('Değiştirilecek taş yok.', 'text-rose-300');
+    return;
+  }
+  state.profile.balance -= 1;
+  saveProfile();
+  const newDock = smartRollDock(state.board);
+  for (let i = 0; i < 3; i++) {
+    if (state.dock[i] !== null) state.dock[i] = newDock[i];
+  }
+  const nextIdx = state.dock.findIndex(x => x !== null);
+  state.selectedDockIndex = nextIdx >= 0 ? nextIdx : null;
+  state.hintMove = null;
+  sound.select();
+  renderGame();
 }
 
 // ============================================================
@@ -1016,6 +1041,7 @@ function showModal(config) {
     `).join('<div class="h-6 w-px bg-white/10"></div>');
   } else {
     statsEl.classList.add('hidden');
+    statsEl.classList.remove('flex');
   }
 
   const primaryBtn = document.getElementById('modalPrimaryBtn');
@@ -1046,7 +1072,6 @@ function closeModal() {
 
 function showWinModal() {
   const mode = state.gameMode;
-  const kingsKilledTotal = state.profile.totalKings; // güncel
 
   if (mode === 'tutorial') {
     state.profile.tutorialDone = true;
@@ -1091,24 +1116,10 @@ function showWinModal() {
   }
 
   // Sefer
-  const oldMax = state.profile.maxLevel;
-  state.profile.currentLevel = Math.max(state.profile.currentLevel + 1, state.profile.currentLevel);
-  state.profile.currentLevel += 0; // artırımı aşağıda yapıyoruz
-  // Aslında yukarıda currentLevel'ı kullandık; doğrusu:
-  // (Bu blok sefer moduna özel)
-  // currentLevel artır:
-  // Yalnızca dikkatli: tekrar artırmayalım
-  // Yeniden düzenle:
-  // state.profile.currentLevel += 1; ← burayı düzelteceğiz
-
-  // DÜZELTME: Yukarıdaki iki satır iptal, aşağıdaki doğru akış:
-  // currentLevel = geçilen seviye + 1
   state.profile.currentLevel = state.levelData.levelNum + 1;
   state.profile.maxLevel = Math.max(state.profile.maxLevel, state.levelData.levelNum);
-
   if (!state.retryUsed) state.profile.winStreak += 1;
   else state.profile.winStreak = 0;
-
   saveProfile();
 
   showModal({
@@ -1174,16 +1185,7 @@ function showFailModal() {
 
 function showRankUp(oldRank, newRank) {
   sound.rankUp();
-  showModal({
-    icon: '⬆️',
-    title: 'Terfi!',
-    desc: `Tebrikler! ${oldRank.name} rütbesinden ${newRank.name} rütbesine yükseldin.`,
-    stats: [
-      { label: 'Yeni Rank', value: `${newRank.glyph} ${newRank.name}`, color: 'text-amber-300' }
-    ],
-    primaryText: 'Harika!',
-    onPrimary: () => {}
-  });
+  toast(`⬆️ Terfi! ${oldRank.name} → ${newRank.name}`, 'text-amber-300');
 }
 
 // ============================================================
@@ -1207,6 +1209,7 @@ function renderHeader() {
     balVal.textContent = bal;
   } else {
     balEl.classList.add('hidden');
+    balEl.classList.remove('flex');
   }
 
   const subtitle = { home: 'Ana Sayfa', profile: 'Profil', settings: 'Ayarlar' }[state.screen] || '';
@@ -1218,7 +1221,6 @@ function renderHome() {
   if (!el || state.screen !== 'home') return;
   const p = state.profile;
 
-  // Ferman kartı
   const fDate = fermanDateStr();
   let fermanStatus = 'available';
   if (p.fermanState && p.fermanState.date === fDate) {
@@ -1455,6 +1457,7 @@ function renderGame() {
   document.getElementById('undoBtn').disabled = state.history.length === 0 || state.levelCleared;
   document.getElementById('hintBtn').disabled = state.levelCleared || state.profile.balance < 1;
   document.getElementById('retryBtn').disabled = state.levelCleared;
+  document.getElementById('rerollBtn').disabled = state.levelCleared || state.profile.balance < 1 || state.gameMode === 'ferman';
 
   renderBoard();
   renderDock();
@@ -1625,6 +1628,7 @@ dockContainer.addEventListener('click', (e) => {
 document.getElementById('undoBtn').addEventListener('click', undoMove);
 document.getElementById('retryBtn').addEventListener('click', retryLevel);
 document.getElementById('hintBtn').addEventListener('click', useHint);
+document.getElementById('rerollBtn').addEventListener('click', rerollDock);
 document.getElementById('backBtn').addEventListener('click', () => exitGame());
 
 // Sekme geçişleri
@@ -1714,7 +1718,13 @@ window.addEventListener('DOMContentLoaded', () => {
   loadProfile();
   state.screen = 'home';
 
-  // İlk açılış → eğitim
+  document.getElementById('homeScreen').classList.add('flex');
+  document.getElementById('homeScreen').classList.remove('hidden');
+  document.getElementById('profileScreen').classList.add('hidden');
+  document.getElementById('profileScreen').classList.remove('flex');
+  document.getElementById('settingsScreen').classList.add('hidden');
+  document.getElementById('settingsScreen').classList.remove('flex');
+
   if (!state.profile.tutorialDone) {
     setTimeout(() => {
       startGame('tutorial');
