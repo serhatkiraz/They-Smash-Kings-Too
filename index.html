@@ -1,1212 +1,1728 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Şahları da Vururlar</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <style>
-    :root { --light-square: #d8cfc2; --dark-square: #5a6270; }
-    * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at 50% 0%, #1c212c 0%, #0f1115 65%);
-      color: #f3f4f6; min-height: 100vh; margin: 0; overflow-x: hidden; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#0f1115" />
+<title>Şahları da Vururlar 2</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --light-square: #d8cfc2;
+    --dark-square: #5a6270;
+    --bg-main: #0f1115;
+    --bg-surface: #171a21;
+    --bg-elevated: #1f242e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --emerald: #10b981;
+    --purple: #8b5cf6;
+  }
+  * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; overscroll-behavior: none; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at 50% 0%, #1c212c 0%, var(--bg-main) 65%);
+    color: #f3f4f6;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  @keyframes smashPop {
+    0% { transform: scale(0.45); opacity: 0; }
+    65% { transform: scale(1.18); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes kingPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  @keyframes hitFlash {
+    0% { box-shadow: inset 0 0 0 999px rgba(239,68,68,0.7); }
+    100% { box-shadow: inset 0 0 0 0 rgba(239,68,68,0); }
+  }
+  @keyframes floatUp {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+    100% { transform: translate(-50%, -120%) scale(1.15); opacity: 0; }
+  }
+  @keyframes slideUp {
+    0% { transform: translateY(30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes hintPulse {
+    0%, 100% { box-shadow: inset 0 0 0 4px #fbbf24, 0 0 24px rgba(251,191,36,0.85); }
+    50% { box-shadow: inset 0 0 0 4px #fbbf24, 0 0 44px rgba(251,191,36,1); }
+  }
 
-    @keyframes screenShake {
-      0%, 100% { transform: translate3d(0,0,0); }
-      20% { transform: translate3d(-5px,3px,0); }
-      40% { transform: translate3d(5px,-3px,0); }
-      60% { transform: translate3d(-4px,-2px,0); }
-      80% { transform: translate3d(3px,2px,0); }
-    }
-    @keyframes kingShake {
-      0%, 100% { transform: translateX(0) rotate(0); }
-      25% { transform: translateX(-3px) rotate(-3deg); }
-      75% { transform: translateX(3px) rotate(3deg); }
-    }
-    @keyframes smashPop {
-      0% { transform: scale(0.45); opacity: 0; }
-      65% { transform: scale(1.18); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    @keyframes floatUp {
-      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
-      100% { transform: translate(-50%, -120%) scale(1.12); opacity: 0; }
-    }
-    @keyframes hitFlash {
-      0% { box-shadow: inset 0 0 0 999px rgba(239,68,68,0.72), 0 0 22px rgba(239,68,68,0.85); }
-      100% { box-shadow: inset 0 0 0 0 rgba(239,68,68,0), 0 0 0 rgba(239,68,68,0); }
-    }
-    @keyframes hintPulse {
-      0%, 100% { box-shadow: inset 0 0 0 4px #fbbf24, 0 0 24px rgba(251,191,36,0.85); }
-      50% { box-shadow: inset 0 0 0 4px #fbbf24, 0 0 44px rgba(251,191,36,1); }
-    }
+  .smash-enter { animation: smashPop 0.24s cubic-bezier(0.22,1,0.36,1); }
+  .king-target-badge { animation: kingPulse 2.2s ease-in-out infinite; }
+  .square-hit-flash { animation: hitFlash 0.45s ease-out forwards; }
+  .slide-up { animation: slideUp 0.32s cubic-bezier(0.22,1,0.36,1); }
 
-    .shake-board { animation: screenShake 0.28s cubic-bezier(0.36,0.07,0.19,0.97) both; }
-    .king-idle { animation: kingShake 2.8s ease-in-out infinite; }
-    .smash-enter { animation: smashPop 0.24s cubic-bezier(0.22,1,0.36,1) forwards; }
-    .square-hit-flash { animation: hitFlash 0.45s ease-out forwards; }
+  .board-square {
+    position: relative;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+    transition: box-shadow 0.15s ease, filter 0.15s ease;
+  }
+  .sq-light { background-color: var(--light-square); }
+  .sq-dark { background-color: var(--dark-square); }
+  .preview-hover-empty { box-shadow: inset 0 0 0 3px rgba(251,191,36,0.92); filter: brightness(1.07); }
+  .preview-path { box-shadow: inset 0 0 0 2px rgba(250,204,21,0.45); background-image: radial-gradient(circle, rgba(250,204,21,0.3) 22%, transparent 24%); }
+  .preview-target { box-shadow: inset 0 0 0 3px var(--red), 0 0 16px rgba(239,68,68,0.65) !important; background-color: rgba(220,38,38,0.34) !important; }
+  .preview-king-target { box-shadow: inset 0 0 0 3.5px var(--amber), 0 0 20px rgba(245,158,11,0.85) !important; background-color: rgba(245,158,11,0.38) !important; }
+  .preview-blocked { box-shadow: inset 0 0 0 2px rgba(148,163,184,0.5); }
+  .preview-hint { animation: hintPulse 1s ease-in-out infinite; background-color: rgba(251,191,36,0.3) !important; }
 
-    .floating-popup-fixed {
-      position: fixed; transform: translate(-50%, -50%); pointer-events: none; z-index: 100;
-      font-weight: 900; font-size: 0.95rem; text-shadow: 0 2px 10px rgba(0,0,0,0.9);
-      animation: floatUp 0.72s cubic-bezier(0.16,1,0.3,1) forwards; white-space: nowrap;
-    }
+  .piece-glyph { line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); pointer-events: none; }
 
-    .board-square {
-      position: relative; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
-      touch-action: manipulation;
-      transition: transform 0.12s ease, filter 0.15s ease, box-shadow 0.15s ease;
-    }
-    .sq-light { background-color: var(--light-square); color: #181a1f; }
-    .sq-dark  { background-color: var(--dark-square);  color: #f9fafb; }
+  .badge-king-enemy { background: linear-gradient(145deg, #ef4444, #991b1b); color: #fffbeb; border: 2px solid #fde68a; box-shadow: 0 3px 10px rgba(239,68,68,0.5); pointer-events: none; }
+  .badge-king-ally { background: linear-gradient(145deg, #a78bfa, #6d28d9); color: #fff; border: 2px solid #ddd6fe; box-shadow: 0 3px 10px rgba(139,92,246,0.5); pointer-events: none; }
+  .badge-pawn { background: linear-gradient(145deg, #f97316, #9a3412); color: #fff7ed; border: 2px solid rgba(254,215,170,0.8); box-shadow: 0 2px 8px rgba(249,115,22,0.45); pointer-events: none; }
+  .badge-friendly { background: linear-gradient(145deg, #10b981, #047857); color: #ecfdf5; border: 2px solid rgba(167,243,208,0.85); box-shadow: 0 2px 8px rgba(16,185,129,0.4); pointer-events: none; }
 
-    .preview-hover-empty { box-shadow: inset 0 0 0 3px rgba(251,191,36,0.92); filter: brightness(1.07); }
-    .preview-path { box-shadow: inset 0 0 0 2px rgba(250,204,21,0.45);
-      background-image: radial-gradient(circle, rgba(250,204,21,0.32) 22%, transparent 24%); }
-    .preview-target { box-shadow: inset 0 0 0 3px #ef4444, 0 0 16px rgba(239,68,68,0.65) !important;
-      background-color: rgba(220,38,38,0.34) !important; }
-    .preview-king-target { box-shadow: inset 0 0 0 3.5px #f59e0b, 0 0 20px rgba(245,158,11,0.85) !important;
-      background-color: rgba(245,158,11,0.38) !important; }
-    .preview-blocked { box-shadow: inset 0 0 0 2px rgba(148,163,184,0.45); }
-    .preview-hint { animation: hintPulse 1s ease-in-out infinite; background-color: rgba(251,191,36,0.3) !important; }
+  .dock-card {
+    background: linear-gradient(180deg, rgba(31,36,46,0.96), rgba(21,24,31,0.98));
+    border: 1.5px solid rgba(255,255,255,0.1);
+    touch-action: manipulation;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .dock-card:not(:disabled):active { transform: scale(0.97); }
+  .dock-card.selected {
+    transform: translateY(-4px);
+    border-color: #fbbf24;
+    box-shadow: 0 10px 24px -4px rgba(245,158,11,0.35), 0 0 0 2px rgba(251,191,36,0.35);
+    background: linear-gradient(180deg, rgba(45,39,26,0.98), rgba(24,24,30,0.98));
+  }
 
-    .piece-glyph { line-height: 1; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.45)); transition: transform 0.14s ease; pointer-events: none; }
-    .friendly-badge { background: linear-gradient(145deg,#10b981,#047857); color:#ecfdf5;
-      border:2px solid rgba(167,243,208,0.85); box-shadow: 0 4px 12px rgba(16,185,129,0.45); pointer-events: none; }
-    .king-target-badge { background: linear-gradient(145deg,#ef4444,#991b1b); color:#fffbeb;
-      border:2px solid #fde68a; box-shadow: 0 4px 14px rgba(239,68,68,0.55); pointer-events: none; }
-    .pawn-target-badge { background: linear-gradient(145deg,#f97316,#9a3412); color:#fff7ed;
-      border:2px solid rgba(254,215,170,0.75); box-shadow: 0 3px 10px rgba(249,115,22,0.45); pointer-events: none; }
+  .tab-btn { transition: color 0.15s ease, background-color 0.15s ease; }
+  .tab-btn.active { color: var(--amber); }
+  .tab-btn.active .tab-icon { transform: scale(1.15); }
+  .tab-icon { transition: transform 0.15s ease; }
 
-    .dock-card {
-      background: linear-gradient(180deg, rgba(31,36,46,0.96) 0%, rgba(21,24,31,0.98) 100%);
-      border: 1.5px solid rgba(255,255,255,0.1);
-      touch-action: manipulation;
-      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-    .dock-card:hover:not(:disabled) { transform: translateY(-3px); border-color: rgba(251,191,36,0.55); }
-    .dock-card.selected {
-      transform: translateY(-6px); border-color: #fbbf24;
-      box-shadow: 0 10px 24px -4px rgba(245,158,11,0.35), 0 0 0 2px rgba(251,191,36,0.35);
-      background: linear-gradient(180deg, rgba(45,39,26,0.98) 0%, rgba(24,24,30,0.98) 100%);
-    }
+  .menu-card {
+    background: linear-gradient(180deg, rgba(31,36,46,0.96), rgba(21,24,31,0.98));
+    border: 1.5px solid rgba(255,255,255,0.1);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+    cursor: pointer;
+  }
+  .menu-card:not(.disabled):active { transform: scale(0.98); }
+  .menu-card:not(.disabled):hover { border-color: rgba(251,191,36,0.4); }
+  .menu-card.disabled { opacity: 0.45; cursor: not-allowed; }
 
-    .util-btn {
-      padding: 0.4rem 0.6rem; border-radius: 0.6rem; font-size: 0.7rem; font-weight: 700;
-      border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
-      color: #d1d5db; transition: all 0.15s ease; cursor: pointer;
-    }
-    .util-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
-    .util-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-  </style>
+  .floating-popup-fixed {
+    position: fixed;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 100;
+    font-weight: 900;
+    font-size: 0.95rem;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+    animation: floatUp 0.75s cubic-bezier(0.16,1,0.3,1) forwards;
+    white-space: nowrap;
+  }
+
+  .progress-bar { background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; height: 8px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); transition: width 0.6s cubic-bezier(0.22,1,0.36,1); border-radius: 999px; }
+
+  .util-btn {
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.55rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: #d1d5db;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+  }
+  .util-btn:not(:disabled):active { transform: scale(0.95); background: rgba(255,255,255,0.12); }
+  .util-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+</style>
 </head>
-<body class="flex flex-col items-center justify-between min-h-screen px-3 py-3 sm:px-6 sm:py-4">
+<body>
 
-  <header class="w-full max-w-3xl flex flex-col gap-2.5">
-    <div class="flex flex-wrap items-center justify-between gap-2 bg-[#171a21]/90 border border-white/10 rounded-2xl px-4 py-2.5 shadow-lg backdrop-blur">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-red-500/15 border border-red-400/30 flex items-center justify-center text-2xl text-red-400 shadow-inner">♚</div>
-        <div>
-          <h1 class="text-lg sm:text-xl font-black tracking-tight text-white leading-tight">Şahları da Vururlar 4</h1>
-          <p class="text-[11px] sm:text-xs text-gray-400">Taşı seç, boş kareye koy ve hat boyunca devir!</p>
-        </div>
-      </div>
+<!-- ============================================================ -->
+<!-- ANA UYGULAMA (Sekmeler) -->
+<!-- ============================================================ -->
+<div id="mainApp" class="flex flex-col" style="min-height: 100dvh;">
 
-      <div class="flex items-center gap-1.5 sm:gap-2">
-        <button id="undoBtn" type="button" title="Hamleyi Geri Al"
-          class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-xs sm:text-sm font-semibold text-gray-200 transition flex items-center gap-1.5 disabled:opacity-35 disabled:pointer-events-none">
-          <span>↩</span><span class="hidden sm:inline">Geri Al</span>
-        </button>
-        <button id="resetBtn" type="button" title="Aynı Bölümü Yeniden Başlat"
-          class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-xs sm:text-sm font-semibold text-gray-200 transition flex items-center gap-1.5">
-          <span>↻</span><span class="hidden sm:inline">Yeniden</span>
-        </button>
-        <button id="hintBtn" type="button" title="İpucu Al (-50 puan)"
-          class="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 border border-amber-400/30 text-xs sm:text-sm font-bold text-amber-300 transition flex items-center gap-1.5">
-          <span>💡</span><span class="hidden sm:inline">İpucu</span>
-        </button>
-        <button id="soundBtn" type="button" title="Ses Aç/Kapat"
-          class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-sm text-amber-300 transition">🔊</button>
-        <button id="rulesBtn" type="button" title="Nasıl Oynanır?"
-          class="px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 active:scale-95 border border-amber-400/30 text-xs sm:text-sm font-bold text-amber-300 transition">?</button>
+  <!-- Üst Bar -->
+  <header class="px-4 pt-3 pb-2 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-red-500/15 border border-red-400/30 flex items-center justify-center text-xl text-red-400">♚</div>
+      <div>
+        <h1 class="text-base font-black tracking-tight leading-tight">Şahları da Vururlar</h1>
+        <p id="headerSubtitle" class="text-[10px] text-gray-400">Ana Sayfa</p>
       </div>
     </div>
-
-    <div class="grid grid-cols-4 gap-2 sm:gap-3">
-      <div class="bg-[#171a21]/90 border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center justify-center">
-        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Seviye</span>
-        <span id="hudLevel" class="text-base sm:text-xl font-extrabold text-amber-400">1</span>
-      </div>
-      <div class="bg-[#171a21]/90 border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center justify-center">
-        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Kalan Şah</span>
-        <span id="hudKings" class="text-base sm:text-xl font-extrabold text-red-400">1</span>
-      </div>
-      <div class="bg-[#171a21]/90 border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center justify-center">
-        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Skor</span>
-        <span id="hudScore" class="text-base sm:text-xl font-extrabold text-emerald-400">0</span>
-      </div>
-      <div class="bg-[#171a21]/90 border border-white/10 rounded-xl px-3 py-2 flex flex-col items-center justify-center">
-        <span class="text-[10px] sm:text-xs uppercase tracking-wider text-gray-400 font-semibold">Vuruş</span>
-        <span id="hudHits" class="text-base sm:text-xl font-extrabold text-sky-400">0</span>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between px-1 text-xs sm:text-sm text-gray-300">
-      <span id="levelTitle" class="font-bold text-white truncate">1. Perde</span>
-      <span id="levelHint" class="text-gray-400 text-right truncate ml-2">Hazırlanıyor...</span>
+    <div id="headerBalance" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-400/20">
+      <span class="text-sm">♔</span>
+      <span id="balanceVal" class="text-xs font-extrabold text-amber-300">0</span>
     </div>
   </header>
 
-  <main class="w-full max-w-[min(92vw,470px)] sm:max-w-[min(86vw,500px)] my-2 relative">
-    <div id="boardContainer"
-      class="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.65)] bg-[#14171d]">
-      <div id="boardGrid" class="grid grid-cols-8 grid-rows-8 w-full h-full"></div>
-      <div id="overlayModal" class="hidden absolute inset-0 z-30 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="w-full max-w-sm bg-[#1a1e27] border border-white/15 rounded-2xl p-5 text-center shadow-2xl smash-enter">
-          <div id="modalIcon" class="text-4xl mb-2">👑</div>
-          <h2 id="modalTitle" class="text-xl sm:text-2xl font-black text-white mb-1">Şah Devrildi!</h2>
-          <p id="modalDesc" class="text-xs sm:text-sm text-gray-300 mb-4">Tahtadaki tüm Şahlar vuruldu.</p>
-          <div class="flex items-center justify-center gap-3 text-xs bg-black/30 rounded-xl p-2.5 mb-5 border border-white/5">
-            <div><span class="text-gray-400 block">Skor</span><strong id="modalScore" class="text-emerald-400 text-sm">0</strong></div>
-            <div class="h-6 w-px bg-white/10"></div>
-            <div><span class="text-gray-400 block">Seviye</span><strong id="modalLevel" class="text-amber-400 text-sm">1</strong></div>
-          </div>
-          <button id="modalPrimaryBtn" type="button"
-            class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-red-500 hover:from-amber-400 hover:to-red-400 active:scale-[0.98] text-white font-extrabold text-sm sm:text-base shadow-lg transition cursor-pointer">
-            Sonraki Seviye →
-          </button>
-          <button id="modalSecondaryBtn" type="button"
-            class="mt-2 w-full py-2 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-semibold text-xs transition cursor-pointer hidden">
-            Ana Oyuna Dön
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div id="selectionBar" class="mt-2 min-h-[34px] px-3.5 py-1.5 rounded-xl bg-[#171a21]/90 border border-white/10 flex items-center justify-between gap-2 text-xs text-gray-300">
-      <span id="selectionText" class="font-medium text-amber-300 truncate">Alttan bir taş seçin.</span>
-      <span id="previewStats" class="font-bold text-red-400 whitespace-nowrap"></span>
-    </div>
+  <!-- Ana İçerik -->
+  <main class="flex-1 overflow-y-auto px-4 pb-2">
+    <!-- HOME -->
+    <section id="homeScreen" class="flex flex-col gap-3 py-2"></section>
+    <!-- PROFILE -->
+    <section id="profileScreen" class="hidden flex-col gap-3 py-2"></section>
+    <!-- SETTINGS -->
+    <section id="settingsScreen" class="hidden flex-col gap-3 py-2"></section>
   </main>
 
-  <footer class="w-full max-w-xl mt-1">
-    <div id="dockContainer" class="grid grid-cols-3 gap-2.5 sm:gap-4"></div>
+  <!-- Alt Sekme -->
+  <nav class="flex items-center justify-around bg-[#171a21]/95 border-t border-white/10 px-2" style="padding-top: 0.4rem; padding-bottom: calc(0.4rem + env(safe-area-inset-bottom));">
+    <button data-tab="home" class="tab-btn active flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg">
+      <span class="tab-icon text-xl">🏠</span>
+      <span class="text-[10px] font-bold">Ana</span>
+    </button>
+    <button data-tab="profile" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg text-gray-400">
+      <span class="tab-icon text-xl">👤</span>
+      <span class="text-[10px] font-bold">Profil</span>
+    </button>
+    <button data-tab="settings" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg text-gray-400">
+      <span class="tab-icon text-xl">⚙️</span>
+      <span class="text-[10px] font-bold">Ayarlar</span>
+    </button>
+  </nav>
+</div>
 
-    <div class="mt-2.5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-gray-400">
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span> Şah</span>
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> Piyon</span>
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Engel</span>
+<!-- ============================================================ -->
+<!-- OYUN EKRANI -->
+<!-- ============================================================ -->
+<div id="gameScreen" class="hidden fixed inset-0 z-20 flex flex-col" style="background: radial-gradient(circle at 50% 0%, #1c212c 0%, var(--bg-main) 65%); padding-top: env(safe-area-inset-top);">
+
+  <!-- Üst -->
+  <div class="px-3 pt-2 pb-1 flex items-center justify-between">
+    <button id="backBtn" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-base text-gray-300">←</button>
+    <div class="text-center">
+      <div id="gameTitle" class="text-sm font-black text-white">Seviye 2</div>
+      <div id="gameSubtitle" class="text-[10px] text-gray-400">3 Şah kaldı</div>
     </div>
-
-    <div class="mt-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-      <button id="newLevelBtn" type="button" class="util-btn">🎲 Yeni Level</button>
-      <button id="rerollBtn" type="button" class="util-btn">🔄 Taş Dağıt (−100)</button>
-      <button id="dailyBtn" type="button" class="util-btn">🎯 Günlük</button>
-      <button id="exitDailyBtn" type="button" class="util-btn hidden">← Ana Oyun</button>
-    </div>
-  </footer>
-
-  <div id="rulesModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-[#1a1e27] border border-white/15 rounded-2xl p-5 shadow-2xl">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-lg font-extrabold text-white">Nasıl Oynanır?</h3>
-        <button id="closeRulesBtn" type="button" class="text-gray-400 hover:text-white text-xl font-bold px-2">✕</button>
-      </div>
-      <ul class="space-y-2.5 text-xs sm:text-sm text-gray-300 leading-relaxed">
-        <li><strong class="text-amber-400">1. Amaç:</strong> Tüm <strong class="text-red-400">Şah (♚)</strong> taşlarını devir.</li>
-        <li><strong class="text-amber-400">2. Koy &amp; Vur:</strong> Alttan taş seç, boş kareye dokun. Taş, satranç vuruş hattındaki hedefleri ezer.</li>
-        <li><strong class="text-amber-400">3. Ömür:</strong> Vuran taş tahtada <strong class="text-emerald-400">engel</strong> olarak kalır.</li>
-        <li><strong class="text-amber-400">4. Hatlar:</strong>
-          <span class="block text-gray-400 text-xs mt-0.5">
-            • <strong>Kale (♜):</strong> Yatay + dikey<br/>
-            • <strong>Fil (♝):</strong> Çapraz<br/>
-            • <strong>Vezir (♛):</strong> Hepsi<br/>
-            • <strong>At (♞):</strong> L-atlayışı
-          </span>
-        </li>
-        <li><strong class="text-amber-400">5. Yardımcılar:</strong>
-          <span class="block text-gray-400 text-xs mt-0.5">
-            💡 İpucu (−50) · 🔄 Taş Dağıt (−100) · 🎲 Yeni Level · 🎯 Günlük Meydan Okuma
-          </span>
-        </li>
-      </ul>
-      <button id="gotItBtn" type="button"
-        class="mt-5 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-extrabold text-sm transition cursor-pointer">
-        Anladım, Vurmaya Başla
-      </button>
+    <div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-400/20">
+      <span class="text-xs">♔</span>
+      <span id="gameBalance" class="text-xs font-extrabold text-amber-300">0</span>
     </div>
   </div>
 
-  <script>
-    // ============================================================
-    // TAŞ TANIMLARI & SABİTLER
-    // ============================================================
-    const PIECE_DEFS = {
-      ROOK:   { id:'ROOK',   name:'Kale',  glyph:'♜', desc:'Düz hat (yatay/dikey)', points:100 },
-      BISHOP: { id:'BISHOP', name:'Fil',   glyph:'♝', desc:'Çapraz hatlar',         points:110 },
-      KNIGHT: { id:'KNIGHT', name:'At',    glyph:'♞', desc:'L-atlayışı (8 nokta)',  points:120 },
-      QUEEN:  { id:'QUEEN',  name:'Vezir', glyph:'♛', desc:'Düz + çapraz hatlar',   points:160 }
-    };
-    const PIECE_POOL = ['ROOK','BISHOP','KNIGHT','QUEEN'];
-    const DAILY_BEST_KEY = 'sahlar2_daily_best';
+  <!-- Tahta -->
+  <div class="flex-1 flex items-center justify-center px-3 py-2">
+    <div class="w-full" style="max-width: min(94vw, 480px);">
+      <div id="boardContainer" class="relative w-full aspect-square rounded-xl overflow-hidden border-2 border-white/15 bg-[#14171d]" style="box-shadow: 0 12px 32px rgba(0,0,0,0.55);">
+        <div id="boardGrid" class="grid grid-cols-8 grid-rows-8 w-full h-full"></div>
+      </div>
+    </div>
+  </div>
 
-    // ============================================================
-    // TOHUMLU RASTGELE (Daily Challenge için)
-    // ============================================================
-    let rng = Math.random;
-    function mulberry32(seed) {
-      return function() {
-        let t = seed += 0x6D2B79F5;
-        t = Math.imul(t ^ t >>> 15, t | 1);
-        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-        return ((t ^ t >>> 14) >>> 0) / 4294967296;
-      };
+  <!-- Alt: Dock + Butonlar -->
+  <div class="px-3 pb-2" style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+    <div id="dockContainer" class="grid grid-cols-3 gap-2 mb-2" style="max-width: min(94vw, 480px); margin-left: auto; margin-right: auto;"></div>
+    <div class="flex items-center justify-center gap-1.5" style="max-width: min(94vw, 480px); margin-left: auto; margin-right: auto;">
+      <button id="undoBtn" class="util-btn flex-1">↩ Geri</button>
+      <button id="retryBtn" class="util-btn flex-1">↻ Yeniden</button>
+      <button id="hintBtn" class="util-btn flex-1" style="border-color: rgba(245,158,11,0.4); color: #fbbf24;">💡 İpucu (1♔)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL (Genel) -->
+<!-- ============================================================ -->
+<div id="modalOverlay" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+  <div id="modalContent" class="w-full max-w-sm bg-[#1a1e27] border border-white/15 rounded-2xl p-5 text-center shadow-2xl slide-up">
+    <div id="modalIcon" class="text-4xl mb-2">👑</div>
+    <h2 id="modalTitle" class="text-lg font-black text-white mb-1">Başlık</h2>
+    <p id="modalDesc" class="text-xs text-gray-300 mb-4 leading-relaxed"></p>
+    <div id="modalStats" class="hidden flex items-center justify-center gap-3 text-xs bg-black/30 rounded-xl p-2.5 mb-4 border border-white/5"></div>
+    <button id="modalPrimaryBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-red-500 text-white font-extrabold text-sm shadow-lg">Devam</button>
+    <button id="modalSecondaryBtn" class="mt-2 w-full py-2 rounded-xl bg-white/5 text-gray-300 font-semibold text-xs hidden">İkincil</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- İSİM DEĞİŞTİRME MODAL -->
+<!-- ============================================================ -->
+<div id="nameOverlay" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="w-full max-w-sm bg-[#1a1e27] border border-white/15 rounded-2xl p-5 shadow-2xl slide-up">
+    <h3 class="text-base font-extrabold text-white mb-1">İsmini Değiştir</h3>
+    <p class="text-[11px] text-gray-400 mb-3">Bu işlem <strong class="text-amber-300">1 şah puanı</strong> harcar.</p>
+    <input id="nameInput" type="text" maxlength="20" placeholder="İsmin..." class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/15 text-sm text-white placeholder-gray-500 outline-none focus:border-amber-400 mb-3" />
+    <div class="flex gap-2">
+      <button id="nameCancelBtn" class="flex-1 py-2 rounded-xl bg-white/5 text-gray-300 font-bold text-xs">Vazgeç</button>
+      <button id="nameConfirmBtn" class="flex-1 py-2 rounded-xl bg-amber-500 text-gray-950 font-extrabold text-xs">1♔ Onayla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- KURALLAR MODAL -->
+<!-- ============================================================ -->
+<div id="rulesOverlay" class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-[#1a1e27] border border-white/15 rounded-2xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto slide-up">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-base font-extrabold text-white">Nasıl Oynanır?</h3>
+      <button id="rulesCloseBtn" class="text-gray-400 text-xl font-bold px-2">✕</button>
+    </div>
+    <ul class="space-y-2.5 text-xs text-gray-300 leading-relaxed">
+      <li><strong class="text-amber-400">Amaç:</strong> Tahtadaki tüm <strong class="text-red-400">kırmızı Şah (♚)</strong> taşlarını devir.</li>
+      <li><strong class="text-amber-400">Koy & Vur:</strong> Alttaki taşlardan birini seç, boş kareye dokun. Taş, satranç hattındaki ilk hedefi ezer.</li>
+      <li><strong class="text-amber-400">Satranç Kuralı:</strong> Kendi taşların da yolu keser. At hariç — at her şeyin üzerinden atlar.</li>
+      <li><strong class="text-amber-400">Taş Menzilleri:</strong>
+        <span class="block text-gray-400 text-[11px] mt-1">
+          ♜ <strong>Kale:</strong> 4 yön, ilk engelde durur<br/>
+          ♝ <strong>Fil:</strong> 4 çapraz, ilk engelde durur<br/>
+          ♛ <strong>Vezir:</strong> 8 yön, ilk engelde durur<br/>
+          ♞ <strong>At:</strong> 8 L karesi, blok yok<br/>
+          ♟ <strong>Piyon:</strong> 4 çapraz komşu<br/>
+          ♔ <strong>Gölge Şah:</strong> 8 komşu kare
+        </span>
+      </li>
+      <li><strong class="text-amber-400">Yerleştirilen Taşlar:</strong> Tahtada kalır ve engel olur.</li>
+      <li><strong class="text-amber-400">Şah Puanı:</strong> Vurulan her Şah +1 puan verir. Bunları ipucu (1) veya isim değiştirmek (1) için harcayabilirsin. Rank'ın harcamadan etkilenmez.</li>
+    </ul>
+    <button id="rulesOkBtn" class="mt-4 w-full py-2.5 rounded-xl bg-amber-500 text-gray-950 font-extrabold text-sm">Anladım</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// 🎯 TAŞ TANIMLARI & SABİTLER
+// ============================================================
+const PIECE_DEFS = {
+  ROOK:        { id: 'ROOK',        name: 'Kale',       glyph: '♜', desc: '4 yön · 1 hedef' },
+  BISHOP:      { id: 'BISHOP',      name: 'Fil',        glyph: '♝', desc: '4 çapraz · 1 hedef' },
+  KNIGHT:      { id: 'KNIGHT',      name: 'At',         glyph: '♞', desc: '8 L karesi · blok yok' },
+  QUEEN:       { id: 'QUEEN',       name: 'Vezir',      glyph: '♛', desc: '8 yön · 1 hedef' },
+  PAWN:        { id: 'PAWN',        name: 'Piyon',      glyph: '♟', desc: '4 çapraz komşu' },
+  SHADOW_KING: { id: 'SHADOW_KING', name: 'Gölge Şah',  glyph: '♔', desc: '8 komşu kare' }
+};
+const ALL_PIECES = ['ROOK','BISHOP','KNIGHT','QUEEN','PAWN','SHADOW_KING'];
+const DOCK_WEIGHTS = { ROOK: 20, BISHOP: 20, KNIGHT: 20, QUEEN: 15, PAWN: 15, SHADOW_KING: 10 };
+
+const RANKS = [
+  { name: 'Piyon', glyph: '♟', threshold: 0 },
+  { name: 'At',    glyph: '♞', threshold: 15 },
+  { name: 'Fil',   glyph: '♝', threshold: 40 },
+  { name: 'Kale',  glyph: '♜', threshold: 80 },
+  { name: 'Vezir', glyph: '♛', threshold: 140 },
+  { name: 'Şah',   glyph: '♚', threshold: 220 }
+];
+
+const PROFILE_KEY = 'sahlar_v2_profile';
+
+// ============================================================
+// 🎲 TOHUMLU RASTGELE
+// ============================================================
+let rng = Math.random;
+function mulberry32(seed) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// ============================================================
+// 🔊 SES
+// ============================================================
+class SoundEngine {
+  constructor() { this.ctx = null; this.muted = false; }
+  ensure() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) this.ctx = new AC();
     }
-    function todayStr() {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(()=>{});
+  }
+  tone(freq, dur, type='triangle', vol=0.08, startOffset=0) {
+    if (this.muted) return;
+    this.ensure(); if (!this.ctx) return;
+    const start = this.ctx.currentTime + startOffset;
+    const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, start);
+    g.gain.setValueAtTime(vol, start);
+    g.gain.exponentialRampToValueAtTime(0.001, start + dur);
+    o.connect(g); g.connect(this.ctx.destination);
+    o.start(start); o.stop(start + dur + 0.02);
+  }
+  select() { this.tone(520, 0.06, 'triangle', 0.07); this.tone(720, 0.05, 'triangle', 0.05, 0.03); }
+  smash(count, king) {
+    this.tone(king ? 160 : 130, 0.18, 'sine', 0.18 + Math.min(count,4)*0.04);
+    if (count > 0) this.tone(king ? 660 : 440 + Math.min(count,4)*60, 0.14, king?'sawtooth':'triangle', 0.1, 0.02);
+  }
+  win() {
+    [523.25, 659.25, 783.99, 1046.5].forEach((f,i)=>this.tone(f, 0.22, 'triangle', 0.1, i*0.08));
+  }
+  fail() {
+    [280, 220].forEach((f,i)=>this.tone(f, 0.2, 'sawtooth', 0.08, i*0.14));
+  }
+  rankUp() {
+    [659.25, 783.99, 1046.5, 1318.5].forEach((f,i)=>this.tone(f, 0.28, 'triangle', 0.11, i*0.09));
+  }
+}
+const sound = new SoundEngine();
+
+// ============================================================
+// 📦 DURUM
+// ============================================================
+const state = {
+  screen: 'home', // 'home' | 'profile' | 'settings' | 'game'
+  profile: {
+    name: 'İsimsiz Piyon',
+    totalKings: 0,
+    balance: 0,
+    currentLevel: 2,     // Sefer'de devam edilecek seviye
+    maxLevel: 1,
+    winStreak: 0,
+    bestCombo: 0,
+    tutorialDone: false,
+    fermanState: null    // { date: 'YYYY-MM-DD', status: 'in_progress'|'solved'|'failed' }
+  },
+  // Oyun durumu
+  gameMode: 'sefer',    // 'sefer' | 'ferman' | 'tutorial'
+  levelData: null,
+  board: [],
+  dock: [],
+  selectedDockIndex: null,
+  hoverSquare: null,
+  history: [],
+  levelCleared: false,
+  retryUsed: false,
+  hintMove: null,
+  flashingSquares: new Set()
+};
+
+// ============================================================
+// 💾 KAYIT / YÜKLEME
+// ============================================================
+function saveProfile() {
+  try { localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile)); } catch {}
+}
+function loadProfile() {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      Object.assign(state.profile, p);
     }
-    function dailySeed() {
-      const d = new Date();
-      return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+  } catch {}
+  // in_progress ferman → sayfa yenilendiyse failed say
+  if (state.profile.fermanState && state.profile.fermanState.status === 'in_progress') {
+    state.profile.fermanState.status = 'failed';
+    saveProfile();
+  }
+}
+
+// ============================================================
+// 📊 RANK SİSTEMİ
+// ============================================================
+function getCurrentRank(totalKings) {
+  let r = RANKS[0];
+  for (const rank of RANKS) if (totalKings >= rank.threshold) r = rank; else break;
+  return r;
+}
+function getNextRank(totalKings) {
+  for (const rank of RANKS) if (totalKings < rank.threshold) return rank;
+  return null;
+}
+function getRankProgress(totalKings) {
+  const curr = getCurrentRank(totalKings);
+  const next = getNextRank(totalKings);
+  if (!next) return 100;
+  const span = next.threshold - curr.threshold;
+  return Math.min(100, ((totalKings - curr.threshold) / span) * 100);
+}
+
+// ============================================================
+// 🎯 MEKANİK: SATRANÇ IŞIN HESABI
+// ============================================================
+/**
+ * Bir taşın (r,c)'ye konduğunda vurabileceği hedefleri hesaplar.
+ * Yeni kural: her yönde İLK engelde durur. Düşman → yık+dur, dost → dur.
+ * At: blok yok, sadece 8 L karesi.
+ */
+function computeAttack(board, pieceType, r, c) {
+  const targets = [];
+  const paths = [];
+  if (r < 0 || r > 7 || c < 0 || c > 7 || board[r][c] !== null) return { targets, paths };
+
+  function rayCheck(nr, nc) {
+    const cell = board[nr][nc];
+    if (cell && cell.kind === 'FRIENDLY') return 'block';
+    if (cell && cell.kind === 'ALLY_KING') return 'block';
+    paths.push({ r: nr, c: nc });
+    if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
+      targets.push({ r: nr, c: nc, kind: cell.kind });
+      return 'stop';
     }
-    function dailyLevelNumber() {
-      const d = new Date();
-      const start = new Date(d.getFullYear(), 0, 0);
-      const dayOfYear = Math.floor((d - start) / 86400000);
-      return Math.max(3, Math.min(60, 3 + Math.floor(dayOfYear / 5)));
+    return 'continue';
+  }
+
+  const ortho = [[-1,0],[1,0],[0,-1],[0,1]];
+  const diag  = [[-1,-1],[-1,1],[1,-1],[1,1]];
+  const all8  = [...ortho, ...diag];
+
+  function castDirs(dirs) {
+    dirs.forEach(([dr, dc]) => {
+      let nr = r + dr, nc = c + dc;
+      while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+        const res = rayCheck(nr, nc);
+        if (res === 'block' || res === 'stop') break;
+        nr += dr; nc += dc;
+      }
+    });
+  }
+
+  if (pieceType === 'ROOK') castDirs(ortho);
+  else if (pieceType === 'BISHOP') castDirs(diag);
+  else if (pieceType === 'QUEEN') castDirs(all8);
+  else if (pieceType === 'KNIGHT') {
+    const jumps = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+    jumps.forEach(([dr, dc]) => {
+      const nr = r + dr, nc = c + dc;
+      if (nr < 0 || nr > 7 || nc < 0 || nc > 7) return;
+      const cell = board[nr][nc];
+      if (cell && (cell.kind === 'FRIENDLY' || cell.kind === 'ALLY_KING')) return;
+      paths.push({ r: nr, c: nc });
+      if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
+        targets.push({ r: nr, c: nc, kind: cell.kind });
+      }
+    });
+  }
+  else if (pieceType === 'PAWN') {
+    diag.forEach(([dr, dc]) => {
+      const nr = r + dr, nc = c + dc;
+      if (nr < 0 || nr > 7 || nc < 0 || nc > 7) return;
+      const cell = board[nr][nc];
+      if (cell && (cell.kind === 'FRIENDLY' || cell.kind === 'ALLY_KING')) return;
+      paths.push({ r: nr, c: nc });
+      if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
+        targets.push({ r: nr, c: nc, kind: cell.kind });
+      }
+    });
+  }
+  else if (pieceType === 'SHADOW_KING') {
+    all8.forEach(([dr, dc]) => {
+      const nr = r + dr, nc = c + dc;
+      if (nr < 0 || nr > 7 || nc < 0 || nc > 7) return;
+      const cell = board[nr][nc];
+      if (cell && (cell.kind === 'FRIENDLY' || cell.kind === 'ALLY_KING')) return;
+      paths.push({ r: nr, c: nc });
+      if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) {
+        targets.push({ r: nr, c: nc, kind: cell.kind });
+      }
+    });
+  }
+
+  return { targets, paths };
+}
+
+// ============================================================
+// 🧰 YARDIMCILAR
+// ============================================================
+const EMPTY_BOARD = () => Array.from({ length: 8 }, () => Array(8).fill(null));
+const cloneB = b => b.map(row => row.map(c => c ? { ...c } : null));
+function countKings(board) {
+  let n = 0;
+  for (const row of board) for (const c of row) if (c && c.kind === 'KING') n++;
+  return n;
+}
+function hasEmpty(board) {
+  for (const row of board) for (const c of row) if (c === null) return true;
+  return false;
+}
+function hasDock(dock) { return dock.some(x => x !== null); }
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ============================================================
+// 🏗️ SEVİYE ÜRETİMİ (Sefer)
+// ============================================================
+function getSeferParams(levelNum) {
+  const n = levelNum - 1;
+  const kings = Math.min(5, Math.max(1, Math.floor(n / 3) + 1));
+  const pawns = Math.min(8, Math.floor(n / 2));
+  return { kings, pawns, maxMoves: kings + pawns + 3 };
+}
+
+function placeTargets(board, kings, pawns) {
+  const cells = [];
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) cells.push({ r, c });
+  shuffle(cells);
+  for (let i = 0; i < kings && i < cells.length; i++) {
+    board[cells[i].r][cells[i].c] = { kind: 'KING' };
+  }
+  for (let i = 0; i < pawns && (kings + i) < cells.length; i++) {
+    board[cells[kings + i].r][cells[kings + i].c] = { kind: 'PAWN' };
+  }
+}
+
+function executeSim(board, pieceType, r, c) {
+  const { targets } = computeAttack(board, pieceType, r, c);
+  board[r][c] = { kind: 'FRIENDLY', pieceType };
+  targets.forEach(t => { board[t.r][t.c] = null; });
+  return targets;
+}
+
+function findProductiveMoves(board, pool, minKings) {
+  const moves = [];
+  for (const pieceType of pool) {
+    for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+      if (board[r][c] !== null) continue;
+      const { targets } = computeAttack(board, pieceType, r, c);
+      if (targets.length === 0) continue;
+      let k = 0;
+      for (const t of targets) if (t.kind === 'KING') k++;
+      if (k < minKings) continue;
+      moves.push({ pieceType, r, c, kings: k, total: targets.length });
     }
+  }
+  return moves;
+}
 
-    // ============================================================
-    // SES MOTORU
-    // ============================================================
-    class SoundEngine {
-      constructor(){ this.ctx = null; this.muted = false; }
-      ensureContext(){
-        if (!this.ctx) {
-          const AC = window.AudioContext || window.webkitAudioContext;
-          if (AC) this.ctx = new AC();
-        }
-        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(()=>{});
-      }
-      playSelect(){
-        if (this.muted) return; this.ensureContext(); if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-        o.type='triangle'; o.frequency.setValueAtTime(420,now);
-        o.frequency.exponentialRampToValueAtTime(620,now+0.06);
-        g.gain.setValueAtTime(0.08,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.065);
-        o.connect(g); g.connect(this.ctx.destination); o.start(now); o.stop(now+0.07);
-      }
-      playSmash(hitCount, hitKing){
-        if (this.muted) return; this.ensureContext(); if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        const t = this.ctx.createOscillator(), tg = this.ctx.createGain();
-        t.type='sine'; t.frequency.setValueAtTime(hitKing?150:120,now);
-        t.frequency.exponentialRampToValueAtTime(38,now+0.18);
-        tg.gain.setValueAtTime(Math.min(0.28,0.14+hitCount*0.04),now);
-        tg.gain.exponentialRampToValueAtTime(0.001,now+0.19);
-        t.connect(tg); tg.connect(this.ctx.destination); t.start(now); t.stop(now+0.2);
-        if (hitCount > 0) {
-          const c = this.ctx.createOscillator(), cg = this.ctx.createGain();
-          c.type = hitKing ? 'sawtooth' : 'triangle';
-          const f = hitKing ? 520 : 340 + Math.min(hitCount,5)*65;
-          c.frequency.setValueAtTime(f,now+0.02);
-          c.frequency.exponentialRampToValueAtTime(f*1.35,now+0.14);
-          cg.gain.setValueAtTime(hitKing?0.12:0.08,now+0.02);
-          cg.gain.exponentialRampToValueAtTime(0.001,now+0.15);
-          c.connect(cg); cg.connect(this.ctx.destination); c.start(now+0.02); c.stop(now+0.16);
-        }
-      }
-      playWin(){
-        if (this.muted) return; this.ensureContext(); if (!this.ctx) return;
-        [523.25,659.25,783.99,1046.5].forEach((f,i)=>{
-          const s = this.ctx.currentTime + i*0.08;
-          const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-          o.type='triangle'; o.frequency.setValueAtTime(f,s);
-          g.gain.setValueAtTime(0.11,s); g.gain.exponentialRampToValueAtTime(0.001,s+0.22);
-          o.connect(g); g.connect(this.ctx.destination); o.start(s); o.stop(s+0.24);
-        });
-      }
-      playFail(){
-        if (this.muted) return; this.ensureContext(); if (!this.ctx) return;
-        [280,220].forEach((f,i)=>{
-          const s = this.ctx.currentTime + i*0.14;
-          const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-          o.type='sawtooth'; o.frequency.setValueAtTime(f,s);
-          g.gain.setValueAtTime(0.08,s); g.gain.exponentialRampToValueAtTime(0.001,s+0.18);
-          o.connect(g); g.connect(this.ctx.destination); o.start(s); o.stop(s+0.2);
-        });
-      }
+function solveGreedy(board, pool, maxMoves) {
+  const b = cloneB(board);
+  const moves = [];
+  while (countKings(b) > 0 && moves.length < maxMoves) {
+    let cand = findProductiveMoves(b, pool, 1);
+    if (cand.length === 0) cand = findProductiveMoves(b, pool, 0);
+    if (cand.length === 0) return null;
+    cand.sort((x, y) => (y.kings * 100 + y.total) - (x.kings * 100 + x.total));
+    const move = cand[0];
+    executeSim(b, move.pieceType, move.r, move.c);
+    moves.push(move);
+  }
+  return countKings(b) === 0 ? moves : null;
+}
+
+function solveRandom(board, pool, maxMoves) {
+  const b = cloneB(board);
+  const moves = [];
+  while (countKings(b) > 0 && moves.length < maxMoves) {
+    const cand = findProductiveMoves(b, pool, 0);
+    if (cand.length === 0) return null;
+    let total = 0;
+    for (const m of cand) total += m.kings * 6 + m.total;
+    let rv = rng() * total;
+    let pick = cand[0];
+    for (const m of cand) {
+      rv -= (m.kings * 6 + m.total);
+      if (rv <= 0) { pick = m; break; }
     }
-    const sound = new SoundEngine();
+    executeSim(b, pick.pieceType, pick.r, pick.c);
+    moves.push(pick);
+  }
+  return countKings(b) === 0 ? moves : null;
+}
 
-    // ============================================================
-    // DURUM
-    // ============================================================
-    const state = {
-      levelIndex: 0,
-      currentLevel: null,
-      score: 0,
-      hits: 0,
-      board: [],
-      dock: [],
-      selectedDockIndex: null,
-      hoverSquare: null,
-      hintMove: null,
-      history: [],
-      levelCleared: false,
-      flashingSquares: new Set(),
-      isDaily: false,
-      savedNormalState: null
-    };
+function generateSeferLevel(levelNum, depth = 0) {
+  const base = getSeferParams(levelNum);
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const params = { ...base };
+    if (attempt >= 15) params.maxMoves += 1;
+    if (attempt >= 28) params.maxMoves += 2;
 
-    // ============================================================
-    // SATRANÇ VURUŞ HESABI
-    // ============================================================
-    function computeSmashPreview(board, pieceType, r, c) {
-      const pathSquares = [], targets = [], blockedByFriendly = [];
-      if (r < 0 || r > 7 || c < 0 || c > 7 || board[r][c] !== null) {
-        return { pathSquares, targets, blockedByFriendly };
-      }
-      const traceRay = (dr, dc) => {
-        let nr = r + dr, nc = c + dc;
-        while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-          const cell = board[nr][nc];
-          if (cell && cell.kind === 'FRIENDLY') { blockedByFriendly.push({ r:nr, c:nc }); break; }
-          pathSquares.push({ r:nr, c:nc });
-          if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) targets.push({ r:nr, c:nc, kind:cell.kind });
-          nr += dr; nc += dc;
-        }
-      };
-      const ortho = [[-1,0],[1,0],[0,-1],[0,1]];
-      const diag  = [[-1,-1],[-1,1],[1,-1],[1,1]];
-      const jumps = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-      if (pieceType === 'ROOK') ortho.forEach(([a,b]) => traceRay(a,b));
-      else if (pieceType === 'BISHOP') diag.forEach(([a,b]) => traceRay(a,b));
-      else if (pieceType === 'QUEEN') [...ortho, ...diag].forEach(([a,b]) => traceRay(a,b));
-      else if (pieceType === 'KNIGHT') {
-        jumps.forEach(([dr, dc]) => {
-          const nr = r + dr, nc = c + dc;
-          if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-            const cell = board[nr][nc];
-            if (cell && cell.kind === 'FRIENDLY') blockedByFriendly.push({ r:nr, c:nc });
-            else {
-              pathSquares.push({ r:nr, c:nc });
-              if (cell && (cell.kind === 'KING' || cell.kind === 'PAWN')) targets.push({ r:nr, c:nc, kind:cell.kind });
-            }
-          }
-        });
-      }
-      return { pathSquares, targets, blockedByFriendly };
-    }
+    const board = EMPTY_BOARD();
+    placeTargets(board, params.kings, params.pawns);
 
-    const countRemainingKings = (b) => {
-      let n = 0;
-      for (const row of b) for (const c of row) if (c && c.kind === 'KING') n++;
-      return n;
-    };
-    const hasAnyEmptySquare = (b) => {
-      for (const row of b) for (const c of row) if (c === null) return true;
-      return false;
-    };
-    const hasAnyRemainingDockPiece = (d) => d.some(x => x !== null);
-    const EMPTY_BOARD = () => Array.from({ length: 8 }, () => Array(8).fill(null));
-    const cloneB = (b) => b.map(row => row.map(c => c ? { ...c } : null));
-
-    // ============================================================
-    // DİNAMİK SEVİYE ÜRETİMİ (Çözüm doğrulanmış)
-    // ============================================================
-    function getDifficulty(levelNum) {
-      const n = Math.max(0, levelNum - 1);
-      const kings = Math.min(7, 1 + Math.floor(n / 3));
-      const pawns = Math.min(10, Math.floor(n / 2));
-      const looseness = Math.max(-0.3, 0.9 - n * 0.055);
-      const maxMoves = Math.max(1, Math.ceil(kings * (1 + looseness)));
-      const pool = n < 2 ? ['ROOK','BISHOP','QUEEN'] : ['ROOK','BISHOP','QUEEN','KNIGHT'];
-      return { kings, pawns, maxMoves, pool };
-    }
-
-    function placeTargets(board, kings, pawns) {
-      const cells = [];
-      for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) cells.push({ r, c });
-      for (let i = cells.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
-        [cells[i], cells[j]] = [cells[j], cells[i]];
-      }
-      for (let i = 0; i < kings && i < cells.length; i++) {
-        board[cells[i].r][cells[i].c] = { kind: 'KING' };
-      }
-      for (let i = 0; i < pawns && (kings+i) < cells.length; i++) {
-        board[cells[kings+i].r][cells[kings+i].c] = { kind: 'PAWN' };
-      }
-    }
-
-    function executeMove(board, move) {
-      const pv = computeSmashPreview(board, move.pieceType, move.r, move.c);
-      board[move.r][move.c] = { kind: 'FRIENDLY', pieceType: move.pieceType };
-      pv.targets.forEach(t => { board[t.r][t.c] = null; });
-    }
-
-    function findProductiveMoves(board, pool, minKings, minTargets) {
-      const moves = [];
-      for (const pieceType of pool) {
-        for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
-          if (board[r][c] !== null) continue;
-          const pv = computeSmashPreview(board, pieceType, r, c);
-          if (pv.targets.length < minTargets) continue;
-          let k = 0;
-          for (const t of pv.targets) if (t.kind === 'KING') k++;
-          if (k < minKings) continue;
-          moves.push({ pieceType, r, c, kings: k, pawns: pv.targets.length - k });
-        }
-      }
-      return moves;
-    }
-
-    function solveGreedy(board, params, allowPawnOnly) {
-      const b = cloneB(board);
-      const moves = [];
-      while (countRemainingKings(b) > 0 && moves.length < params.maxMoves) {
-        let cand = findProductiveMoves(b, params.pool, 1, 1);
-        if (cand.length === 0 && allowPawnOnly) cand = findProductiveMoves(b, params.pool, 0, 1);
-        if (cand.length === 0) return null;
-        cand.sort((x, y) => (y.kings*100 + y.pawns) - (x.kings*100 + x.pawns));
-        executeMove(b, cand[0]);
-        moves.push(cand[0]);
-      }
-      return countRemainingKings(b) === 0 ? moves : null;
-    }
-
-    function solveRandom(board, params) {
-      const b = cloneB(board);
-      const moves = [];
-      while (countRemainingKings(b) > 0 && moves.length < params.maxMoves) {
-        const cand = findProductiveMoves(b, params.pool, 0, 1);
-        if (cand.length === 0) return null;
-        let total = 0;
-        for (const m of cand) total += m.kings * 6 + m.pawns;
-        let rv = rng() * total;
-        let pick = cand[0];
-        for (const m of cand) {
-          rv -= (m.kings * 6 + m.pawns);
-          if (rv <= 0) { pick = m; break; }
-        }
-        executeMove(b, pick);
-        moves.push(pick);
-      }
-      return countRemainingKings(b) === 0 ? moves : null;
-    }
-
-    function generateLevel(levelNum, depth = 0) {
-      const base = getDifficulty(levelNum);
-      for (let attempt = 0; attempt < 50; attempt++) {
-        const params = { ...base, pool: [...base.pool] };
-        if (attempt >= 20) params.maxMoves += 1;
-        if (attempt >= 35) params.maxMoves += 1;
-
-        const board = EMPTY_BOARD();
-        placeTargets(board, params.kings, params.pawns);
-
-        let solution = solveGreedy(board, params, false);
-        if (!solution) solution = solveGreedy(board, params, true);
-        if (!solution) {
-          for (let i = 0; i < 4; i++) {
-            solution = solveRandom(board, params);
-            if (solution) break;
-          }
-        }
-
-        if (solution) {
-          const targets = [];
-          for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
-            if (board[r][c]) targets.push({ r, c, type: board[r][c].kind });
-          }
-          return {
-            levelNumber: levelNum,
-            title: `${levelNum}. Perde${levelNum<=3?': Isınma':levelNum<=8?': Pusu':levelNum<=15?': Ustalık':levelNum<=25?': Gazap':': Sonsuz Devrim'}`,
-            hint: `En az ${solution.length} hamlede temizle (${params.kings} şah).`,
-            allowedPool: [...params.pool],
-            targets,
-            solution,
-            params
-          };
-        }
-      }
-      if (depth > 3) return createTrivialLevel(levelNum);
-      return generateLevel(Math.max(1, levelNum - 2), depth + 1);
-    }
-
-    function createTrivialLevel(levelNum) {
-      const board = EMPTY_BOARD();
-      board[3][3] = { kind: 'KING' };
-      return {
-        levelNumber: levelNum,
-        title: `${levelNum}. Perde`,
-        hint: 'Tek şahı devir.',
-        allowedPool: ['ROOK','QUEEN'],
-        targets: [{ r:3, c:3, type:'KING' }],
-        solution: [{ pieceType:'ROOK', r:3, c:0, kings:1, pawns:0 }],
-        params: { kings:1, pawns:0, maxMoves:2, pool:['ROOK','QUEEN'] }
-      };
-    }
-
-    function smartRollDock(pool, board) {
-      const useful = new Set();
-      for (const pt of pool) {
-        outer:
-        for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
-          if (board[r][c] !== null) continue;
-          const pv = computeSmashPreview(board, pt, r, c);
-          if (pv.targets.some(t => t.kind === 'KING')) { useful.add(pt); break outer; }
-        }
-      }
-      const uArr = [...useful];
-      const dock = [0,1,2].map(() => pool[Math.floor(rng() * pool.length)]);
-      if (uArr.length > 0) {
-        dock[0] = uArr[Math.floor(rng() * uArr.length)];
-        if (rng() < 0.4) dock[1] = uArr[Math.floor(rng() * uArr.length)];
-      }
-      for (let i = 2; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
-        [dock[i], dock[j]] = [dock[j], dock[i]];
-      }
-      return dock;
-    }
-
-    // ============================================================
-    // YÜKLEME / GEÇİŞLER
-    // ============================================================
-    function saveHistorySnapshot() {
-      state.history.push({
-        board: cloneB(state.board),
-        dock: [...state.dock],
-        score: state.score,
-        hits: state.hits,
-        selectedDockIndex: state.selectedDockIndex
-      });
-    }
-
-    function setupLevelFromData(lvl) {
-      state.currentLevel = lvl;
-      state.board = EMPTY_BOARD();
-      lvl.targets.forEach(t => { state.board[t.r][t.c] = { kind: t.type }; });
-      state.dock = smartRollDock(lvl.allowedPool, state.board);
-      state.selectedDockIndex = state.dock.findIndex(d => d !== null);
-      state.hoverSquare = null;
-      state.hintMove = null;
-      state.history = [];
-      state.levelCleared = false;
-      state.flashingSquares.clear();
-      hideOverlay();
-      updateFooterButtons();
-      renderAll();
-    }
-
-    function loadLevel(idx, keepScore = true) {
-      state.levelIndex = idx;
-      state.isDaily = false;
-      if (!keepScore) { state.score = 0; state.hits = 0; }
-      const lvl = generateLevel(idx + 1);
-      setupLevelFromData(lvl);
-    }
-
-    function retryLevel() {
-      if (!state.currentLevel) return;
-      // Aynı target dizilimini koru, dock'u yeniden dağıt
-      const lvl = state.currentLevel;
-      state.board = EMPTY_BOARD();
-      lvl.targets.forEach(t => { state.board[t.r][t.c] = { kind: t.type }; });
-      state.dock = smartRollDock(lvl.allowedPool, state.board);
-      state.selectedDockIndex = state.dock.findIndex(d => d !== null);
-      state.hoverSquare = null;
-      state.hintMove = null;
-      state.history = [];
-      state.levelCleared = false;
-      state.flashingSquares.clear();
-      hideOverlay();
-      renderAll();
-    }
-
-    function loadDailyChallenge() {
-      // Normal oyuna dönüş için snapshot
-      if (!state.isDaily) {
-        state.savedNormalState = {
-          levelIndex: state.levelIndex,
-          score: state.score,
-          hits: state.hits
-        };
-      }
-      state.isDaily = true;
-
-      const savedRng = rng;
-      rng = mulberry32(dailySeed());
-      try {
-        const lvlNum = dailyLevelNumber();
-        const lvl = generateLevel(lvlNum);
-        lvl.title = `🎯 Günlük: ${todayStr()}`;
-        lvl.hint = `Herkesle aynı tahta. ${lvl.params.kings} şah seni bekliyor!`;
-        state.score = 0;
-        state.hits = 0;
-        setupLevelFromData(lvl);
-      } finally {
-        rng = savedRng;
-      }
-    }
-
-    function exitDaily() {
-      state.isDaily = false;
-      if (state.savedNormalState) {
-        state.levelIndex = state.savedNormalState.levelIndex;
-        state.score = state.savedNormalState.score;
-        state.hits = state.savedNormalState.hits;
-        state.savedNormalState = null;
-      } else {
-        state.levelIndex = 0;
-        state.score = 0;
-        state.hits = 0;
-      }
-      loadLevel(state.levelIndex, true);
-    }
-
-    function updateFooterButtons() {
-      const exitBtn = document.getElementById('exitDailyBtn');
-      const dailyBtn = document.getElementById('dailyBtn');
-      if (state.isDaily) {
-        exitBtn.classList.remove('hidden');
-        dailyBtn.classList.add('hidden');
-      } else {
-        exitBtn.classList.add('hidden');
-        dailyBtn.classList.remove('hidden');
-      }
-    }
-
-    // ============================================================
-    // HAMLE UYGULAMA
-    // ============================================================
-    function placeAndSmash(r, c) {
-      if (state.levelCleared) return;
-      if (state.selectedDockIndex === null) return;
-      const pieceType = state.dock[state.selectedDockIndex];
-      if (!pieceType) return;
-      if (state.board[r][c] !== null) return;
-
-      saveHistorySnapshot();
-
-      const preview = computeSmashPreview(state.board, pieceType, r, c);
-      state.board[r][c] = { kind: 'FRIENDLY', pieceType, justPlaced: true };
-
-      let kingsSmashed = 0, pawnsSmashed = 0, earnedPoints = 0;
-      preview.targets.forEach(t => {
-        const cell = state.board[t.r][t.c];
-        if (cell && cell.kind === 'KING') { kingsSmashed++; earnedPoints += 350; }
-        else if (cell && cell.kind === 'PAWN') { pawnsSmashed++; earnedPoints += 120; }
-        state.board[t.r][t.c] = null;
-        state.flashingSquares.add(`${t.r},${t.c}`);
-      });
-
-      const totalSmashed = kingsSmashed + pawnsSmashed;
-      if (totalSmashed > 1) earnedPoints += (totalSmashed - 1) * 75;
-
-      state.score += earnedPoints;
-      state.hits += totalSmashed;
-      state.dock[state.selectedDockIndex] = null;
-      state.hintMove = null;
-
-      const remainingKingsAfter = countRemainingKings(state.board);
-      if (remainingKingsAfter > 0 && !hasAnyRemainingDockPiece(state.dock)) {
-        state.dock = smartRollDock(state.currentLevel.allowedPool, state.board);
-      }
-      const nextIdx = state.dock.findIndex(x => x !== null);
-      state.selectedDockIndex = nextIdx >= 0 ? nextIdx : null;
-
-      renderAll();
-
-      sound.playSmash(totalSmashed, kingsSmashed > 0);
-      triggerBoardShake(kingsSmashed > 0 || totalSmashed >= 2);
-
-      if (totalSmashed > 0) {
-        const label = kingsSmashed > 0
-          ? `👑 ŞAH DEVRİLDİ! +${earnedPoints}`
-          : `💥 ${totalSmashed} DEVİRME! +${earnedPoints}`;
-        spawnFloatingPopup(r, c, label, kingsSmashed > 0 ? 'text-amber-300' : 'text-red-400');
-      } else {
-        spawnFloatingPopup(r, c, 'TAŞ KONDU', 'text-emerald-300');
-      }
-
-      if (remainingKingsAfter === 0) {
-        state.levelCleared = true;
-        sound.playWin();
-        if (state.isDaily) {
-          const best = getDailyBest();
-          if (best === null || state.score > best) setDailyBest(state.score);
-        }
-        setTimeout(showWinModal, 420);
-      } else if (!hasAnyEmptySquare(state.board) || !hasAnyRemainingDockPiece(state.dock)) {
-        sound.playFail();
-        setTimeout(showOutOfMovesModal, 420);
-      }
-    }
-
-    function undoMove() {
-      if (state.history.length === 0 || state.levelCleared) return;
-      const prev = state.history.pop();
-      state.board = prev.board;
-      state.dock = prev.dock;
-      state.score = prev.score;
-      state.hits = prev.hits;
-      state.selectedDockIndex = prev.selectedDockIndex;
-      state.hintMove = null;
-      state.flashingSquares.clear();
-      hideOverlay();
-      sound.playSelect();
-      renderAll();
-    }
-
-    // ============================================================
-    // İPUCU / YENİDEN DAĞIT
-    // ============================================================
-    function useHint() {
-      if (state.levelCleared || !state.currentLevel) return;
-      if (state.score < 50) {
-        flashToast('İpucu için en az 50 puan gerekli.', 'text-rose-300');
-        return;
-      }
-      const params = { ...state.currentLevel.params, maxMoves: 30, pool: [...state.currentLevel.params.pool] };
-      let sol = solveGreedy(state.board, params, true) || solveGreedy(state.board, params, false);
-      if (!sol || sol.length === 0) {
-        flashToast('Bu pozisyonda ipucu bulunamadı. Geri alıp tekrar dene.', 'text-rose-300');
-        return;
-      }
-      state.score -= 50;
-      const move = sol[0];
-      state.hintMove = move;
-      renderAll();
-
-      const def = PIECE_DEFS[move.pieceType];
-      const file = String.fromCharCode(65 + move.c);
-      const rank = 8 - move.r;
-      flashToast(`💡 ${def.name} → ${file}${rank}`, 'text-amber-300');
-
-      setTimeout(() => {
-        state.hintMove = null;
-        renderAll();
-      }, 4000);
-    }
-
-    function rerollDock() {
-      if (state.levelCleared || !state.currentLevel) return;
-      if (state.score < 100) {
-        flashToast('Yeniden dağıtım için 100 puan gerekli.', 'text-rose-300');
-        return;
-      }
-      const usedCount = state.dock.filter(x => x === null).length;
-      if (usedCount === 3) {
-        flashToast('Tüm taşlar kullanıldı. Yeni dağıtım otomatik gelir.', 'text-rose-300');
-        return;
-      }
-      state.score -= 100;
-      const newDock = smartRollDock(state.currentLevel.allowedPool, state.board);
+    let solution = solveGreedy(board, ALL_PIECES, params.maxMoves);
+    if (!solution) {
       for (let i = 0; i < 3; i++) {
-        if (state.dock[i] !== null) state.dock[i] = newDock[i];
-      }
-      state.selectedDockIndex = state.dock.findIndex(x => x !== null);
-      state.hintMove = null;
-      sound.playSelect();
-      renderAll();
-    }
-
-    // ============================================================
-    // GÖRSEL EFEKTLER
-    // ============================================================
-    function triggerBoardShake(strong = false) {
-      const el = document.getElementById('boardContainer');
-      el.classList.remove('shake-board');
-      void el.offsetWidth;
-      el.classList.add('shake-board');
-      if (strong) {
-        el.style.boxShadow = '0 0 35px rgba(239,68,68,0.55)';
-        setTimeout(() => { el.style.boxShadow = ''; }, 320);
+        solution = solveRandom(board, ALL_PIECES, params.maxMoves);
+        if (solution) break;
       }
     }
-
-    function spawnFloatingPopup(r, c, text, colorClass) {
-      const grid = document.getElementById('boardGrid');
-      const sqEl = grid.children[r * 8 + c];
-      if (!sqEl) return;
-      const rect = sqEl.getBoundingClientRect();
-      const popup = document.createElement('div');
-      popup.className = `floating-popup-fixed ${colorClass}`;
-      popup.style.left = `${rect.left + rect.width / 2}px`;
-      popup.style.top = `${rect.top + rect.height / 2}px`;
-      popup.textContent = text;
-      document.body.appendChild(popup);
-      setTimeout(() => popup.remove(), 750);
-    }
-
-    function flashToast(text, colorClass = 'text-amber-300') {
-      const t = document.createElement('div');
-      t.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[120] px-4 py-2 rounded-xl bg-[#1a1e27] border border-white/15 font-bold text-sm shadow-2xl ${colorClass}`;
-      t.textContent = text;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2200);
-    }
-
-    function getDailyBest() {
-      try {
-        const raw = localStorage.getItem(DAILY_BEST_KEY);
-        if (!raw) return null;
-        const data = JSON.parse(raw);
-        if (data.date === todayStr()) return data.best;
-      } catch {}
-      return null;
-    }
-    function setDailyBest(score) {
-      try {
-        localStorage.setItem(DAILY_BEST_KEY, JSON.stringify({ date: todayStr(), best: score }));
-      } catch {}
-    }
-
-    // ============================================================
-    // MODAL
-    // ============================================================
-    function showWinModal() {
-      const modal = document.getElementById('overlayModal');
-      document.getElementById('modalIcon').textContent = state.isDaily ? '🎯' : '👑';
-      document.getElementById('modalTitle').textContent = state.isDaily ? 'Günlük Tamamlandı!' : 'Şahlar Devrildi!';
-
-      let desc;
-      if (state.isDaily) {
-        const best = getDailyBest();
-        const isNewBest = best === state.score;
-        desc = isNewBest
-          ? `Yeni rekor! Günlük meydan okumayı ${state.score} puanla bitirdin.`
-          : `Bugünün en iyisi: ${best ?? 0} puan · Senin skorun: ${state.score}`;
-      } else {
-        desc = `${state.levelIndex + 1}. perde temizlendi. Sıradaki Şahlar seni bekliyor.`;
+    if (solution) {
+      const targets = [];
+      for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+        if (board[r][c]) targets.push({ r, c, type: board[r][c].kind });
       }
-      document.getElementById('modalDesc').textContent = desc;
-      document.getElementById('modalScore').textContent = state.score.toLocaleString('tr-TR');
-      document.getElementById('modalLevel').textContent =
-        state.isDaily ? todayStr() : `${state.levelIndex + 1}`;
-
-      const primaryBtn = document.getElementById('modalPrimaryBtn');
-      const secondaryBtn = document.getElementById('modalSecondaryBtn');
-
-      if (state.isDaily) {
-        primaryBtn.textContent = '← Ana Oyuna Dön';
-        primaryBtn.onclick = () => {
-          modal.classList.add('hidden');
-          exitDaily();
-        };
-        secondaryBtn.classList.add('hidden');
-      } else {
-        primaryBtn.textContent = 'Sonraki Seviye →';
-        primaryBtn.onclick = () => {
-          modal.classList.add('hidden');
-          loadLevel(state.levelIndex + 1, true);
-        };
-        secondaryBtn.classList.remove('hidden');
-        secondaryBtn.textContent = '🔄 Aynı Perdeyi Tekrar Oyna';
-        secondaryBtn.onclick = () => {
-          modal.classList.add('hidden');
-          retryLevel();
-        };
-      }
-
-      modal.classList.remove('hidden');
-    }
-
-    function showOutOfMovesModal() {
-      const modal = document.getElementById('overlayModal');
-      const rem = countRemainingKings(state.board);
-      document.getElementById('modalIcon').textContent = '🛡️';
-      document.getElementById('modalTitle').textContent = 'Hamle / Alan Kalmadı';
-      document.getElementById('modalDesc').textContent =
-        `Hâlâ ${rem} Şah ayakta. Geri alıp farklı bir hamle dene.`;
-      document.getElementById('modalScore').textContent = state.score.toLocaleString('tr-TR');
-      document.getElementById('modalLevel').textContent =
-        state.isDaily ? todayStr() : `${state.levelIndex + 1}`;
-
-      const primaryBtn = document.getElementById('modalPrimaryBtn');
-      const secondaryBtn = document.getElementById('modalSecondaryBtn');
-
-      primaryBtn.textContent = 'Bölümü Yeniden Dene';
-      primaryBtn.onclick = () => {
-        modal.classList.add('hidden');
-        retryLevel();
+      return {
+        levelNum, targets,
+        minMoves: solution.length,
+        kings: params.kings,
+        title: `${levelNum}. Sefer`,
+        subtitle: `${params.kings} şahı devir`
       };
-      if (state.isDaily) {
-        secondaryBtn.classList.remove('hidden');
-        secondaryBtn.textContent = '← Ana Oyuna Dön';
-        secondaryBtn.onclick = () => {
-          modal.classList.add('hidden');
-          exitDaily();
+    }
+  }
+  if (depth > 3) return createTrivialLevel(levelNum);
+  return generateSeferLevel(Math.max(2, levelNum - 1), depth + 1);
+}
+
+function createTrivialLevel(levelNum) {
+  const board = EMPTY_BOARD();
+  board[3][3] = { kind: 'KING' };
+  return {
+    levelNum, targets: [{ r: 3, c: 3, type: 'KING' }],
+    minMoves: 1, kings: 1,
+    title: `${levelNum}. Sefer`,
+    subtitle: 'Tek şahı devir'
+  };
+}
+
+// ============================================================
+// 🎲 DOCK DAĞITIMI
+// ============================================================
+function weightedPick(pool) {
+  const weights = pool.map(p => DOCK_WEIGHTS[p] || 10);
+  const total = weights.reduce((a,b)=>a+b, 0);
+  let rv = rng() * total;
+  for (let i = 0; i < pool.length; i++) {
+    rv -= weights[i];
+    if (rv <= 0) return pool[i];
+  }
+  return pool[pool.length - 1];
+}
+
+function smartRollDock(board) {
+  const useful = new Set();
+  for (const pt of ALL_PIECES) {
+    outer:
+    for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+      if (board[r][c] !== null) continue;
+      const { targets } = computeAttack(board, pt, r, c);
+      if (targets.some(t => t.kind === 'KING')) { useful.add(pt); break outer; }
+    }
+  }
+  const uArr = [...useful];
+  const dock = [0, 1, 2].map(() => weightedPick(ALL_PIECES));
+  // En az 1 faydalı taş garantile
+  if (uArr.length > 0) {
+    dock[0] = uArr[Math.floor(rng() * uArr.length)];
+    if (rng() < 0.4) dock[1] = uArr[Math.floor(rng() * uArr.length)];
+  }
+  // En fazla 1 SHADOW_KING
+  let skCount = dock.filter(p => p === 'SHADOW_KING').length;
+  for (let i = 2; i >= 0 && skCount > 1; i--) {
+    if (dock[i] === 'SHADOW_KING') {
+      dock[i] = weightedPick(ALL_PIECES.filter(p => p !== 'SHADOW_KING'));
+      skCount--;
+    }
+  }
+  shuffle(dock);
+  return dock;
+}
+
+// ============================================================
+// 📜 FERMAN
+// ============================================================
+function getFermanDate() {
+  const d = new Date();
+  const day = d.getDay();
+  let back = 0;
+  if (day === 2 || day === 5) back = 0;
+  else if (day === 0) back = 2;
+  else if (day === 1) back = 3;
+  else if (day === 3) back = 1;
+  else if (day === 4) back = 2;
+  else if (day === 6) back = 1;
+  const target = new Date(d);
+  target.setDate(target.getDate() - back);
+  return target;
+}
+function fermanDateStr() {
+  const d = getFermanDate();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function fermanSeed() {
+  const d = getFermanDate();
+  return d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+}
+
+function generateFerman() {
+  const oldRng = rng;
+  rng = mulberry32(fermanSeed());
+  try {
+    for (let attempt = 0; attempt < 300; attempt++) {
+      const board = EMPTY_BOARD();
+      placeTargets(board, 3, 5);
+      // 3 taşla çözülebilmeli
+      let solution = solveGreedy(board, ALL_PIECES, 3);
+      if (!solution) {
+        for (let i = 0; i < 3; i++) {
+          solution = solveRandom(board, ALL_PIECES, 3);
+          if (solution) break;
+        }
+      }
+      if (solution && solution.length <= 3) {
+        const targets = [];
+        for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+          if (board[r][c]) targets.push({ r, c, type: board[r][c].kind });
+        }
+        const dock = solution.map(m => m.pieceType);
+        return {
+          targets,
+          fixedDock: dock, // ferman 3 taşla sınırlı
+          date: fermanDateStr(),
+          title: 'Ferman',
+          subtitle: '3 taşla 3 şahı devir'
         };
-      } else {
-        secondaryBtn.classList.add('hidden');
       }
-
-      modal.classList.remove('hidden');
     }
+  } finally {
+    rng = oldRng;
+  }
+  // Fallback: tek şah tek vezir
+  const board = EMPTY_BOARD();
+  board[3][3] = { kind: 'KING' };
+  return {
+    targets: [{ r: 3, c: 3, type: 'KING' }],
+    fixedDock: ['QUEEN', 'ROOK', 'BISHOP'],
+    date: fermanDateStr(),
+    title: 'Ferman',
+    subtitle: 'Tek şahı devir'
+  };
+}
 
-    function hideOverlay() {
-      document.getElementById('overlayModal').classList.add('hidden');
+// ============================================================
+// 🎮 OYUN KURULUMU
+// ============================================================
+function startGame(mode) {
+  state.gameMode = mode;
+  state.history = [];
+  state.levelCleared = false;
+  state.retryUsed = false;
+  state.hintMove = null;
+  state.flashingSquares.clear();
+  state.selectedDockIndex = null;
+  state.hoverSquare = null;
+
+  if (mode === 'tutorial') {
+    // Eğitim: tek şah, dock'ta 3 at
+    state.board = EMPTY_BOARD();
+    state.board[3][3] = { kind: 'KING' };
+    state.dock = ['KNIGHT', 'KNIGHT', 'KNIGHT'];
+    state.levelData = { title: 'Eğitim', subtitle: 'Atı koy, Şahı vur' };
+    state.selectedDockIndex = 0;
+  }
+  else if (mode === 'ferman') {
+    const ferman = generateFerman();
+    state.levelData = ferman;
+    state.board = EMPTY_BOARD();
+    ferman.targets.forEach(t => { state.board[t.r][t.c] = { kind: t.type }; });
+    state.dock = [...ferman.fixedDock];
+    shuffle(state.dock);
+    state.selectedDockIndex = 0;
+    // Ferman başladı olarak işaretle
+    state.profile.fermanState = { date: fermanDateStr(), status: 'in_progress' };
+    saveProfile();
+  }
+  else {
+    // Sefer
+    const lvl = generateSeferLevel(state.profile.currentLevel);
+    state.levelData = lvl;
+    state.board = EMPTY_BOARD();
+    lvl.targets.forEach(t => { state.board[t.r][t.c] = { kind: t.type }; });
+    state.dock = smartRollDock(state.board);
+    state.selectedDockIndex = state.dock.findIndex(x => x !== null);
+  }
+
+  state.screen = 'game';
+  showGameScreen();
+  renderGame();
+}
+
+function showGameScreen() {
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  renderGame();
+}
+
+function hideGameScreen() {
+  document.getElementById('gameScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  renderAll();
+}
+
+function exitGame(mode) {
+  // Fermandan çıkıyorsa ve henüz bitmemişse → failed
+  if (state.gameMode === 'ferman' && !state.levelCleared) {
+    if (state.profile.fermanState && state.profile.fermanState.status === 'in_progress') {
+      state.profile.fermanState.status = 'failed';
+      saveProfile();
     }
+  }
+  state.screen = 'home';
+  hideGameScreen();
+}
 
-    // ============================================================
-    // RENDER
-    // ============================================================
-    function renderHud() {
-      const lvl = state.currentLevel;
-      if (!lvl) return;
-      const remainingKings = countRemainingKings(state.board);
+// ============================================================
+// 🎮 HAMLE UYGULAMA
+// ============================================================
+function placeAndSmash(r, c) {
+  if (state.levelCleared) return;
+  if (state.selectedDockIndex === null) return;
+  const pieceType = state.dock[state.selectedDockIndex];
+  if (!pieceType) return;
+  if (state.board[r][c] !== null) return;
 
-      document.getElementById('hudLevel').textContent = state.isDaily ? '🎯' : lvl.levelNumber;
-      document.getElementById('hudKings').textContent = remainingKings;
-      document.getElementById('hudScore').textContent = state.score.toLocaleString('tr-TR');
-      document.getElementById('hudHits').textContent = state.hits;
-      document.getElementById('levelTitle').textContent = lvl.title;
-      document.getElementById('levelHint').textContent = lvl.hint;
+  // Snapshot
+  state.history.push({
+    board: cloneB(state.board),
+    dock: [...state.dock],
+    selectedDockIndex: state.selectedDockIndex
+  });
 
-      document.getElementById('undoBtn').disabled = state.history.length === 0 || state.levelCleared;
-      document.getElementById('hintBtn').disabled = state.levelCleared || state.score < 50;
-      document.getElementById('rerollBtn').disabled = state.levelCleared || state.score < 100;
+  const { targets } = computeAttack(state.board, pieceType, r, c);
+  state.board[r][c] = { kind: 'FRIENDLY', pieceType, justPlaced: true };
 
-      const selectedType =
-        state.selectedDockIndex !== null ? state.dock[state.selectedDockIndex] : null;
-      const selText = document.getElementById('selectionText');
-      const prevStats = document.getElementById('previewStats');
+  let kingsKilled = 0, pawnsKilled = 0;
+  targets.forEach(t => {
+    const cell = state.board[t.r][t.c];
+    if (cell && cell.kind === 'KING') kingsKilled++;
+    else if (cell && cell.kind === 'PAWN') pawnsKilled++;
+    state.board[t.r][t.c] = null;
+    state.flashingSquares.add(`${t.r},${t.c}`);
+  });
+  const total = kingsKilled + pawnsKilled;
 
-      if (!selectedType) {
-        selText.textContent = 'Seçili taş yok.';
-        prevStats.textContent = '';
-        return;
+  // Kazançlar
+  if (kingsKilled > 0) {
+    state.profile.totalKings += kingsKilled;
+    state.profile.balance += kingsKilled;
+    const oldRank = getCurrentRank(state.profile.totalKings - kingsKilled);
+    const newRank = getCurrentRank(state.profile.totalKings);
+    if (newRank.threshold > oldRank.threshold) {
+      setTimeout(() => showRankUp(oldRank, newRank), 800);
+    }
+  }
+  if (total > state.profile.bestCombo) state.profile.bestCombo = total;
+  saveProfile();
+
+  // Dock güncelle
+  state.dock[state.selectedDockIndex] = null;
+  state.hintMove = null;
+
+  const remainingKings = countKings(state.board);
+
+  // Ferman: yenileme yok. Sefer/Eğitim: yenileme var
+  if (state.gameMode !== 'ferman' && remainingKings > 0 && !hasDock(state.dock)) {
+    state.dock = smartRollDock(state.board);
+  }
+  const nextIdx = state.dock.findIndex(x => x !== null);
+  state.selectedDockIndex = nextIdx >= 0 ? nextIdx : null;
+
+  renderGame();
+
+  sound.smash(total, kingsKilled > 0);
+  if (total > 0) {
+    const label = kingsKilled > 0 ? `👑 ${kingsKilled} Şah!` : `💥 ${total} vuruş!`;
+    spawnPopup(r, c, label, kingsKilled > 0 ? 'text-amber-300' : 'text-red-400');
+  }
+
+  if (remainingKings === 0) {
+    state.levelCleared = true;
+    sound.win();
+    setTimeout(showWinModal, 420);
+  } else if (!hasEmpty(state.board) || (!hasDock(state.dock) && state.gameMode === 'ferman')) {
+    sound.fail();
+    setTimeout(showFailModal, 420);
+  }
+}
+
+function undoMove() {
+  if (state.history.length === 0 || state.levelCleared) return;
+  const prev = state.history.pop();
+  state.board = prev.board;
+  state.dock = prev.dock;
+  state.selectedDockIndex = prev.selectedDockIndex;
+  state.hintMove = null;
+  state.flashingSquares.clear();
+  sound.select();
+  renderGame();
+}
+
+function retryLevel() {
+  if (state.levelCleared) return;
+  state.retryUsed = true;
+  const lvl = state.levelData;
+  state.board = EMPTY_BOARD();
+  lvl.targets.forEach(t => { state.board[t.r][t.c] = { kind: t.type }; });
+
+  if (state.gameMode === 'ferman') {
+    // Ferman: retry deneme sayılır → fail
+    state.profile.fermanState = { date: fermanDateStr(), status: 'failed' };
+    saveProfile();
+    showFailModal();
+    return;
+  }
+  state.dock = smartRollDock(state.board);
+  state.selectedDockIndex = state.dock.findIndex(x => x !== null);
+  state.history = [];
+  state.hintMove = null;
+  sound.select();
+  renderGame();
+}
+
+function useHint() {
+  if (state.levelCleared) return;
+  if (state.profile.balance < 1) {
+    toast('Yeterli şah puanın yok. Önce şah vur.', 'text-rose-300');
+    return;
+  }
+  const params = { pool: ALL_PIECES, maxMoves: 30 };
+  let sol = solveGreedy(state.board, ALL_PIECES, 30);
+  if (!sol || sol.length === 0) {
+    toast('Bu pozisyonda ipucu bulunamadı.', 'text-rose-300');
+    return;
+  }
+  state.profile.balance -= 1;
+  saveProfile();
+  const move = sol[0];
+  state.hintMove = move;
+  renderGame();
+  const def = PIECE_DEFS[move.pieceType];
+  const file = String.fromCharCode(65 + move.c);
+  const rank = 8 - move.r;
+  toast(`💡 ${def.name} → ${file}${rank}`, 'text-amber-300');
+  setTimeout(() => {
+    state.hintMove = null;
+    renderGame();
+  }, 4000);
+}
+
+// ============================================================
+// 🎉 MODALLAR
+// ============================================================
+function showModal(config) {
+  document.getElementById('modalIcon').textContent = config.icon || '👑';
+  document.getElementById('modalTitle').textContent = config.title || '';
+  document.getElementById('modalDesc').textContent = config.desc || '';
+
+  const statsEl = document.getElementById('modalStats');
+  if (config.stats && config.stats.length > 0) {
+    statsEl.classList.remove('hidden');
+    statsEl.classList.add('flex');
+    statsEl.innerHTML = config.stats.map(s => `
+      <div class="text-center">
+        <span class="text-gray-400 block text-[10px]">${s.label}</span>
+        <strong class="${s.color || 'text-white'} text-sm">${s.value}</strong>
+      </div>
+    `).join('<div class="h-6 w-px bg-white/10"></div>');
+  } else {
+    statsEl.classList.add('hidden');
+  }
+
+  const primaryBtn = document.getElementById('modalPrimaryBtn');
+  const secondaryBtn = document.getElementById('modalSecondaryBtn');
+
+  primaryBtn.textContent = config.primaryText || 'Devam';
+  primaryBtn.onclick = () => {
+    closeModal();
+    if (config.onPrimary) config.onPrimary();
+  };
+
+  if (config.secondaryText) {
+    secondaryBtn.classList.remove('hidden');
+    secondaryBtn.textContent = config.secondaryText;
+    secondaryBtn.onclick = () => {
+      closeModal();
+      if (config.onSecondary) config.onSecondary();
+    };
+  } else {
+    secondaryBtn.classList.add('hidden');
+  }
+
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+}
+
+function showWinModal() {
+  const mode = state.gameMode;
+  const kingsKilledTotal = state.profile.totalKings; // güncel
+
+  if (mode === 'tutorial') {
+    state.profile.tutorialDone = true;
+    state.profile.currentLevel = 2;
+    saveProfile();
+    showModal({
+      icon: '🎉',
+      title: 'Harika!',
+      desc: 'Atını koydun ve Şahı devirdin. +1 şah puanı kazandın. Artık oyuna hazırsın!',
+      stats: [
+        { label: 'Bakiye', value: `${state.profile.balance} ♔`, color: 'text-amber-300' }
+      ],
+      primaryText: 'Ana Sayfaya Dön',
+      onPrimary: () => {
+        state.gameMode = null;
+        state.levelCleared = false;
+        hideGameScreen();
       }
-      const def = PIECE_DEFS[selectedType];
-      selText.textContent = `Seçili: ${def.glyph} ${def.name} (${def.desc})`;
+    });
+    return;
+  }
 
-      if (state.hoverSquare && state.board[state.hoverSquare.r][state.hoverSquare.c] === null) {
-        const pv = computeSmashPreview(state.board, selectedType, state.hoverSquare.r, state.hoverSquare.c);
-        const kCount = pv.targets.filter(t => t.kind === 'KING').length;
-        const pCount = pv.targets.filter(t => t.kind === 'PAWN').length;
-        if (pv.targets.length > 0) {
-          const parts = [];
-          if (kCount > 0) parts.push(`${kCount} Şah`);
-          if (pCount > 0) parts.push(`${pCount} Piyon`);
-          prevStats.textContent = `Vurulacak: ${parts.join(' + ')}`;
+  if (mode === 'ferman') {
+    state.profile.fermanState = { date: fermanDateStr(), status: 'solved' };
+    saveProfile();
+    showModal({
+      icon: '📜',
+      title: 'Ferman Çözüldü!',
+      desc: 'Bu haftanın fermanını başarıyla tamamladın. Yeni ferman için biraz bekle.',
+      stats: [
+        { label: 'Bakiye', value: `${state.profile.balance} ♔`, color: 'text-amber-300' },
+        { label: 'En İyi Combo', value: `${state.profile.bestCombo}`, color: 'text-sky-300' }
+      ],
+      primaryText: 'Ana Sayfa',
+      onPrimary: () => {
+        state.gameMode = null;
+        state.levelCleared = false;
+        hideGameScreen();
+      }
+    });
+    return;
+  }
+
+  // Sefer
+  const oldMax = state.profile.maxLevel;
+  state.profile.currentLevel = Math.max(state.profile.currentLevel + 1, state.profile.currentLevel);
+  state.profile.currentLevel += 0; // artırımı aşağıda yapıyoruz
+  // Aslında yukarıda currentLevel'ı kullandık; doğrusu:
+  // (Bu blok sefer moduna özel)
+  // currentLevel artır:
+  // Yalnızca dikkatli: tekrar artırmayalım
+  // Yeniden düzenle:
+  // state.profile.currentLevel += 1; ← burayı düzelteceğiz
+
+  // DÜZELTME: Yukarıdaki iki satır iptal, aşağıdaki doğru akış:
+  // currentLevel = geçilen seviye + 1
+  state.profile.currentLevel = state.levelData.levelNum + 1;
+  state.profile.maxLevel = Math.max(state.profile.maxLevel, state.levelData.levelNum);
+
+  if (!state.retryUsed) state.profile.winStreak += 1;
+  else state.profile.winStreak = 0;
+
+  saveProfile();
+
+  showModal({
+    icon: '👑',
+    title: 'Perde Temizlendi!',
+    desc: 'Tüm şahları devirdin. Bir sonraki perde seni bekliyor.',
+    stats: [
+      { label: 'Seviye', value: `${state.levelData.levelNum}`, color: 'text-amber-300' },
+      { label: 'Bakiye', value: `${state.profile.balance} ♔`, color: 'text-amber-300' },
+      { label: 'Seri', value: `${state.profile.winStreak}🔥`, color: 'text-orange-300' }
+    ],
+    primaryText: 'Sonraki Perde →',
+    onPrimary: () => {
+      state.gameMode = 'sefer';
+      state.levelCleared = false;
+      state.retryUsed = false;
+      startGame('sefer');
+    },
+    secondaryText: 'Ana Sayfa',
+    onSecondary: () => {
+      state.gameMode = null;
+      state.levelCleared = false;
+      hideGameScreen();
+    }
+  });
+}
+
+function showFailModal() {
+  const rem = countKings(state.board);
+  if (state.gameMode === 'ferman') {
+    showModal({
+      icon: '📜',
+      title: 'Ferman Başarısız',
+      desc: `Bu fermanı geçemedin. Yeni ferman için salı veya cumayı bekle.`,
+      stats: [
+        { label: 'Kalan Şah', value: `${rem}`, color: 'text-red-300' }
+      ],
+      primaryText: 'Ana Sayfa',
+      onPrimary: () => {
+        state.gameMode = null;
+        state.levelCleared = false;
+        hideGameScreen();
+      }
+    });
+  } else {
+    showModal({
+      icon: '🛡️',
+      title: 'Hamle Kalmadı',
+      desc: `Hâlâ ${rem} şah ayakta. Tekrar dene veya geri al.`,
+      primaryText: 'Tekrar Dene',
+      onPrimary: () => {
+        retryLevel();
+      },
+      secondaryText: 'Ana Sayfa',
+      onSecondary: () => {
+        state.gameMode = null;
+        state.levelCleared = false;
+        hideGameScreen();
+      }
+    });
+  }
+}
+
+function showRankUp(oldRank, newRank) {
+  sound.rankUp();
+  showModal({
+    icon: '⬆️',
+    title: 'Terfi!',
+    desc: `Tebrikler! ${oldRank.name} rütbesinden ${newRank.name} rütbesine yükseldin.`,
+    stats: [
+      { label: 'Yeni Rank', value: `${newRank.glyph} ${newRank.name}`, color: 'text-amber-300' }
+    ],
+    primaryText: 'Harika!',
+    onPrimary: () => {}
+  });
+}
+
+// ============================================================
+// 🎨 RENDER
+// ============================================================
+function renderAll() {
+  renderHeader();
+  renderHome();
+  renderProfile();
+  renderSettings();
+  updateTabBar();
+}
+
+function renderHeader() {
+  const bal = state.profile.balance;
+  const balEl = document.getElementById('headerBalance');
+  const balVal = document.getElementById('balanceVal');
+  if (bal > 0 || state.screen !== 'home') {
+    balEl.classList.remove('hidden');
+    balEl.classList.add('flex');
+    balVal.textContent = bal;
+  } else {
+    balEl.classList.add('hidden');
+  }
+
+  const subtitle = { home: 'Ana Sayfa', profile: 'Profil', settings: 'Ayarlar' }[state.screen] || '';
+  document.getElementById('headerSubtitle').textContent = subtitle;
+}
+
+function renderHome() {
+  const el = document.getElementById('homeScreen');
+  if (!el || state.screen !== 'home') return;
+  const p = state.profile;
+
+  // Ferman kartı
+  const fDate = fermanDateStr();
+  let fermanStatus = 'available';
+  if (p.fermanState && p.fermanState.date === fDate) {
+    fermanStatus = p.fermanState.status;
+  }
+
+  const fermanSubtitle = {
+    available: 'Yeni ferman yayınlandı — oyna',
+    in_progress: 'Devam ediyor',
+    solved: 'Bu ferman çözüldü ✓',
+    failed: 'Bu ferman başarısız — yeni fermanı bekle'
+  }[fermanStatus];
+
+  const fermanDisabled = fermanStatus === 'solved' || fermanStatus === 'failed';
+  const fermanBadge = fermanStatus === 'available' ? '✨' : fermanStatus === 'solved' ? '✓' : '';
+
+  el.innerHTML = `
+    <div class="flex items-center justify-between px-1 mt-1">
+      <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Merhaba, ${escapeHtml(p.name)}</div>
+      <div class="text-[11px] text-amber-300 font-bold flex items-center gap-1">${getCurrentRank(p.totalKings).glyph} ${getCurrentRank(p.totalKings).name}</div>
+    </div>
+
+    <button data-mode="sefer" class="menu-card rounded-2xl p-3.5 flex items-center gap-3 text-left w-full">
+      <div class="w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-400/30 flex items-center justify-center text-2xl">⚔️</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-extrabold text-white">Sefere Çık</div>
+        <div class="text-[11px] text-gray-400 truncate">Seviye ${p.currentLevel} · Devam et</div>
+      </div>
+      <div class="text-amber-400 text-lg">›</div>
+    </button>
+
+    <button data-mode="ferman" class="menu-card rounded-2xl p-3.5 flex items-center gap-3 text-left w-full ${fermanDisabled ? 'disabled' : ''}" ${fermanDisabled ? 'disabled' : ''}>
+      <div class="w-11 h-11 rounded-xl bg-purple-500/15 border border-purple-400/30 flex items-center justify-center text-2xl">📜</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-extrabold text-white">Ferman Yayınlandı ${fermanBadge}</div>
+        <div class="text-[11px] text-gray-400 truncate">${fermanSubtitle}</div>
+      </div>
+      <div class="text-purple-400 text-lg">›</div>
+    </button>
+
+    <div class="menu-card rounded-2xl p-3.5 flex items-center gap-3 disabled">
+      <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl">🏆</div>
+      <div class="flex-1">
+        <div class="text-sm font-extrabold text-white">Turnuva</div>
+        <div class="text-[11px] text-gray-400">Yakında</div>
+      </div>
+    </div>
+
+    <div class="menu-card rounded-2xl p-3.5 flex items-center gap-3 disabled">
+      <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl">🎯</div>
+      <div class="flex-1">
+        <div class="text-sm font-extrabold text-white">Düello</div>
+        <div class="text-[11px] text-gray-400">Yakında</div>
+      </div>
+    </div>
+
+    <div class="text-center text-[10px] text-gray-600 mt-2">Şahları da Vururlar v2</div>
+  `;
+
+  el.querySelectorAll('[data-mode]').forEach(btn => {
+    if (btn.disabled) return;
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      if (mode === 'sefer') {
+        if (!state.profile.tutorialDone) {
+          startGame('tutorial');
         } else {
-          prevStats.textContent = 'Hedef vurulmayacak';
+          startGame('sefer');
         }
-      } else {
-        prevStats.textContent = 'Boş kareye dokun';
-      }
-    }
-
-    function renderBoard() {
-      const grid = document.getElementById('boardGrid');
-      grid.innerHTML = '';
-
-      const selectedType =
-        state.selectedDockIndex !== null ? state.dock[state.selectedDockIndex] : null;
-
-      let activePreview = { pathSquares: [], targets: [], blockedByFriendly: [] };
-      if (selectedType && state.hoverSquare &&
-          state.board[state.hoverSquare.r][state.hoverSquare.c] === null &&
-          !state.levelCleared) {
-        activePreview = computeSmashPreview(state.board, selectedType, state.hoverSquare.r, state.hoverSquare.c);
-      }
-
-      const pathSet = new Set(activePreview.pathSquares.map(p => `${p.r},${p.c}`));
-      const targetMap = new Map(activePreview.targets.map(t => [`${t.r},${t.c}`, t.kind]));
-      const blockedSet = new Set(activePreview.blockedByFriendly.map(b => `${b.r},${b.c}`));
-      const hintKey = state.hintMove ? `${state.hintMove.r},${state.hintMove.c}` : null;
-
-      for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-          const isLight = (r + c) % 2 === 0;
-          const key = `${r},${c}`;
-          const cell = state.board[r][c];
-          const isEmpty = cell === null;
-
-          const sq = document.createElement('button');
-          sq.type = 'button';
-          sq.dataset.r = r;
-          sq.dataset.c = c;
-          sq.className = `board-square ${isLight ? 'sq-light' : 'sq-dark'} ${
-            isEmpty && selectedType && !state.levelCleared ? 'cursor-pointer' : 'cursor-default'
-          }`;
-
-          if (state.flashingSquares.has(key)) sq.classList.add('square-hit-flash');
-          if (hintKey === key) sq.classList.add('preview-hint');
-
-          if (state.hoverSquare && state.hoverSquare.r === r && state.hoverSquare.c === c && isEmpty && selectedType) {
-            sq.classList.add('preview-hover-empty');
-          } else if (targetMap.has(key)) {
-            const tKind = targetMap.get(key);
-            sq.classList.add(tKind === 'KING' ? 'preview-king-target' : 'preview-target');
-          } else if (pathSet.has(key)) {
-            sq.classList.add('preview-path');
-          } else if (blockedSet.has(key)) {
-            sq.classList.add('preview-blocked');
-          }
-
-          if (cell) {
-            const token = document.createElement('div');
-            token.className = 'w-[78%] h-[78%] rounded-xl flex flex-col items-center justify-center relative pointer-events-none';
-            if (cell.kind === 'KING') {
-              token.classList.add('king-target-badge', 'king-idle');
-              token.innerHTML = `<span class="piece-glyph text-2xl sm:text-3xl">♚</span><span class="text-[8px] font-black tracking-tighter uppercase leading-none mt-0.5">ŞAH</span>`;
-            } else if (cell.kind === 'PAWN') {
-              token.classList.add('pawn-target-badge');
-              token.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">♟</span>`;
-            } else if (cell.kind === 'FRIENDLY') {
-              const pDef = PIECE_DEFS[cell.pieceType] || PIECE_DEFS.ROOK;
-              token.classList.add('friendly-badge');
-              if (cell.justPlaced) { token.classList.add('smash-enter'); cell.justPlaced = false; }
-              token.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">${pDef.glyph}</span><span class="text-[7px] font-bold uppercase tracking-tight leading-none opacity-90">ENGEL</span>`;
-            }
-            sq.appendChild(token);
-          } else if (hintKey === key && state.hintMove) {
-            const pDef = PIECE_DEFS[state.hintMove.pieceType];
-            const ghost = document.createElement('span');
-            ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-90 text-amber-200 pointer-events-none';
-            ghost.textContent = pDef.glyph;
-            sq.appendChild(ghost);
-          } else if (state.hoverSquare && state.hoverSquare.r === r &&
-                     state.hoverSquare.c === c && selectedType && !state.levelCleared) {
-            const pDef = PIECE_DEFS[selectedType];
-            const ghost = document.createElement('span');
-            ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-55 text-amber-300 pointer-events-none';
-            ghost.textContent = pDef.glyph;
-            sq.appendChild(ghost);
-          }
-
-          grid.appendChild(sq);
-        }
-      }
-      state.flashingSquares.clear();
-    }
-
-    function renderDock() {
-      const dockEl = document.getElementById('dockContainer');
-      dockEl.innerHTML = '';
-      state.dock.forEach((pieceType, idx) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.dataset.dockIdx = idx;
-        if (!pieceType) {
-          btn.disabled = true;
-          btn.className = 'dock-card rounded-2xl py-3 px-2 flex flex-col items-center justify-center opacity-30 cursor-not-allowed min-h-[86px] sm:min-h-[98px]';
-          btn.innerHTML = `<span class="text-xs font-bold text-gray-500">KULLANILDI</span>`;
-          dockEl.appendChild(btn);
+      } else if (mode === 'ferman') {
+        if (!state.profile.tutorialDone) {
+          toast('Önce eğitimi tamamla.', 'text-rose-300');
           return;
         }
-        const def = PIECE_DEFS[pieceType];
-        const isSelected = state.selectedDockIndex === idx;
-        btn.className = `dock-card rounded-2xl py-2.5 px-2 sm:py-3 sm:px-3 flex flex-col items-center justify-center cursor-pointer min-h-[86px] sm:min-h-[98px] ${isSelected ? 'selected' : ''}`;
-        btn.innerHTML = `
-          <span class="piece-glyph text-3xl sm:text-4xl ${isSelected ? 'text-amber-300' : 'text-white'}">${def.glyph}</span>
-          <span class="mt-1 text-xs sm:text-sm font-extrabold ${isSelected ? 'text-amber-300' : 'text-gray-100'}">${def.name}</span>
-          <span class="text-[10px] text-gray-400 line-clamp-1">${def.desc}</span>`;
-        dockEl.appendChild(btn);
-      });
-    }
-
-    function renderAll() { renderHud(); renderDock(); renderBoard(); }
-
-    // ============================================================
-    // ⭐ OLAY DİNLEYİCİLERİ — Event Delegation (Bırakma hatası düzeltmesi)
-    // ============================================================
-    const grid = document.getElementById('boardGrid');
-    const dockContainer = document.getElementById('dockContainer');
-
-    // Tıklama: hangi eleman olursa olsun, üst kaptan yakala
-    grid.addEventListener('click', (e) => {
-      const btn = e.target.closest('.board-square');
-      if (!btn) return;
-      const r = parseInt(btn.dataset.r, 10);
-      const c = parseInt(btn.dataset.c, 10);
-      if (isNaN(r) || isNaN(c)) return;
-      if (state.levelCleared) return;
-      if (state.selectedDockIndex === null) return;
-      const pType = state.dock[state.selectedDockIndex];
-      if (!pType) return;
-      if (state.board[r][c] !== null) return;
-      placeAndSmash(r, c);
-    });
-
-    // Hover: SADECE mouse (dokunmatikte preview yok)
-    grid.addEventListener('pointerover', (e) => {
-      if (e.pointerType !== 'mouse') return;
-      const btn = e.target.closest('.board-square');
-      if (!btn) return;
-      const r = parseInt(btn.dataset.r, 10);
-      const c = parseInt(btn.dataset.c, 10);
-      if (isNaN(r) || isNaN(c)) return;
-      if (state.hoverSquare && state.hoverSquare.r === r && state.hoverSquare.c === c) return;
-      state.hoverSquare = { r, c };
-      renderHud();
-      renderBoard();
-    });
-
-    grid.addEventListener('pointerleave', () => {
-      if (state.hoverSquare !== null) {
-        state.hoverSquare = null;
-        renderHud();
-        renderBoard();
+        startGame('ferman');
       }
     });
+  });
+}
 
-    // Dock: delegasyon
-    dockContainer.addEventListener('click', (e) => {
-      const btn = e.target.closest('.dock-card');
-      if (!btn || btn.disabled) return;
-      const idx = parseInt(btn.dataset.dockIdx, 10);
-      if (isNaN(idx)) return;
-      if (!state.dock[idx]) return;
-      state.selectedDockIndex = idx;
-      sound.playSelect();
-      renderHud();
-      renderDock();
-      renderBoard();
-    });
+function renderProfile() {
+  const el = document.getElementById('profileScreen');
+  if (!el || state.screen !== 'profile') return;
+  const p = state.profile;
+  const rank = getCurrentRank(p.totalKings);
+  const next = getNextRank(p.totalKings);
+  const progress = getRankProgress(p.totalKings);
 
-    document.getElementById('undoBtn').addEventListener('click', undoMove);
-    document.getElementById('resetBtn').addEventListener('click', retryLevel);
-    document.getElementById('hintBtn').addEventListener('click', useHint);
-    document.getElementById('rerollBtn').addEventListener('click', rerollDock);
-    document.getElementById('newLevelBtn').addEventListener('click', () => {
-      if (state.isDaily) exitDaily();
-      loadLevel(state.levelIndex, true);
-    });
-    document.getElementById('dailyBtn').addEventListener('click', loadDailyChallenge);
-    document.getElementById('exitDailyBtn').addEventListener('click', exitDaily);
+  el.innerHTML = `
+    <div class="rounded-2xl bg-[#171a21] border border-white/10 p-4 flex flex-col items-center gap-2 slide-up">
+      <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500/30 to-red-500/20 border-2 border-amber-400/40 flex items-center justify-center text-4xl" style="box-shadow: 0 6px 20px rgba(245,158,11,0.25);">
+        ${rank.glyph}
+      </div>
+      <div class="text-center">
+        <div class="text-base font-black text-white">${escapeHtml(p.name)}</div>
+        <div class="text-xs text-amber-300 font-bold">${rank.glyph} ${rank.name}</div>
+      </div>
+      <button id="changeNameBtn" class="mt-1 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-bold text-gray-300 flex items-center gap-1.5">
+        ✏️ İsim Değiştir (1♔)
+      </button>
+    </div>
 
-    document.getElementById('soundBtn').addEventListener('click', (e) => {
-      sound.muted = !sound.muted;
-      e.currentTarget.textContent = sound.muted ? '🔇' : '🔊';
-      if (!sound.muted) sound.playSelect();
-    });
+    <div class="rounded-2xl bg-[#171a21] border border-white/10 p-4">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-bold text-gray-300">İlerleme</span>
+        <span class="text-xs font-bold text-amber-300">${next ? `${next.glyph} ${next.name}` : 'Maksimum'}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: ${progress}%;"></div>
+      </div>
+      <div class="text-[10px] text-gray-500 mt-1.5">Sonraki rütbeye ilerleme</div>
+    </div>
 
-    const rulesModal = document.getElementById('rulesModal');
-    document.getElementById('rulesBtn').addEventListener('click', () => rulesModal.classList.remove('hidden'));
-    document.getElementById('closeRulesBtn').addEventListener('click', () => rulesModal.classList.add('hidden'));
-    document.getElementById('gotItBtn').addEventListener('click', () => rulesModal.classList.add('hidden'));
-    rulesModal.addEventListener('click', (e) => {
-      if (e.target === rulesModal) rulesModal.classList.add('hidden');
-    });
+    <div class="grid grid-cols-2 gap-2">
+      <div class="rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
+        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Vurulan Şah</span>
+        <span class="text-lg font-black text-red-300 mt-0.5">${p.totalKings}</span>
+      </div>
+      <div class="rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
+        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Bakiye</span>
+        <span class="text-lg font-black text-amber-300 mt-0.5">${p.balance} ♔</span>
+      </div>
+      <div class="rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
+        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Kazanma Serisi</span>
+        <span class="text-lg font-black text-orange-300 mt-0.5">${p.winStreak}🔥</span>
+      </div>
+      <div class="rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
+        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">En Yüksek Combo</span>
+        <span class="text-lg font-black text-sky-300 mt-0.5">${p.bestCombo}</span>
+      </div>
+      <div class="col-span-2 rounded-xl bg-[#171a21] border border-white/10 p-3 flex flex-col items-center">
+        <span class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">En Yüksek Seviye</span>
+        <span class="text-lg font-black text-purple-300 mt-0.5">${p.maxLevel}</span>
+      </div>
+    </div>
+  `;
 
-    // ============================================================
-    // BAŞLAT
-    // ============================================================
-    window.addEventListener('DOMContentLoaded', () => {
-      loadLevel(0, false);
+  document.getElementById('changeNameBtn').addEventListener('click', openNameModal);
+}
+
+function renderSettings() {
+  const el = document.getElementById('settingsScreen');
+  if (!el || state.screen !== 'settings') return;
+
+  el.innerHTML = `
+    <div class="rounded-2xl bg-[#171a21] border border-white/10 divide-y divide-white/5">
+      <button id="soundToggle" class="w-full p-3.5 flex items-center justify-between text-left">
+        <div class="flex items-center gap-3">
+          <span class="text-lg">🔊</span>
+          <span class="text-sm font-bold text-white">Ses</span>
+        </div>
+        <span id="soundStatus" class="text-xs font-bold ${sound.muted ? 'text-gray-500' : 'text-emerald-400'}">${sound.muted ? 'Kapalı' : 'Açık'}</span>
+      </button>
+
+      <button id="rulesToggle" class="w-full p-3.5 flex items-center justify-between text-left">
+        <div class="flex items-center gap-3">
+          <span class="text-lg">📖</span>
+          <span class="text-sm font-bold text-white">Nasıl Oynanır?</span>
+        </div>
+        <span class="text-gray-500 text-lg">›</span>
+      </button>
+
+      <button id="resetToggle" class="w-full p-3.5 flex items-center justify-between text-left">
+        <div class="flex items-center gap-3">
+          <span class="text-lg">🗑️</span>
+          <span class="text-sm font-bold text-rose-400">İlerlemeyi Sıfırla</span>
+        </div>
+      </button>
+    </div>
+
+    <div class="rounded-2xl bg-[#171a21] border border-white/10 p-4 text-center">
+      <div class="text-[11px] text-gray-400 leading-relaxed">
+        <div class="font-bold text-white mb-1">Şahları da Vururlar</div>
+        <div>Versiyon 2.0</div>
+        <div class="mt-2 text-gray-500">Bir bulmaca oyunu</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('soundToggle').addEventListener('click', () => {
+    sound.muted = !sound.muted;
+    if (!sound.muted) sound.select();
+    renderSettings();
+  });
+
+  document.getElementById('rulesToggle').addEventListener('click', () => {
+    document.getElementById('rulesOverlay').classList.remove('hidden');
+  });
+
+  document.getElementById('resetToggle').addEventListener('click', () => {
+    showModal({
+      icon: '⚠️',
+      title: 'İlerlemeyi Sıfırla',
+      desc: 'Tüm rank, bakiye ve istatistikler silinir. Emin misin?',
+      primaryText: 'Evet, Sil',
+      onPrimary: () => {
+        localStorage.removeItem(PROFILE_KEY);
+        location.reload();
+      },
+      secondaryText: 'Vazgeç'
     });
-  </script>
+  });
+}
+
+function updateTabBar() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    const tab = btn.dataset.tab;
+    if (tab === state.screen) {
+      btn.classList.add('active');
+      btn.classList.remove('text-gray-400');
+    } else {
+      btn.classList.remove('active');
+      btn.classList.add('text-gray-400');
+    }
+  });
+}
+
+// ============================================================
+// 🎮 GAME RENDER
+// ============================================================
+function renderGame() {
+  if (state.screen !== 'game' || !state.levelData) return;
+
+  const lvl = state.levelData;
+  const remKings = countKings(state.board);
+
+  document.getElementById('gameTitle').textContent =
+    state.gameMode === 'ferman' ? `📜 Ferman` :
+    state.gameMode === 'tutorial' ? 'Eğitim' :
+    `Seviye ${lvl.levelNum}`;
+  document.getElementById('gameSubtitle').textContent = `${remKings} şah kaldı`;
+  document.getElementById('gameBalance').textContent = state.profile.balance;
+
+  document.getElementById('undoBtn').disabled = state.history.length === 0 || state.levelCleared;
+  document.getElementById('hintBtn').disabled = state.levelCleared || state.profile.balance < 1;
+  document.getElementById('retryBtn').disabled = state.levelCleared;
+
+  renderBoard();
+  renderDock();
+}
+
+function renderBoard() {
+  const grid = document.getElementById('boardGrid');
+  grid.innerHTML = '';
+
+  const selectedType = state.selectedDockIndex !== null ? state.dock[state.selectedDockIndex] : null;
+
+  let activeAttack = { targets: [], paths: [] };
+  if (selectedType && state.hoverSquare &&
+      state.board[state.hoverSquare.r][state.hoverSquare.c] === null &&
+      !state.levelCleared) {
+    activeAttack = computeAttack(state.board, selectedType, state.hoverSquare.r, state.hoverSquare.c);
+  }
+
+  const pathSet = new Set(activeAttack.paths.map(p => `${p.r},${p.c}`));
+  const targetMap = new Map(activeAttack.targets.map(t => [`${t.r},${t.c}`, t.kind]));
+  const hintKey = state.hintMove ? `${state.hintMove.r},${state.hintMove.c}` : null;
+
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const isLight = (r + c) % 2 === 0;
+      const key = `${r},${c}`;
+      const cell = state.board[r][c];
+      const isEmpty = cell === null;
+
+      const sq = document.createElement('button');
+      sq.type = 'button';
+      sq.dataset.r = r;
+      sq.dataset.c = c;
+      sq.className = `board-square ${isLight ? 'sq-light' : 'sq-dark'}`;
+
+      if (state.flashingSquares.has(key)) sq.classList.add('square-hit-flash');
+      if (hintKey === key) sq.classList.add('preview-hint');
+
+      if (state.hoverSquare && state.hoverSquare.r === r && state.hoverSquare.c === c && isEmpty && selectedType) {
+        sq.classList.add('preview-hover-empty');
+      } else if (targetMap.has(key)) {
+        const tKind = targetMap.get(key);
+        sq.classList.add(tKind === 'KING' ? 'preview-king-target' : 'preview-target');
+      } else if (pathSet.has(key)) {
+        sq.classList.add('preview-path');
+      }
+
+      if (cell) {
+        const token = document.createElement('div');
+        token.className = 'w-[80%] h-[80%] rounded-lg flex flex-col items-center justify-center relative pointer-events-none';
+        if (cell.kind === 'KING') {
+          token.classList.add('badge-king-enemy', 'king-target-badge');
+          token.innerHTML = `<span class="piece-glyph text-2xl sm:text-3xl">♚</span>`;
+        } else if (cell.kind === 'PAWN') {
+          token.classList.add('badge-pawn');
+          token.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">♟</span>`;
+        } else if (cell.kind === 'FRIENDLY') {
+          const def = PIECE_DEFS[cell.pieceType] || PIECE_DEFS.ROOK;
+          if (cell.pieceType === 'SHADOW_KING') {
+            token.classList.add('badge-king-ally');
+          } else {
+            token.classList.add('badge-friendly');
+          }
+          if (cell.justPlaced) { token.classList.add('smash-enter'); cell.justPlaced = false; }
+          token.innerHTML = `<span class="piece-glyph text-xl sm:text-2xl">${def.glyph}</span>`;
+        }
+        sq.appendChild(token);
+      } else if (hintKey === key && state.hintMove) {
+        const def = PIECE_DEFS[state.hintMove.pieceType];
+        const ghost = document.createElement('span');
+        ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-90 text-amber-200 pointer-events-none';
+        ghost.textContent = def.glyph;
+        sq.appendChild(ghost);
+      } else if (state.hoverSquare && state.hoverSquare.r === r &&
+                 state.hoverSquare.c === c && selectedType && !state.levelCleared) {
+        const def = PIECE_DEFS[selectedType];
+        const ghost = document.createElement('span');
+        ghost.className = 'piece-glyph text-2xl sm:text-3xl opacity-60 text-amber-300 pointer-events-none';
+        ghost.textContent = def.glyph;
+        sq.appendChild(ghost);
+      }
+
+      grid.appendChild(sq);
+    }
+  }
+  state.flashingSquares.clear();
+}
+
+function renderDock() {
+  const el = document.getElementById('dockContainer');
+  el.innerHTML = '';
+  state.dock.forEach((pieceType, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.dataset.dockIdx = idx;
+
+    if (!pieceType) {
+      btn.disabled = true;
+      btn.className = 'dock-card rounded-xl py-2 px-1 flex flex-col items-center justify-center opacity-25 cursor-not-allowed min-h-[72px]';
+      btn.innerHTML = `<span class="text-[10px] font-bold text-gray-500">KULLANILDI</span>`;
+      el.appendChild(btn);
+      return;
+    }
+
+    const def = PIECE_DEFS[pieceType];
+    const isSelected = state.selectedDockIndex === idx;
+    const isShadow = pieceType === 'SHADOW_KING';
+
+    btn.className = `dock-card rounded-xl py-2 px-1 flex flex-col items-center justify-center cursor-pointer min-h-[72px] ${isSelected ? 'selected' : ''}`;
+    btn.innerHTML = `
+      <span class="piece-glyph text-2xl sm:text-3xl ${isShadow ? 'text-purple-300' : isSelected ? 'text-amber-300' : 'text-white'}">${def.glyph}</span>
+      <span class="mt-0.5 text-[10px] font-extrabold ${isSelected ? 'text-amber-300' : 'text-gray-200'}">${def.name}</span>
+    `;
+    el.appendChild(btn);
+  });
+}
+
+// ============================================================
+// 🎯 EVENT HANDLERS
+// ============================================================
+const grid = document.getElementById('boardGrid');
+const dockContainer = document.getElementById('dockContainer');
+
+grid.addEventListener('click', (e) => {
+  const btn = e.target.closest('.board-square');
+  if (!btn) return;
+  const r = parseInt(btn.dataset.r, 10);
+  const c = parseInt(btn.dataset.c, 10);
+  if (isNaN(r) || isNaN(c)) return;
+  if (state.levelCleared) return;
+  if (state.selectedDockIndex === null) return;
+  const pType = state.dock[state.selectedDockIndex];
+  if (!pType) return;
+  if (state.board[r][c] !== null) return;
+  placeAndSmash(r, c);
+});
+
+grid.addEventListener('pointerover', (e) => {
+  if (e.pointerType !== 'mouse') return;
+  const btn = e.target.closest('.board-square');
+  if (!btn) return;
+  const r = parseInt(btn.dataset.r, 10);
+  const c = parseInt(btn.dataset.c, 10);
+  if (isNaN(r) || isNaN(c)) return;
+  if (state.hoverSquare && state.hoverSquare.r === r && state.hoverSquare.c === c) return;
+  state.hoverSquare = { r, c };
+  renderBoard();
+});
+
+grid.addEventListener('pointerleave', () => {
+  if (state.hoverSquare !== null) {
+    state.hoverSquare = null;
+    renderBoard();
+  }
+});
+
+dockContainer.addEventListener('click', (e) => {
+  const btn = e.target.closest('.dock-card');
+  if (!btn || btn.disabled) return;
+  const idx = parseInt(btn.dataset.dockIdx, 10);
+  if (isNaN(idx) || !state.dock[idx]) return;
+  state.selectedDockIndex = idx;
+  sound.select();
+  renderBoard();
+  renderDock();
+});
+
+document.getElementById('undoBtn').addEventListener('click', undoMove);
+document.getElementById('retryBtn').addEventListener('click', retryLevel);
+document.getElementById('hintBtn').addEventListener('click', useHint);
+document.getElementById('backBtn').addEventListener('click', () => exitGame());
+
+// Sekme geçişleri
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.screen = btn.dataset.tab;
+    document.getElementById('homeScreen').classList.toggle('hidden', state.screen !== 'home');
+    document.getElementById('homeScreen').classList.toggle('flex', state.screen === 'home');
+    document.getElementById('profileScreen').classList.toggle('hidden', state.screen !== 'profile');
+    document.getElementById('profileScreen').classList.toggle('flex', state.screen === 'profile');
+    document.getElementById('settingsScreen').classList.toggle('hidden', state.screen !== 'settings');
+    document.getElementById('settingsScreen').classList.toggle('flex', state.screen === 'settings');
+    renderAll();
+  });
+});
+
+// İsim değiştirme
+function openNameModal() {
+  if (state.profile.balance < 1) {
+    toast('Yeterli şah puanın yok.', 'text-rose-300');
+    return;
+  }
+  const input = document.getElementById('nameInput');
+  input.value = state.profile.name;
+  document.getElementById('nameOverlay').classList.remove('hidden');
+  setTimeout(() => input.focus(), 50);
+}
+document.getElementById('nameCancelBtn').addEventListener('click', () => {
+  document.getElementById('nameOverlay').classList.add('hidden');
+});
+document.getElementById('nameConfirmBtn').addEventListener('click', () => {
+  const val = document.getElementById('nameInput').value.trim();
+  if (!val) { toast('İsim boş olamaz.', 'text-rose-300'); return; }
+  if (state.profile.balance < 1) { toast('Yeterli bakiyen yok.', 'text-rose-300'); return; }
+  state.profile.balance -= 1;
+  state.profile.name = val.substring(0, 20);
+  saveProfile();
+  document.getElementById('nameOverlay').classList.add('hidden');
+  toast('İsmin değiştirildi ✓', 'text-emerald-300');
+  renderAll();
+});
+
+// Kurallar modal
+document.getElementById('rulesCloseBtn').addEventListener('click', () => {
+  document.getElementById('rulesOverlay').classList.add('hidden');
+});
+document.getElementById('rulesOkBtn').addEventListener('click', () => {
+  document.getElementById('rulesOverlay').classList.add('hidden');
+});
+
+// ============================================================
+// 🎉 YARDIMCILAR
+// ============================================================
+function spawnPopup(r, c, text, colorClass) {
+  const grid = document.getElementById('boardGrid');
+  const sqEl = grid.children[r * 8 + c];
+  if (!sqEl) return;
+  const rect = sqEl.getBoundingClientRect();
+  const popup = document.createElement('div');
+  popup.className = `floating-popup-fixed ${colorClass}`;
+  popup.style.left = `${rect.left + rect.width / 2}px`;
+  popup.style.top = `${rect.top + rect.height / 2}px`;
+  popup.textContent = text;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 750);
+}
+
+function toast(text, colorClass = 'text-amber-300') {
+  const t = document.createElement('div');
+  t.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[120] px-4 py-2 rounded-xl bg-[#1a1e27] border border-white/15 font-bold text-sm shadow-2xl ${colorClass}`;
+  t.style.maxWidth = '90vw';
+  t.textContent = text;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ============================================================
+// 🚀 BAŞLAT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  loadProfile();
+  state.screen = 'home';
+
+  // İlk açılış → eğitim
+  if (!state.profile.tutorialDone) {
+    setTimeout(() => {
+      startGame('tutorial');
+    }, 200);
+  } else {
+    renderAll();
+  }
+});
+</script>
 </body>
 </html>
